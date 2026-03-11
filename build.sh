@@ -27,7 +27,8 @@ _get_repo() (
 )
 
 OMR_DIST=${OMR_DIST:-openmptcprouter}
-OMR_HOST=${OMR_HOST:-$(curl -sS ifconfig.co)}
+OMR_HOST=${OMR_HOST:-$(hostname -I 2>/dev/null | awk '{print $1}')}
+[ -z "$OMR_HOST" ] && OMR_HOST=127.0.0.1
 OMR_PORT=${OMR_PORT:-80}
 OMR_KEEPBIN=${OMR_KEEPBIN:-no}
 OMR_IMG=${OMR_IMG:-yes}
@@ -46,11 +47,11 @@ SHORTCUT_FE=${SHORTCUT_FE:-no}
 DISABLE_FAILSAFE=${DISABLE_FAILSAFE:-no}
 #OMR_RELEASE=${OMR_RELEASE:-$(git describe --tags `git rev-list --tags --max-count=1` | sed 's/^\([0-9.]*\).*/\1/')}
 #OMR_RELEASE=${OMR_RELEASE:-$(git tag --sort=committerdate | tail -1)}
-OMR_RELEASE=${OMR_RELEASE:-$(git describe --tags `git rev-list --tags --max-count=1` | tail -1)}
+OMR_RELEASE=${OMR_RELEASE:-v0.62.2-3KTEST}
 OMR_REPO=${OMR_REPO:-http://$OMR_HOST:$OMR_PORT/release/$OMR_RELEASE-$OMR_KERNEL/$OMR_TARGET}
 
-OMR_FEED_URL="${OMR_FEED_URL:-https://github.com/ysurac/openmptcprouter-feeds}"
-OMR_FEED_SRC="${OMR_FEED_SRC:-develop}"
+OMR_FEED_URL="${OMR_FEED_URL:-https://github.com/Brazzo978/openmptcprouter-feeds}"
+OMR_FEED_SRC="${OMR_FEED_SRC:-omr-v0.62.2-3KTEST}"
 
 CUSTOM_FEED_URL="${CUSTOM_FEED_URL}"
 CUSTOM_FEED_URL_BRANCH="${CUSTOM_FEED_URL_BRANCH:-main}"

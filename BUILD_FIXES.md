@@ -1,0 +1,2 @@
+- Disabled `llvm.download-ci-llvm` in `feeds/openmptcprouter/rust/Makefile` because Rust 1.85.0 host bootstrap was failing with `404` on `ci-artifacts.rust-lang.org`; this forces local LLVM build instead of fetching expired CI artifacts.
+- Forced `shadowsocks-rust` to build with `cargo install --locked` in `feeds/openmptcprouter/shadowsocks-rust/Makefile` because Cargo was refreshing the index and selecting newer crates (`time 0.3.47`) that require Rust 1.88.0, while this tree builds Rust 1.85.0.

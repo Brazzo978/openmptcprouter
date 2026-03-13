@@ -126,6 +126,19 @@ This file is the single consolidated log for the current `v0.62` 3KTEST client t
   - `feeds/openmptcprouter/luci-app-firewall/htdocs/luci-static/resources/view/firewall/forwards.js`
   - `feeds/openmptcprouter/openmptcprouter/files/etc/init.d/openmptcprouter-vps`
 
+11. Fix: prevent UDP XRay redirect leakage with PF-only force mode (planned for `0.62.5-3K`)
+- Problem:
+  - when `force_xray_pf=1` was active and UDP override had previously been set to `xray`,
+    `xray.main_transparent_proxy.redirect_udp` could remain enabled after returning to `auto`.
+- Fix:
+  - explicitly set `xray.main_transparent_proxy.redirect_udp='0'` when in PF-only forced XRay mode
+    and in non-force/legacy paths for non-Ray default proxies.
+- Result:
+  - PF can still use forced XRay backend, but UDP traffic no longer stays forced to XRay unless
+    `traffic_udp_path=xray` is explicitly selected.
+- File:
+  - `feeds/openmptcprouter/openmptcprouter/files/etc/init.d/openmptcprouter-vps`
+
 ## Live validation done
 
 - On live client `5.182.48.31`:

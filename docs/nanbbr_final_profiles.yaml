@@ -1,944 +1,667 @@
 metadata:
-  project: nanbbr1/nanbbr2/nanbbr3 for OpenMPTCProuter kernel 6.6
-  fixed_point: BBR_SCALE=8, BBR_UNIT=1<<8=256
-  integer_policy: Linux-kernel style integer arithmetic/flooring, except startup high gain keeps the common +1 bias.
-  design_goal: 'Throughput-dominant Nan-style behavior for 4G/5G/Starlink/FWA: squeeze lossy/high-latency links, but slow
-    down on sustained congestion/loss/ECN.'
-  fairness_goal: Fairness with competing CUBIC/Reno/BBR flows is deliberately low priority; self-preservation and link usability
-    are high priority.
-recommended_defaults:
-  nanbbr3: balanced_edge
-  nanbbr2: balanced_edge, slightly calmer than nanbbr3 because BBR2 porting/rebase is riskier
-  nanbbr1: balanced_edge only as BBRv1/Nanqinlang-style fallback; nanbbr3 should be primary
-nanbbr3:
-  recommendation: balanced_edge
-  profiles:
-    conservative:
-      startup_pacing_gain:
-        target_float: 2.8515625
-        c_expr: BBR_UNIT * 285 / 100 + 1
-        integer_value: 730
-        actual_float: 2.8515625
-      startup_cwnd_gain:
-        target_float: 2.25
-        c_expr: BBR_UNIT * 225 / 100
-        integer_value: 576
-        actual_float: 2.25
-      drain_gain:
-        target_float: 0.34765625
-        c_expr: BBR_UNIT * 100 / 285
-        integer_value: 89
-        actual_float: 0.34765625
-        note: reciprocal-style drain of startup pacing gain; floors slightly lower, so it drains a bit harder
-      probe_bw_pacing_gain:
-        up:
-          target_float: 1.34765625
-          c_expr: BBR_UNIT * 135 / 100
-          integer_value: 345
-          actual_float: 1.34765625
-        down:
-          target_float: 0.796875
-          c_expr: BBR_UNIT * 80 / 100
-          integer_value: 204
-          actual_float: 0.796875
-        cruise:
-          target_float: 1.0
-          c_expr: BBR_UNIT
-          integer_value: 256
-          actual_float: 1.0
-        refill:
-          target_float: 1.09765625
-          c_expr: BBR_UNIT * 110 / 100
-          integer_value: 281
-          actual_float: 1.09765625
-      probe_bw_average_gain:
-        integer_average: 271.5
-        actual_float: 1.060546875
-        effective_with_1pct_pacing_margin: 1.049941406
-      inflight_headroom:
-        target_float: 0.19921875
+  project: nanbbr 9 congestion-control profiles for OpenMPTCProuter Linux 6.6
+  date: '2026-05-26'
+  fixed_point: BBR_UNIT = 1 << 8 = 256
+  runtime_names:
+  - nanbbr1_light
+  - nanbbr1_def
+  - nanbbr1_aggr
+  - nanbbr2_light
+  - nanbbr2_def
+  - nanbbr2_aggr
+  - nanbbr3_light
+  - nanbbr3_def
+  - nanbbr3_aggr
+  goal: Throughput-first Nan-style behavior for lossy/high-latency 4G/5G/Starlink/FWA, with guarded slowdown on queue collapse
+    or severe loss.
+  default_recommendation: Use *_def as the normal mobile/edge profile. Use *_light for cleaner Starlink/FWA or latency-sensitive
+    cases. Use *_aggr for dirty LTE/5G where high loss is normal but delivery rate remains alive.
+  important_names_length_note: All names are <= 15 chars, safe for Linux TCP_CA_NAME_MAX=16 including NUL.
+common_logic_for_nanbbr2_nanbbr3:
+  dynamic_loss_gate:
+    rule: trigger = panic_loss || hard_loss || (soft_loss && (rtt_bad || bw_bad))
+    rtt_bad: sample_rtt_us >= min_rtt_us * rtt_inflation_trigger / BBR_UNIT
+    bw_bad: bw_latest <= bw_reference * bw_drop_trigger / BBR_UNIT
+    note: Do not feed soft_loss into the original BBR2/3 loss gate as an unconditional threshold. Soft loss is conditional;
+      hard/panic are unconditional.
+  static_fallback_if_dynamic_gate_is_not_implemented:
+    light: BBR_UNIT * 8 / 100  /* 20, 7.8125% */
+    def: BBR_UNIT * 12 / 100 /* 30, 11.71875% */
+    aggr: BBR_UNIT * 16 / 100 /* 40, 15.625% */
+    note: Fallback is less smart than the dynamic gate. Prefer the dynamic gate on LTE/5G.
+  ecn:
+    recommendation: Keep base BBRv2/BBRv3 ECN behavior initially.
+    reason: The profiles already increase loss tolerance; making ECN more permissive at the same time makes debugging impossible.
+  beta_semantics_warning: 'Check the actual local BBR2/3 code: some versions store beta as cut_fraction, others use keep_factor.
+    Values below are beta_cut percentages.'
+profiles:
+  nanbbr1_light:
+    runtime_name: nanbbr1_light
+    base: BBRv1 / Nanqinlang-style
+    high_gain:
+      c_expr: BBR_UNIT * 275 / 100 + 1
+      integer: 705
+      actual_gain: 2.75390625
+    drain_gain:
+      c_expr: BBR_UNIT * 100 / 275
+      integer: 93
+      actual_gain: 0.36328125
+    cwnd_gain:
+      c_expr: BBR_UNIT * 200 / 100
+      integer: 512
+      actual_gain: 2.0
+    pacing_gain_cycle_8:
+    - c_expr: BBR_UNIT * 130 / 100
+      integer: 332
+      actual_gain: 1.296875
+    - c_expr: BBR_UNIT * 72 / 100
+      integer: 184
+      actual_gain: 0.71875
+    - c_expr: BBR_UNIT * 100 / 100
+      integer: 256
+      actual_gain: 1.0
+    - c_expr: BBR_UNIT * 100 / 100
+      integer: 256
+      actual_gain: 1.0
+    - c_expr: BBR_UNIT * 100 / 100
+      integer: 256
+      actual_gain: 1.0
+    - c_expr: BBR_UNIT * 112 / 100
+      integer: 286
+      actual_gain: 1.1171875
+    - c_expr: BBR_UNIT * 112 / 100
+      integer: 286
+      actual_gain: 1.1171875
+    - c_expr: BBR_UNIT * 112 / 100
+      integer: 286
+      actual_gain: 1.1171875
+    probe_bw_mean: 1.045898438
+    probe_bw_mean_after_1pct_margin: 1.035439453
+    lt_loss_thresh:
+      c_expr: BBR_UNIT * 8 / 100
+      integer: 20
+      actual_percent: 7.8125
+      actual_fraction: 0.078125
+    probe_rtt_mode_ms: 220
+    note: BBRv1 has weaker modern loss/ECN/inflight protection than BBR2/3. Treat nanbbr1_* as fallback/benchmark, not the
+      primary mobile-loss profile.
+  nanbbr1_def:
+    runtime_name: nanbbr1_def
+    base: BBRv1 / Nanqinlang-style
+    high_gain:
+      c_expr: BBR_UNIT * 285 / 100 + 1
+      integer: 730
+      actual_gain: 2.8515625
+    drain_gain:
+      c_expr: BBR_UNIT * 100 / 285
+      integer: 89
+      actual_gain: 0.34765625
+    cwnd_gain:
+      c_expr: BBR_UNIT * 200 / 100
+      integer: 512
+      actual_gain: 2.0
+    pacing_gain_cycle_8:
+    - c_expr: BBR_UNIT * 138 / 100
+      integer: 353
+      actual_gain: 1.37890625
+    - c_expr: BBR_UNIT * 72 / 100
+      integer: 184
+      actual_gain: 0.71875
+    - c_expr: BBR_UNIT * 105 / 100
+      integer: 268
+      actual_gain: 1.046875
+    - c_expr: BBR_UNIT * 105 / 100
+      integer: 268
+      actual_gain: 1.046875
+    - c_expr: BBR_UNIT * 105 / 100
+      integer: 268
+      actual_gain: 1.046875
+    - c_expr: BBR_UNIT * 120 / 100
+      integer: 307
+      actual_gain: 1.19921875
+    - c_expr: BBR_UNIT * 120 / 100
+      integer: 307
+      actual_gain: 1.19921875
+    - c_expr: BBR_UNIT * 120 / 100
+      integer: 307
+      actual_gain: 1.19921875
+    probe_bw_mean: 1.104492188
+    probe_bw_mean_after_1pct_margin: 1.093447266
+    lt_loss_thresh:
+      c_expr: BBR_UNIT * 12 / 100
+      integer: 30
+      actual_percent: 11.71875
+      actual_fraction: 0.1171875
+    probe_rtt_mode_ms: 200
+    note: BBRv1 has weaker modern loss/ECN/inflight protection than BBR2/3. Treat nanbbr1_* as fallback/benchmark, not the
+      primary mobile-loss profile.
+  nanbbr1_aggr:
+    runtime_name: nanbbr1_aggr
+    base: BBRv1 / Nanqinlang-style
+    high_gain:
+      c_expr: BBR_UNIT * 295 / 100 + 1
+      integer: 756
+      actual_gain: 2.953125
+    drain_gain:
+      c_expr: BBR_UNIT * 100 / 295
+      integer: 86
+      actual_gain: 0.3359375
+    cwnd_gain:
+      c_expr: BBR_UNIT * 200 / 100
+      integer: 512
+      actual_gain: 2.0
+    pacing_gain_cycle_8:
+    - c_expr: BBR_UNIT * 145 / 100
+      integer: 371
+      actual_gain: 1.44921875
+    - c_expr: BBR_UNIT * 70 / 100
+      integer: 179
+      actual_gain: 0.69921875
+    - c_expr: BBR_UNIT * 110 / 100
+      integer: 281
+      actual_gain: 1.09765625
+    - c_expr: BBR_UNIT * 110 / 100
+      integer: 281
+      actual_gain: 1.09765625
+    - c_expr: BBR_UNIT * 110 / 100
+      integer: 281
+      actual_gain: 1.09765625
+    - c_expr: BBR_UNIT * 130 / 100
+      integer: 332
+      actual_gain: 1.296875
+    - c_expr: BBR_UNIT * 130 / 100
+      integer: 332
+      actual_gain: 1.296875
+    - c_expr: BBR_UNIT * 130 / 100
+      integer: 332
+      actual_gain: 1.296875
+    probe_bw_mean: 1.166503906
+    probe_bw_mean_after_1pct_margin: 1.154838867
+    lt_loss_thresh:
+      c_expr: BBR_UNIT * 16 / 100
+      integer: 40
+      actual_percent: 15.625
+      actual_fraction: 0.15625
+    probe_rtt_mode_ms: 170
+    note: BBRv1 has weaker modern loss/ECN/inflight protection than BBR2/3. Treat nanbbr1_* as fallback/benchmark, not the
+      primary mobile-loss profile.
+  nanbbr2_light:
+    runtime_name: nanbbr2_light
+    base: BBRv2-style
+    startup_pacing_gain:
+      c_expr: BBR_UNIT * 275 / 100 + 1
+      integer: 705
+      actual_gain: 2.75390625
+    startup_cwnd_gain:
+      c_expr: BBR_UNIT * 210 / 100
+      integer: 537
+      actual_gain: 2.09765625
+    drain_gain:
+      c_expr: BBR_UNIT * 100 / 275
+      integer: 93
+      actual_gain: 0.36328125
+    pacing_gain:
+      up:
+        c_expr: BBR_UNIT * 128 / 100
+        integer: 327
+        actual_gain: 1.27734375
+      down:
+        c_expr: BBR_UNIT * 72 / 100
+        integer: 184
+        actual_gain: 0.71875
+      cruise:
+        c_expr: BBR_UNIT * 100 / 100
+        integer: 256
+        actual_gain: 1.0
+      refill:
+        c_expr: BBR_UNIT * 106 / 100
+        integer: 271
+        actual_gain: 1.05859375
+    probe_bw_mean: 1.013671875
+    probe_bw_mean_after_1pct_margin: 1.003535156
+    inflight_headroom:
+      c_expr: BBR_UNIT * 30 / 100
+      integer: 76
+      actual_percent: 29.6875
+      actual_fraction: 0.296875
+    loss_gate:
+      soft:
+        c_expr: BBR_UNIT * 6 / 100
+        integer: 15
+        actual_percent: 5.859375
+        actual_fraction: 0.05859375
+      hard:
+        c_expr: BBR_UNIT * 12 / 100
+        integer: 30
+        actual_percent: 11.71875
+        actual_fraction: 0.1171875
+      panic:
         c_expr: BBR_UNIT * 20 / 100
-        integer_value: 51
-        actual_float: 0.19921875
-      loss_thresh:
-        target_float: 0.01953125
-        c_expr: BBR_UNIT * 2 / 100
-        integer_value: 5
-        actual_float: 0.01953125
-        note: sustained per-round loss above this should trigger BBR2/3 safety logic
-      kernel_beta_cut:
-        target_float: 0.34765625
-        c_expr: BBR_UNIT * 35 / 100
-        integer_value: 89
-        actual_float: 0.34765625
-        note: kernel-style cut fraction; if code computes keep factor as BBR_UNIT - beta, keep factor is shown below
-      derived_keep_factor_if_kernel_uses_unit_minus_beta:
-        integer_value: 167
-        actual_float: 0.65234375
-      ecn_factor:
-        target_float: 0.3333333333333333
-        c_expr: BBR_UNIT * 1 / 3
-        integer_value: 85
-        actual_float: 0.33203125
-        note: leave BBRv3/base behavior initially
-      ecn_thresh:
-        target_float: 0.5
-        c_expr: BBR_UNIT * 1 / 2
-        integer_value: 128
-        actual_float: 0.5
-        note: leave base behavior initially
-      ecn_reprobe_gain:
-        target_float: 0.5
-        c_expr: BBR_UNIT * 1 / 2
-        integer_value: 128
-        actual_float: 0.5
-        note: leave base behavior initially
-      full_loss_cnt:
-        c_expr: '4'
-        value: 4
-        note: startup exits earlier under repeated loss when lower
-      full_ecn_cnt:
-        c_expr: '2'
-        value: 2
-        note: leave base unless testing shows ECN-specific issue
-      bw_probe_cwnd_gain:
-        c_expr: '1'
-        value: 1
-        note: do not increase in the first patch
-      do_not_touch_initially:
-      - probe_rtt_win_ms
-      - probe_rtt_cwnd_gain
-      - bw_probe_max_rounds
-      - bw_probe_rand_rounds
-      - bw_probe_base_us
-      - bw_probe_rand_us
-      - ecn_alpha_gain
-      - ecn_alpha_init
-      - TSO/GSO send quantum logic
-    balanced_edge:
-      startup_pacing_gain:
-        target_float: 2.953125
-        c_expr: BBR_UNIT * 295 / 100 + 1
-        integer_value: 756
-        actual_float: 2.953125
-      startup_cwnd_gain:
-        target_float: 2.5
-        c_expr: BBR_UNIT * 250 / 100
-        integer_value: 640
-        actual_float: 2.5
-      drain_gain:
-        target_float: 0.3359375
-        c_expr: BBR_UNIT * 100 / 295
-        integer_value: 86
-        actual_float: 0.3359375
-        note: reciprocal-style drain of startup pacing gain; floors slightly lower, so it drains a bit harder
-      probe_bw_pacing_gain:
-        up:
-          target_float: 1.44921875
-          c_expr: BBR_UNIT * 145 / 100
-          integer_value: 371
-          actual_float: 1.44921875
-        down:
-          target_float: 0.75
-          c_expr: BBR_UNIT * 3 / 4
-          integer_value: 192
-          actual_float: 0.75
-        cruise:
-          target_float: 1.046875
-          c_expr: BBR_UNIT * 105 / 100
-          integer_value: 268
-          actual_float: 1.046875
-        refill:
-          target_float: 1.1484375
-          c_expr: BBR_UNIT * 115 / 100
-          integer_value: 294
-          actual_float: 1.1484375
-      probe_bw_average_gain:
-        integer_average: 281.25
-        actual_float: 1.098632812
-        effective_with_1pct_pacing_margin: 1.087646484
-      inflight_headroom:
-        target_float: 0.15625
-        c_expr: BBR_UNIT * 16 / 100
-        integer_value: 40
-        actual_float: 0.15625
-      loss_thresh:
-        target_float: 0.02734375
-        c_expr: BBR_UNIT * 3 / 100
-        integer_value: 7
-        actual_float: 0.02734375
-        note: sustained per-round loss above this should trigger BBR2/3 safety logic
-      kernel_beta_cut:
-        target_float: 0.296875
-        c_expr: BBR_UNIT * 30 / 100
-        integer_value: 76
-        actual_float: 0.296875
-        note: kernel-style cut fraction; if code computes keep factor as BBR_UNIT - beta, keep factor is shown below
-      derived_keep_factor_if_kernel_uses_unit_minus_beta:
-        integer_value: 180
-        actual_float: 0.703125
-      ecn_factor:
-        target_float: 0.3333333333333333
-        c_expr: BBR_UNIT * 1 / 3
-        integer_value: 85
-        actual_float: 0.33203125
-        note: leave BBRv3/base behavior initially
-      ecn_thresh:
-        target_float: 0.5
-        c_expr: BBR_UNIT * 1 / 2
-        integer_value: 128
-        actual_float: 0.5
-        note: leave base behavior initially
-      ecn_reprobe_gain:
-        target_float: 0.5
-        c_expr: BBR_UNIT * 1 / 2
-        integer_value: 128
-        actual_float: 0.5
-        note: leave base behavior initially
-      full_loss_cnt:
-        c_expr: '5'
-        value: 5
-        note: startup exits earlier under repeated loss when lower
-      full_ecn_cnt:
-        c_expr: '2'
-        value: 2
-        note: leave base unless testing shows ECN-specific issue
-      bw_probe_cwnd_gain:
-        c_expr: '1'
-        value: 1
-        note: do not increase in the first patch
-      do_not_touch_initially:
-      - probe_rtt_win_ms
-      - probe_rtt_cwnd_gain
-      - bw_probe_max_rounds
-      - bw_probe_rand_rounds
-      - bw_probe_base_us
-      - bw_probe_rand_us
-      - ecn_alpha_gain
-      - ecn_alpha_init
-      - TSO/GSO send quantum logic
-    aggressive_edge:
-      startup_pacing_gain:
-        target_float: 3.00390625
-        c_expr: BBR_UNIT * 3000 / 1000 + 1
-        integer_value: 769
-        actual_float: 3.00390625
-      startup_cwnd_gain:
-        target_float: 2.75
-        c_expr: BBR_UNIT * 275 / 100
-        integer_value: 704
-        actual_float: 2.75
-      drain_gain:
-        target_float: 0.33203125
-        c_expr: BBR_UNIT * 1000 / 3000
-        integer_value: 85
-        actual_float: 0.33203125
-        note: reciprocal-style drain of startup pacing gain; floors slightly lower, so it drains a bit harder
-      probe_bw_pacing_gain:
-        up:
-          target_float: 1.546875
-          c_expr: BBR_UNIT * 155 / 100
-          integer_value: 396
-          actual_float: 1.546875
-        down:
-          target_float: 0.71875
-          c_expr: BBR_UNIT * 72 / 100
-          integer_value: 184
-          actual_float: 0.71875
-        cruise:
-          target_float: 1.078125
-          c_expr: BBR_UNIT * 108 / 100
-          integer_value: 276
-          actual_float: 1.078125
-        refill:
-          target_float: 1.21875
-          c_expr: BBR_UNIT * 122 / 100
-          integer_value: 312
-          actual_float: 1.21875
-      probe_bw_average_gain:
-        integer_average: 292.0
-        actual_float: 1.140625
-        effective_with_1pct_pacing_margin: 1.12921875
-      inflight_headroom:
-        target_float: 0.13671875
-        c_expr: BBR_UNIT * 14 / 100
-        integer_value: 35
-        actual_float: 0.13671875
-      loss_thresh:
-        target_float: 0.0390625
-        c_expr: BBR_UNIT * 4 / 100
-        integer_value: 10
-        actual_float: 0.0390625
-        note: sustained per-round loss above this should trigger BBR2/3 safety logic
-      kernel_beta_cut:
-        target_float: 0.25
-        c_expr: BBR_UNIT * 25 / 100
-        integer_value: 64
-        actual_float: 0.25
-        note: kernel-style cut fraction; if code computes keep factor as BBR_UNIT - beta, keep factor is shown below
-      derived_keep_factor_if_kernel_uses_unit_minus_beta:
-        integer_value: 192
-        actual_float: 0.75
-      ecn_factor:
-        target_float: 0.3333333333333333
-        c_expr: BBR_UNIT * 1 / 3
-        integer_value: 85
-        actual_float: 0.33203125
-        note: leave BBRv3/base behavior initially
-      ecn_thresh:
-        target_float: 0.5
-        c_expr: BBR_UNIT * 1 / 2
-        integer_value: 128
-        actual_float: 0.5
-        note: leave base behavior initially
-      ecn_reprobe_gain:
-        target_float: 0.5
-        c_expr: BBR_UNIT * 1 / 2
-        integer_value: 128
-        actual_float: 0.5
-        note: leave base behavior initially
-      full_loss_cnt:
-        c_expr: '6'
-        value: 6
-        note: startup exits earlier under repeated loss when lower
-      full_ecn_cnt:
-        c_expr: '2'
-        value: 2
-        note: leave base unless testing shows ECN-specific issue
-      bw_probe_cwnd_gain:
-        c_expr: '1'
-        value: 1
-        note: do not increase in the first patch
-      do_not_touch_initially:
-      - probe_rtt_win_ms
-      - probe_rtt_cwnd_gain
-      - bw_probe_max_rounds
-      - bw_probe_rand_rounds
-      - bw_probe_base_us
-      - bw_probe_rand_us
-      - ecn_alpha_gain
-      - ecn_alpha_init
-      - TSO/GSO send quantum logic
-nanbbr2:
-  recommendation: balanced_edge
-  profiles:
-    conservative:
-      startup_pacing_gain:
-        target_float: 2.8515625
-        c_expr: BBR_UNIT * 285 / 100 + 1
-        integer_value: 730
-        actual_float: 2.8515625
-      startup_cwnd_gain:
-        target_float: 2.25
-        c_expr: BBR_UNIT * 225 / 100
-        integer_value: 576
-        actual_float: 2.25
-      drain_gain:
-        target_float: 0.34765625
-        c_expr: BBR_UNIT * 100 / 285
-        integer_value: 89
-        actual_float: 0.34765625
-        note: reciprocal-style drain of startup pacing gain; floors slightly lower, so it drains a bit harder
-      probe_bw_pacing_gain:
-        up:
-          target_float: 1.34765625
-          c_expr: BBR_UNIT * 135 / 100
-          integer_value: 345
-          actual_float: 1.34765625
-        down:
-          target_float: 0.796875
-          c_expr: BBR_UNIT * 80 / 100
-          integer_value: 204
-          actual_float: 0.796875
-        cruise:
-          target_float: 1.0
-          c_expr: BBR_UNIT
-          integer_value: 256
-          actual_float: 1.0
-        refill:
-          target_float: 1.09765625
-          c_expr: BBR_UNIT * 110 / 100
-          integer_value: 281
-          actual_float: 1.09765625
-      probe_bw_average_gain:
-        integer_average: 271.5
-        actual_float: 1.060546875
-        effective_with_1pct_pacing_margin: 1.049941406
-      inflight_headroom:
-        target_float: 0.19921875
-        c_expr: BBR_UNIT * 20 / 100
-        integer_value: 51
-        actual_float: 0.19921875
-      loss_thresh:
-        target_float: 0.01953125
-        c_expr: BBR_UNIT * 2 / 100
-        integer_value: 5
-        actual_float: 0.01953125
-        note: sustained per-round loss above this should trigger BBR2/3 safety logic
-      kernel_beta_cut:
-        target_float: 0.34765625
-        c_expr: BBR_UNIT * 35 / 100
-        integer_value: 89
-        actual_float: 0.34765625
-        note: kernel-style cut fraction; if code computes keep factor as BBR_UNIT - beta, keep factor is shown below
-      derived_keep_factor_if_kernel_uses_unit_minus_beta:
-        integer_value: 167
-        actual_float: 0.65234375
-      ecn_factor:
-        target_float: 0.3333333333333333
-        c_expr: BBR_UNIT * 1 / 3
-        integer_value: 85
-        actual_float: 0.33203125
-        note: leave BBRv3/base behavior initially
-      ecn_thresh:
-        target_float: 0.5
-        c_expr: BBR_UNIT * 1 / 2
-        integer_value: 128
-        actual_float: 0.5
-        note: leave base behavior initially
-      ecn_reprobe_gain:
-        target_float: 0.5
-        c_expr: BBR_UNIT * 1 / 2
-        integer_value: 128
-        actual_float: 0.5
-        note: leave base behavior initially
-      full_loss_cnt:
-        c_expr: '4'
-        value: 4
-        note: startup exits earlier under repeated loss when lower
-      full_ecn_cnt:
-        c_expr: '2'
-        value: 2
-        note: leave base unless testing shows ECN-specific issue
-      bw_probe_cwnd_gain:
-        c_expr: '1'
-        value: 1
-        note: do not increase in the first patch
-      do_not_touch_initially:
-      - probe_rtt_win_ms
-      - probe_rtt_cwnd_gain
-      - bw_probe_max_rounds
-      - bw_probe_rand_rounds
-      - bw_probe_base_us
-      - bw_probe_rand_us
-      - ecn_alpha_gain
-      - ecn_alpha_init
-      - TSO/GSO send quantum logic
-    balanced_edge:
-      startup_pacing_gain:
-        target_float: 2.90234375
-        c_expr: BBR_UNIT * 290 / 100 + 1
-        integer_value: 743
-        actual_float: 2.90234375
-      startup_cwnd_gain:
-        target_float: 2.3984375
-        c_expr: BBR_UNIT * 240 / 100
-        integer_value: 614
-        actual_float: 2.3984375
-      drain_gain:
-        target_float: 0.34375
-        c_expr: BBR_UNIT * 100 / 290
-        integer_value: 88
-        actual_float: 0.34375
-        note: reciprocal-style drain of startup pacing gain; floors slightly lower, so it drains a bit harder
-      probe_bw_pacing_gain:
-        up:
-          target_float: 1.3984375
-          c_expr: BBR_UNIT * 140 / 100
-          integer_value: 358
-          actual_float: 1.3984375
-        down:
-          target_float: 0.7578125
-          c_expr: BBR_UNIT * 76 / 100
-          integer_value: 194
-          actual_float: 0.7578125
-        cruise:
-          target_float: 1.02734375
-          c_expr: BBR_UNIT * 103 / 100
-          integer_value: 263
-          actual_float: 1.02734375
-        refill:
-          target_float: 1.1171875
-          c_expr: BBR_UNIT * 112 / 100
-          integer_value: 286
-          actual_float: 1.1171875
-      probe_bw_average_gain:
-        integer_average: 275.25
-        actual_float: 1.075195312
-        effective_with_1pct_pacing_margin: 1.064443359
-      inflight_headroom:
-        target_float: 0.1796875
-        c_expr: BBR_UNIT * 18 / 100
-        integer_value: 46
-        actual_float: 0.1796875
-      loss_thresh:
-        target_float: 0.02734375
-        c_expr: BBR_UNIT * 3 / 100
-        integer_value: 7
-        actual_float: 0.02734375
-        note: sustained per-round loss above this should trigger BBR2/3 safety logic
-      kernel_beta_cut:
-        target_float: 0.296875
-        c_expr: BBR_UNIT * 30 / 100
-        integer_value: 76
-        actual_float: 0.296875
-        note: kernel-style cut fraction; if code computes keep factor as BBR_UNIT - beta, keep factor is shown below
-      derived_keep_factor_if_kernel_uses_unit_minus_beta:
-        integer_value: 180
-        actual_float: 0.703125
-      ecn_factor:
-        target_float: 0.3333333333333333
-        c_expr: BBR_UNIT * 1 / 3
-        integer_value: 85
-        actual_float: 0.33203125
-        note: leave BBRv3/base behavior initially
-      ecn_thresh:
-        target_float: 0.5
-        c_expr: BBR_UNIT * 1 / 2
-        integer_value: 128
-        actual_float: 0.5
-        note: leave base behavior initially
-      ecn_reprobe_gain:
-        target_float: 0.5
-        c_expr: BBR_UNIT * 1 / 2
-        integer_value: 128
-        actual_float: 0.5
-        note: leave base behavior initially
-      full_loss_cnt:
-        c_expr: '5'
-        value: 5
-        note: startup exits earlier under repeated loss when lower
-      full_ecn_cnt:
-        c_expr: '2'
-        value: 2
-        note: leave base unless testing shows ECN-specific issue
-      bw_probe_cwnd_gain:
-        c_expr: '1'
-        value: 1
-        note: do not increase in the first patch
-      do_not_touch_initially:
-      - probe_rtt_win_ms
-      - probe_rtt_cwnd_gain
-      - bw_probe_max_rounds
-      - bw_probe_rand_rounds
-      - bw_probe_base_us
-      - bw_probe_rand_us
-      - ecn_alpha_gain
-      - ecn_alpha_init
-      - TSO/GSO send quantum logic
-    aggressive_edge:
-      startup_pacing_gain:
-        target_float: 2.953125
-        c_expr: BBR_UNIT * 295 / 100 + 1
-        integer_value: 756
-        actual_float: 2.953125
-      startup_cwnd_gain:
-        target_float: 2.59765625
-        c_expr: BBR_UNIT * 260 / 100
-        integer_value: 665
-        actual_float: 2.59765625
-      drain_gain:
-        target_float: 0.3359375
-        c_expr: BBR_UNIT * 100 / 295
-        integer_value: 86
-        actual_float: 0.3359375
-        note: reciprocal-style drain of startup pacing gain; floors slightly lower, so it drains a bit harder
-      probe_bw_pacing_gain:
-        up:
-          target_float: 1.5
-          c_expr: BBR_UNIT * 150 / 100
-          integer_value: 384
-          actual_float: 1.5
-        down:
-          target_float: 0.73828125
-          c_expr: BBR_UNIT * 74 / 100
-          integer_value: 189
-          actual_float: 0.73828125
-        cruise:
-          target_float: 1.05859375
-          c_expr: BBR_UNIT * 106 / 100
-          integer_value: 271
-          actual_float: 1.05859375
-        refill:
-          target_float: 1.1796875
-          c_expr: BBR_UNIT * 118 / 100
-          integer_value: 302
-          actual_float: 1.1796875
-      probe_bw_average_gain:
-        integer_average: 286.5
-        actual_float: 1.119140625
-        effective_with_1pct_pacing_margin: 1.107949219
-      inflight_headroom:
-        target_float: 0.1484375
-        c_expr: BBR_UNIT * 15 / 100
-        integer_value: 38
-        actual_float: 0.1484375
-      loss_thresh:
-        target_float: 0.0390625
-        c_expr: BBR_UNIT * 4 / 100
-        integer_value: 10
-        actual_float: 0.0390625
-        note: sustained per-round loss above this should trigger BBR2/3 safety logic
-      kernel_beta_cut:
-        target_float: 0.25
-        c_expr: BBR_UNIT * 25 / 100
-        integer_value: 64
-        actual_float: 0.25
-        note: kernel-style cut fraction; if code computes keep factor as BBR_UNIT - beta, keep factor is shown below
-      derived_keep_factor_if_kernel_uses_unit_minus_beta:
-        integer_value: 192
-        actual_float: 0.75
-      ecn_factor:
-        target_float: 0.3333333333333333
-        c_expr: BBR_UNIT * 1 / 3
-        integer_value: 85
-        actual_float: 0.33203125
-        note: leave BBRv3/base behavior initially
-      ecn_thresh:
-        target_float: 0.5
-        c_expr: BBR_UNIT * 1 / 2
-        integer_value: 128
-        actual_float: 0.5
-        note: leave base behavior initially
-      ecn_reprobe_gain:
-        target_float: 0.5
-        c_expr: BBR_UNIT * 1 / 2
-        integer_value: 128
-        actual_float: 0.5
-        note: leave base behavior initially
-      full_loss_cnt:
-        c_expr: '6'
-        value: 6
-        note: startup exits earlier under repeated loss when lower
-      full_ecn_cnt:
-        c_expr: '2'
-        value: 2
-        note: leave base unless testing shows ECN-specific issue
-      bw_probe_cwnd_gain:
-        c_expr: '1'
-        value: 1
-        note: do not increase in the first patch
-      do_not_touch_initially:
-      - probe_rtt_win_ms
-      - probe_rtt_cwnd_gain
-      - bw_probe_max_rounds
-      - bw_probe_rand_rounds
-      - bw_probe_base_us
-      - bw_probe_rand_us
-      - ecn_alpha_gain
-      - ecn_alpha_init
-      - TSO/GSO send quantum logic
-  porting_note: 'Map names to the BBRv2 source being ported. If the BBR2 tree has bbr2_* names or slightly different enums,
-    preserve behavior: STARTUP/DRAIN/PROBE_UP/PROBE_DOWN/CRUISE/REFILL, inflight_hi/lo/loss/ECN response.'
-nanbbr1:
-  recommendation: balanced_edge
-  profiles:
-    conservative:
-      high_gain:
-        target_float: 2.88671875
-        c_expr: BBR_UNIT * 2885 / 1000 + 1
-        integer_value: 739
-        actual_float: 2.88671875
-      drain_gain:
-        target_float: 0.34375
-        c_expr: BBR_UNIT * 1000 / 2885
-        integer_value: 88
-        actual_float: 0.34375
-        note: reciprocal-style drain of high_gain
-      steady_cwnd_gain:
-        target_float: 2.0
-        c_expr: BBR_UNIT * 2
-        integer_value: 512
-        actual_float: 2.0
-      startup_cwnd_gain_behavior: BBRv1 code normally sets bbr->cwnd_gain = bbr_high_gain in STARTUP; keep that unless Codex
-        explicitly splits startup cwnd gain.
-      probe_bw_pacing_cycle:
-      - index: 0
+        integer: 51
+        actual_percent: 19.921875
+        actual_fraction: 0.19921875
+      rtt_inflation_trigger:
+        c_expr: BBR_UNIT * 155 / 100
+        integer: 396
+        actual_gain: 1.546875
+      bw_drop_trigger:
+        c_expr: BBR_UNIT * 88 / 100
+        integer: 225
+        actual_percent: 87.890625
+        actual_fraction: 0.87890625
+    bbr_loss_thresh_static_fallback:
+      c_expr: BBR_UNIT * 8 / 100
+      integer: 20
+      actual_percent: 7.8125
+      actual_fraction: 0.078125
+    beta_cut:
+      c_expr: BBR_UNIT * 40 / 100
+      integer: 102
+      actual_percent: 39.84375
+      actual_fraction: 0.3984375
+    beta_keep_equivalent_percent: 60.15625
+    keep_initially:
+    - bbr_bw_probe_cwnd_gain = 1
+    - existing ECN factor/threshold/reprobe gain
+    - existing ProbeRTT window unless the local port already changed it
+    - existing TSO/GSO/send quantum logic
+  nanbbr2_def:
+    runtime_name: nanbbr2_def
+    base: BBRv2-style
+    startup_pacing_gain:
+      c_expr: BBR_UNIT * 285 / 100 + 1
+      integer: 730
+      actual_gain: 2.8515625
+    startup_cwnd_gain:
+      c_expr: BBR_UNIT * 230 / 100
+      integer: 588
+      actual_gain: 2.296875
+    drain_gain:
+      c_expr: BBR_UNIT * 100 / 285
+      integer: 89
+      actual_gain: 0.34765625
+    pacing_gain:
+      up:
         c_expr: BBR_UNIT * 135 / 100
-        integer_value: 345
-        actual_float: 1.34765625
-      - index: 1
-        c_expr: BBR_UNIT * 3 / 4
-        integer_value: 192
-        actual_float: 0.75
-      - index: 2
-        c_expr: BBR_UNIT * 105 / 100
-        integer_value: 268
-        actual_float: 1.046875
-      - index: 3
-        c_expr: BBR_UNIT * 105 / 100
-        integer_value: 268
-        actual_float: 1.046875
-      - index: 4
-        c_expr: BBR_UNIT * 105 / 100
-        integer_value: 268
-        actual_float: 1.046875
-      - index: 5
-        c_expr: BBR_UNIT * 120 / 100
-        integer_value: 307
-        actual_float: 1.19921875
-      - index: 6
-        c_expr: BBR_UNIT * 120 / 100
-        integer_value: 307
-        actual_float: 1.19921875
-      - index: 7
-        c_expr: BBR_UNIT * 120 / 100
-        integer_value: 307
-        actual_float: 1.19921875
-      probe_bw_average_gain:
-        integer_average: 282.75
-        actual_float: 1.104492188
-        effective_with_1pct_pacing_margin: 1.093447266
-      lt_loss_thresh:
-        target_float: 0.02734375
-        c_expr: BBR_UNIT * 3 / 100
-        integer_value: 7
-        actual_float: 0.02734375
-        note: BBRv1 long-term policer/loss estimator threshold; this is the BBR1 emergency brake
-      probe_rtt_mode_ms:
-        c_expr: '150'
-        value: 150
-      do_not_touch_initially:
-      - extra_acked_gain
-      - extra_acked_win_rtts
-      - ack aggregation window
-      - min_tso_rate
-      - cwnd_min_target
-    balanced_edge:
-      high_gain:
-        target_float: 2.953125
-        c_expr: BBR_UNIT * 295 / 100 + 1
-        integer_value: 756
-        actual_float: 2.953125
-      drain_gain:
-        target_float: 0.3359375
-        c_expr: BBR_UNIT * 100 / 295
-        integer_value: 86
-        actual_float: 0.3359375
-        note: reciprocal-style drain of high_gain
-      steady_cwnd_gain:
-        target_float: 2.0
-        c_expr: BBR_UNIT * 2
-        integer_value: 512
-        actual_float: 2.0
-      startup_cwnd_gain_behavior: BBRv1 code normally sets bbr->cwnd_gain = bbr_high_gain in STARTUP; keep that unless Codex
-        explicitly splits startup cwnd gain.
-      probe_bw_pacing_cycle:
-      - index: 0
-        c_expr: BBR_UNIT * 145 / 100
-        integer_value: 371
-        actual_float: 1.44921875
-      - index: 1
-        c_expr: BBR_UNIT * 3 / 4
-        integer_value: 192
-        actual_float: 0.75
-      - index: 2
+        integer: 345
+        actual_gain: 1.34765625
+      down:
+        c_expr: BBR_UNIT * 73 / 100
+        integer: 186
+        actual_gain: 0.7265625
+      cruise:
+        c_expr: BBR_UNIT * 102 / 100
+        integer: 261
+        actual_gain: 1.01953125
+      refill:
         c_expr: BBR_UNIT * 110 / 100
-        integer_value: 281
-        actual_float: 1.09765625
-      - index: 3
-        c_expr: BBR_UNIT * 110 / 100
-        integer_value: 281
-        actual_float: 1.09765625
-      - index: 4
-        c_expr: BBR_UNIT * 110 / 100
-        integer_value: 281
-        actual_float: 1.09765625
-      - index: 5
-        c_expr: BBR_UNIT * 130 / 100
-        integer_value: 332
-        actual_float: 1.296875
-      - index: 6
-        c_expr: BBR_UNIT * 130 / 100
-        integer_value: 332
-        actual_float: 1.296875
-      - index: 7
-        c_expr: BBR_UNIT * 130 / 100
-        integer_value: 332
-        actual_float: 1.296875
-      probe_bw_average_gain:
-        integer_average: 300.25
-        actual_float: 1.172851562
-        effective_with_1pct_pacing_margin: 1.161123047
-      lt_loss_thresh:
-        target_float: 0.046875
-        c_expr: BBR_UNIT * 5 / 100
-        integer_value: 12
-        actual_float: 0.046875
-        note: BBRv1 long-term policer/loss estimator threshold; this is the BBR1 emergency brake
-      probe_rtt_mode_ms:
-        c_expr: '150'
-        value: 150
-      do_not_touch_initially:
-      - extra_acked_gain
-      - extra_acked_win_rtts
-      - ack aggregation window
-      - min_tso_rate
-      - cwnd_min_target
-    aggressive_edge:
-      high_gain:
-        target_float: 3.00390625
-        c_expr: BBR_UNIT * 3000 / 1000 + 1
-        integer_value: 769
-        actual_float: 3.00390625
-      drain_gain:
-        target_float: 0.33203125
-        c_expr: BBR_UNIT * 1000 / 3000
-        integer_value: 85
-        actual_float: 0.33203125
-        note: reciprocal-style drain of high_gain
-      steady_cwnd_gain:
-        target_float: 2.0
-        c_expr: BBR_UNIT * 2
-        integer_value: 512
-        actual_float: 2.0
-      startup_cwnd_gain_behavior: BBRv1 code normally sets bbr->cwnd_gain = bbr_high_gain in STARTUP; keep that unless Codex
-        explicitly splits startup cwnd gain.
-      probe_bw_pacing_cycle:
-      - index: 0
-        c_expr: BBR_UNIT * 3 / 2
-        integer_value: 384
-        actual_float: 1.5
-      - index: 1
-        c_expr: BBR_UNIT * 3 / 4
-        integer_value: 192
-        actual_float: 0.75
-      - index: 2
+        integer: 281
+        actual_gain: 1.09765625
+    probe_bw_mean: 1.047851562
+    probe_bw_mean_after_1pct_margin: 1.037373047
+    inflight_headroom:
+      c_expr: BBR_UNIT * 26 / 100
+      integer: 66
+      actual_percent: 25.78125
+      actual_fraction: 0.2578125
+    loss_gate:
+      soft:
+        c_expr: BBR_UNIT * 8 / 100
+        integer: 20
+        actual_percent: 7.8125
+        actual_fraction: 0.078125
+      hard:
+        c_expr: BBR_UNIT * 16 / 100
+        integer: 40
+        actual_percent: 15.625
+        actual_fraction: 0.15625
+      panic:
+        c_expr: BBR_UNIT * 25 / 100
+        integer: 64
+        actual_percent: 25.0
+        actual_fraction: 0.25
+      rtt_inflation_trigger:
+        c_expr: BBR_UNIT * 175 / 100
+        integer: 448
+        actual_gain: 1.75
+      bw_drop_trigger:
+        c_expr: BBR_UNIT * 85 / 100
+        integer: 217
+        actual_percent: 84.765625
+        actual_fraction: 0.84765625
+    bbr_loss_thresh_static_fallback:
+      c_expr: BBR_UNIT * 12 / 100
+      integer: 30
+      actual_percent: 11.71875
+      actual_fraction: 0.1171875
+    beta_cut:
+      c_expr: BBR_UNIT * 37 / 100
+      integer: 94
+      actual_percent: 36.71875
+      actual_fraction: 0.3671875
+    beta_keep_equivalent_percent: 63.28125
+    keep_initially:
+    - bbr_bw_probe_cwnd_gain = 1
+    - existing ECN factor/threshold/reprobe gain
+    - existing ProbeRTT window unless the local port already changed it
+    - existing TSO/GSO/send quantum logic
+  nanbbr2_aggr:
+    runtime_name: nanbbr2_aggr
+    base: BBRv2-style
+    startup_pacing_gain:
+      c_expr: BBR_UNIT * 295 / 100 + 1
+      integer: 756
+      actual_gain: 2.953125
+    startup_cwnd_gain:
+      c_expr: BBR_UNIT * 255 / 100
+      integer: 652
+      actual_gain: 2.546875
+    drain_gain:
+      c_expr: BBR_UNIT * 100 / 295
+      integer: 86
+      actual_gain: 0.3359375
+    pacing_gain:
+      up:
+        c_expr: BBR_UNIT * 143 / 100
+        integer: 366
+        actual_gain: 1.4296875
+      down:
+        c_expr: BBR_UNIT * 70 / 100
+        integer: 179
+        actual_gain: 0.69921875
+      cruise:
+        c_expr: BBR_UNIT * 104 / 100
+        integer: 266
+        actual_gain: 1.0390625
+      refill:
         c_expr: BBR_UNIT * 115 / 100
-        integer_value: 294
-        actual_float: 1.1484375
-      - index: 3
-        c_expr: BBR_UNIT * 115 / 100
-        integer_value: 294
-        actual_float: 1.1484375
-      - index: 4
-        c_expr: BBR_UNIT * 115 / 100
-        integer_value: 294
-        actual_float: 1.1484375
-      - index: 5
-        c_expr: BBR_UNIT * 140 / 100
-        integer_value: 358
-        actual_float: 1.3984375
-      - index: 6
-        c_expr: BBR_UNIT * 140 / 100
-        integer_value: 358
-        actual_float: 1.3984375
-      - index: 7
-        c_expr: BBR_UNIT * 140 / 100
-        integer_value: 358
-        actual_float: 1.3984375
-      probe_bw_average_gain:
-        integer_average: 316.5
-        actual_float: 1.236328125
-        effective_with_1pct_pacing_margin: 1.223964844
-      lt_loss_thresh:
-        target_float: 0.06640625
-        c_expr: BBR_UNIT * 7 / 100
-        integer_value: 17
-        actual_float: 0.06640625
-        note: BBRv1 long-term policer/loss estimator threshold; this is the BBR1 emergency brake
-      probe_rtt_mode_ms:
-        c_expr: '100'
-        value: 100
-      do_not_touch_initially:
-      - extra_acked_gain
-      - extra_acked_win_rtts
-      - ack aggregation window
-      - min_tso_rate
-      - cwnd_min_target
-    nanqinlang_original_reference:
-      high_gain:
-        target_float: 3.00390625
-        c_expr: BBR_UNIT * 3000 / 1000 + 1
-        integer_value: 769
-        actual_float: 3.00390625
-      drain_gain:
-        target_float: 0.33203125
-        c_expr: BBR_UNIT * 1000 / 3000
-        integer_value: 85
-        actual_float: 0.33203125
-        note: reciprocal-style drain of high_gain
-      steady_cwnd_gain:
-        target_float: 2.0
-        c_expr: BBR_UNIT * 2
-        integer_value: 512
-        actual_float: 2.0
-      startup_cwnd_gain_behavior: BBRv1 code normally sets bbr->cwnd_gain = bbr_high_gain in STARTUP; keep that unless Codex
-        explicitly splits startup cwnd gain.
-      probe_bw_pacing_cycle:
-      - index: 0
-        c_expr: BBR_UNIT * 6 / 4
-        integer_value: 384
-        actual_float: 1.5
-      - index: 1
-        c_expr: BBR_UNIT * 3 / 4
-        integer_value: 192
-        actual_float: 0.75
-      - index: 2
-        c_expr: BBR_UNIT * 5 / 4
-        integer_value: 320
-        actual_float: 1.25
-      - index: 3
-        c_expr: BBR_UNIT * 5 / 4
-        integer_value: 320
-        actual_float: 1.25
-      - index: 4
-        c_expr: BBR_UNIT * 5 / 4
-        integer_value: 320
-        actual_float: 1.25
-      - index: 5
-        c_expr: BBR_UNIT * 6 / 4
-        integer_value: 384
-        actual_float: 1.5
-      - index: 6
-        c_expr: BBR_UNIT * 6 / 4
-        integer_value: 384
-        actual_float: 1.5
-      - index: 7
-        c_expr: BBR_UNIT * 6 / 4
-        integer_value: 384
-        actual_float: 1.5
-      probe_bw_average_gain:
-        integer_average: 336.0
-        actual_float: 1.3125
-        effective_with_1pct_pacing_margin: 1.299375
-      lt_loss_thresh:
-        target_float: 0.19921875
+        integer: 294
+        actual_gain: 1.1484375
+    probe_bw_mean: 1.079101562
+    probe_bw_mean_after_1pct_margin: 1.068310547
+    inflight_headroom:
+      c_expr: BBR_UNIT * 22 / 100
+      integer: 56
+      actual_percent: 21.875
+      actual_fraction: 0.21875
+    loss_gate:
+      soft:
+        c_expr: BBR_UNIT * 10 / 100
+        integer: 25
+        actual_percent: 9.765625
+        actual_fraction: 0.09765625
+      hard:
         c_expr: BBR_UNIT * 20 / 100
-        integer_value: 51
-        actual_float: 0.19921875
-        note: BBRv1 long-term policer/loss estimator threshold; this is the BBR1 emergency brake
-      probe_rtt_mode_ms:
-        c_expr: '100'
-        value: 100
-      do_not_touch_initially:
-      - extra_acked_gain
-      - extra_acked_win_rtts
-      - ack aggregation window
-      - min_tso_rate
-      - cwnd_min_target
-  implementation_note: BBRv1 lacks BBR2/3 inflight_hi/lo and ECN safety. Use the LT loss threshold as the emergency brake
-    and do not make the BBR1 default as wild as the historical Nanqinlang cycle.
-codex_tasks:
-- Create separate tcp_nanbbr1.c, tcp_nanbbr2.c, tcp_nanbbr3.c files; do not mutate upstream bbr runtime unless intentionally
-  replacing it.
-- 'Register runtime names: nanbbr1, nanbbr2, nanbbr3.'
-- Add Kconfig entries TCP_CONG_NANBBR1, TCP_CONG_NANBBR2, TCP_CONG_NANBBR3 and matching Makefile objects.
-- For nanbbr3, start by duplicating the existing OMR/XanMod BBRv3 implementation and only change the constants above.
-- For nanbbr2, first rebase/compile vanilla BBR2 on Linux/OpenWrt 6.6, then apply the constants above.
-- For nanbbr1, duplicate Linux 6.6 BBRv1/Nanqinlang-style code and apply the balanced_edge constants.
-- Do not disable loss, ECN, recovery, app-limited filtering, or ProbeRTT logic.
-- Keep fq/fq_codel pacing available; BBR-style algorithms depend heavily on pacing.
-- 'Expose only one profile in code initially: balanced_edge. Keep conservative/aggressive in comments or compile-time macros
-  for test builds.'
-test_gates:
-  must_not_collapse:
-  - iperf3 10-15 min over 4G/5G or Starlink/FWA without RTO storms
-  - sustained retransmission rate should not remain above ~3-4% for long periods on balanced_edge
-  - p95 RTT under load should rise, but not stay at multi-second bufferbloat levels
-  - on sustained loss >=3%, nanbbr2/3 should leave UP/refill behavior and reduce inflight/rate through existing BBR2/3 logic
-  - on nanbbr1 sustained loss >=~4.7%, LT policer/loss estimator should engage
-  expected_behavior:
-  - beats normal bbr/cubic on high-latency lossy paths
-  - unfair to other flows by design
-  - less queue explosion than historical Nanqinlang BBR1 because cruise/refill means are lower and loss brakes are tighter
+        integer: 51
+        actual_percent: 19.921875
+        actual_fraction: 0.19921875
+      panic:
+        c_expr: BBR_UNIT * 28 / 100
+        integer: 71
+        actual_percent: 27.734375
+        actual_fraction: 0.27734375
+      rtt_inflation_trigger:
+        c_expr: BBR_UNIT * 190 / 100
+        integer: 486
+        actual_gain: 1.8984375
+      bw_drop_trigger:
+        c_expr: BBR_UNIT * 80 / 100
+        integer: 204
+        actual_percent: 79.6875
+        actual_fraction: 0.796875
+    bbr_loss_thresh_static_fallback:
+      c_expr: BBR_UNIT * 16 / 100
+      integer: 40
+      actual_percent: 15.625
+      actual_fraction: 0.15625
+    beta_cut:
+      c_expr: BBR_UNIT * 40 / 100
+      integer: 102
+      actual_percent: 39.84375
+      actual_fraction: 0.3984375
+    beta_keep_equivalent_percent: 60.15625
+    keep_initially:
+    - bbr_bw_probe_cwnd_gain = 1
+    - existing ECN factor/threshold/reprobe gain
+    - existing ProbeRTT window unless the local port already changed it
+    - existing TSO/GSO/send quantum logic
+  nanbbr3_light:
+    runtime_name: nanbbr3_light
+    base: BBRv3-style
+    startup_pacing_gain:
+      c_expr: BBR_UNIT * 280 / 100 + 1
+      integer: 717
+      actual_gain: 2.80078125
+    startup_cwnd_gain:
+      c_expr: BBR_UNIT * 220 / 100
+      integer: 563
+      actual_gain: 2.19921875
+    drain_gain:
+      c_expr: BBR_UNIT * 100 / 280
+      integer: 91
+      actual_gain: 0.35546875
+    pacing_gain:
+      up:
+        c_expr: BBR_UNIT * 132 / 100
+        integer: 337
+        actual_gain: 1.31640625
+      down:
+        c_expr: BBR_UNIT * 72 / 100
+        integer: 184
+        actual_gain: 0.71875
+      cruise:
+        c_expr: BBR_UNIT * 100 / 100
+        integer: 256
+        actual_gain: 1.0
+      refill:
+        c_expr: BBR_UNIT * 108 / 100
+        integer: 276
+        actual_gain: 1.078125
+    probe_bw_mean: 1.028320312
+    probe_bw_mean_after_1pct_margin: 1.018037109
+    inflight_headroom:
+      c_expr: BBR_UNIT * 30 / 100
+      integer: 76
+      actual_percent: 29.6875
+      actual_fraction: 0.296875
+    loss_gate:
+      soft:
+        c_expr: BBR_UNIT * 6 / 100
+        integer: 15
+        actual_percent: 5.859375
+        actual_fraction: 0.05859375
+      hard:
+        c_expr: BBR_UNIT * 12 / 100
+        integer: 30
+        actual_percent: 11.71875
+        actual_fraction: 0.1171875
+      panic:
+        c_expr: BBR_UNIT * 20 / 100
+        integer: 51
+        actual_percent: 19.921875
+        actual_fraction: 0.19921875
+      rtt_inflation_trigger:
+        c_expr: BBR_UNIT * 155 / 100
+        integer: 396
+        actual_gain: 1.546875
+      bw_drop_trigger:
+        c_expr: BBR_UNIT * 88 / 100
+        integer: 225
+        actual_percent: 87.890625
+        actual_fraction: 0.87890625
+    bbr_loss_thresh_static_fallback:
+      c_expr: BBR_UNIT * 8 / 100
+      integer: 20
+      actual_percent: 7.8125
+      actual_fraction: 0.078125
+    beta_cut:
+      c_expr: BBR_UNIT * 40 / 100
+      integer: 102
+      actual_percent: 39.84375
+      actual_fraction: 0.3984375
+    beta_keep_equivalent_percent: 60.15625
+    keep_initially:
+    - bbr_bw_probe_cwnd_gain = 1
+    - existing ECN factor/threshold/reprobe gain
+    - existing ProbeRTT window unless the local port already changed it
+    - existing TSO/GSO/send quantum logic
+  nanbbr3_def:
+    runtime_name: nanbbr3_def
+    base: BBRv3-style
+    startup_pacing_gain:
+      c_expr: BBR_UNIT * 290 / 100 + 1
+      integer: 743
+      actual_gain: 2.90234375
+    startup_cwnd_gain:
+      c_expr: BBR_UNIT * 240 / 100
+      integer: 614
+      actual_gain: 2.3984375
+    drain_gain:
+      c_expr: BBR_UNIT * 100 / 290
+      integer: 88
+      actual_gain: 0.34375
+    pacing_gain:
+      up:
+        c_expr: BBR_UNIT * 140 / 100
+        integer: 358
+        actual_gain: 1.3984375
+      down:
+        c_expr: BBR_UNIT * 72 / 100
+        integer: 184
+        actual_gain: 0.71875
+      cruise:
+        c_expr: BBR_UNIT * 103 / 100
+        integer: 263
+        actual_gain: 1.02734375
+      refill:
+        c_expr: BBR_UNIT * 112 / 100
+        integer: 286
+        actual_gain: 1.1171875
+    probe_bw_mean: 1.065429688
+    probe_bw_mean_after_1pct_margin: 1.054775391
+    inflight_headroom:
+      c_expr: BBR_UNIT * 24 / 100
+      integer: 61
+      actual_percent: 23.828125
+      actual_fraction: 0.23828125
+    loss_gate:
+      soft:
+        c_expr: BBR_UNIT * 8 / 100
+        integer: 20
+        actual_percent: 7.8125
+        actual_fraction: 0.078125
+      hard:
+        c_expr: BBR_UNIT * 16 / 100
+        integer: 40
+        actual_percent: 15.625
+        actual_fraction: 0.15625
+      panic:
+        c_expr: BBR_UNIT * 25 / 100
+        integer: 64
+        actual_percent: 25.0
+        actual_fraction: 0.25
+      rtt_inflation_trigger:
+        c_expr: BBR_UNIT * 175 / 100
+        integer: 448
+        actual_gain: 1.75
+      bw_drop_trigger:
+        c_expr: BBR_UNIT * 85 / 100
+        integer: 217
+        actual_percent: 84.765625
+        actual_fraction: 0.84765625
+    bbr_loss_thresh_static_fallback:
+      c_expr: BBR_UNIT * 12 / 100
+      integer: 30
+      actual_percent: 11.71875
+      actual_fraction: 0.1171875
+    beta_cut:
+      c_expr: BBR_UNIT * 35 / 100
+      integer: 89
+      actual_percent: 34.765625
+      actual_fraction: 0.34765625
+    beta_keep_equivalent_percent: 65.234375
+    keep_initially:
+    - bbr_bw_probe_cwnd_gain = 1
+    - existing ECN factor/threshold/reprobe gain
+    - existing ProbeRTT window unless the local port already changed it
+    - existing TSO/GSO/send quantum logic
+  nanbbr3_aggr:
+    runtime_name: nanbbr3_aggr
+    base: BBRv3-style
+    startup_pacing_gain:
+      c_expr: BBR_UNIT * 300 / 100 + 1
+      integer: 769
+      actual_gain: 3.00390625
+    startup_cwnd_gain:
+      c_expr: BBR_UNIT * 265 / 100
+      integer: 678
+      actual_gain: 2.6484375
+    drain_gain:
+      c_expr: BBR_UNIT * 100 / 300
+      integer: 85
+      actual_gain: 0.33203125
+    pacing_gain:
+      up:
+        c_expr: BBR_UNIT * 148 / 100
+        integer: 378
+        actual_gain: 1.4765625
+      down:
+        c_expr: BBR_UNIT * 70 / 100
+        integer: 179
+        actual_gain: 0.69921875
+      cruise:
+        c_expr: BBR_UNIT * 105 / 100
+        integer: 268
+        actual_gain: 1.046875
+      refill:
+        c_expr: BBR_UNIT * 118 / 100
+        integer: 302
+        actual_gain: 1.1796875
+    probe_bw_mean: 1.100585938
+    probe_bw_mean_after_1pct_margin: 1.089580078
+    inflight_headroom:
+      c_expr: BBR_UNIT * 20 / 100
+      integer: 51
+      actual_percent: 19.921875
+      actual_fraction: 0.19921875
+    loss_gate:
+      soft:
+        c_expr: BBR_UNIT * 10 / 100
+        integer: 25
+        actual_percent: 9.765625
+        actual_fraction: 0.09765625
+      hard:
+        c_expr: BBR_UNIT * 20 / 100
+        integer: 51
+        actual_percent: 19.921875
+        actual_fraction: 0.19921875
+      panic:
+        c_expr: BBR_UNIT * 28 / 100
+        integer: 71
+        actual_percent: 27.734375
+        actual_fraction: 0.27734375
+      rtt_inflation_trigger:
+        c_expr: BBR_UNIT * 190 / 100
+        integer: 486
+        actual_gain: 1.8984375
+      bw_drop_trigger:
+        c_expr: BBR_UNIT * 80 / 100
+        integer: 204
+        actual_percent: 79.6875
+        actual_fraction: 0.796875
+    bbr_loss_thresh_static_fallback:
+      c_expr: BBR_UNIT * 16 / 100
+      integer: 40
+      actual_percent: 15.625
+      actual_fraction: 0.15625
+    beta_cut:
+      c_expr: BBR_UNIT * 40 / 100
+      integer: 102
+      actual_percent: 39.84375
+      actual_fraction: 0.3984375
+    beta_keep_equivalent_percent: 60.15625
+    keep_initially:
+    - bbr_bw_probe_cwnd_gain = 1
+    - existing ECN factor/threshold/reprobe gain
+    - existing ProbeRTT window unless the local port already changed it
+    - existing TSO/GSO/send quantum logic

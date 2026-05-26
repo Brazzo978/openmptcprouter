@@ -1,117 +1,76 @@
-# nanbbr final porting brief for Codex
+# nanbbr 9-profile plan for Codex
 
-## Design intent
+Generated: 2026-05-26
+Fixed point: `BBR_UNIT = 1 << 8 = 256`
 
-Implement `nanbbr1`, `nanbbr2`, and `nanbbr3` for OpenMPTCProuter kernel 6.6.
+## Goal
 
-Goal: throughput-dominant Nan-style congestion control for 4G/5G, Starlink and FWA. Fairness toward competing CUBIC/Reno/BBR flows is deliberately low priority. The hard rule is self-preservation: when sustained loss, ECN or queue pressure makes the path unusable, the algorithm must slow down instead of continuing to flood.
+Create 9 separate TCP congestion-control modules/runtime names:
 
-Fixed point: `BBR_SCALE = 8`, `BBR_UNIT = 1 << 8 = 256`.
-
-Integer policy: Linux-kernel style integer arithmetic/flooring. Startup high gain keeps the common `+1` bias.
-
-## Recommended defaults
-
-Use these as the first implementation values:
-
-- `nanbbr3`: `balanced_edge`
-- `nanbbr2`: `balanced_edge`, slightly calmer than nanbbr3
-- `nanbbr1`: `balanced_edge`, fallback/benchmark only; BBRv1 has fewer safety brakes
-
-## nanbbr3 balanced_edge constants
-
-```c
-static const int bbr_startup_pacing_gain = BBR_UNIT * 295 / 100 + 1; /* 756, 2.953125x */
-static const int bbr_startup_cwnd_gain   = BBR_UNIT * 250 / 100;     /* 640, 2.500000x */
-static const int bbr_drain_gain          = BBR_UNIT * 100 / 295;     /*  86, 0.335938x */
-
-static const int bbr_pacing_gain[] = {
-        [BBR_BW_PROBE_UP]     = BBR_UNIT * 145 / 100, /* 371, 1.449219x */
-        [BBR_BW_PROBE_DOWN]   = BBR_UNIT * 3 / 4,     /* 192, 0.750000x */
-        [BBR_BW_PROBE_CRUISE] = BBR_UNIT * 105 / 100, /* 268, 1.046875x */
-        [BBR_BW_PROBE_REFILL] = BBR_UNIT * 115 / 100, /* 294, 1.148438x */
-};
-
-static const int bbr_inflight_headroom = BBR_UNIT * 16 / 100; /* 40, 15.625% */
-static const int bbr_loss_thresh       = BBR_UNIT * 3 / 100;  /*  7, 2.734% */
-static const int bbr_beta              = BBR_UNIT * 30 / 100; /* 76, 29.688% kernel cut; keep ~=70.312% if code uses UNIT-beta */
-
-static const int bbr_ecn_factor       = BBR_UNIT * 1 / 3; /* keep base */
-static const int bbr_ecn_thresh       = BBR_UNIT * 1 / 2; /* keep base */
-static const int bbr_ecn_reprobe_gain = BBR_UNIT * 1 / 2; /* keep base */
-static const int bbr_full_loss_cnt    = 5;
-static const int bbr_full_ecn_cnt     = 2;
-static const int bbr_bw_probe_cwnd_gain = 1;
+```text
+nanbbr1_light  nanbbr1_def  nanbbr1_aggr
+nanbbr2_light  nanbbr2_def  nanbbr2_aggr
+nanbbr3_light  nanbbr3_def  nanbbr3_aggr
 ```
 
-Probe BW mean: `(371 + 192 + 268 + 294) / 4 / 256 = 1.0986328125x`.
-With 1% pacing margin: about `1.087646484x`.
+These are **separate congestion controls**, not sysctl modes and not replacements for upstream `bbr`.
+The `*_def` profiles are the normal/default mobile-edge profiles.
+The `*_light` profiles are slightly more conservative.
+The `*_aggr` profiles are the most aggressive, but still guarded against collapse.
 
-## nanbbr2 balanced_edge constants
+All runtime names are <= 15 characters, so they fit Linux `TCP_CA_NAME_MAX=16` with the terminating NUL.
 
-Implementation note for this branch: `nanbbr2` is implemented as `9974-tcp_nanbbr2.patch`, copied from the OMR 6.6 build-tree `tcp_bbr2.c` and renamed at runtime to `nanbbr2`. That BBRv2 base uses `bbr_high_gain` for startup pacing and keeps an 8-entry `bbr_pacing_gain[]`; only the first four BBRv2 phases are semantically used, and the remaining entries are filled with cruise gain as a safe fallback.
+## Implementation priority
 
-```c
-static int bbr_high_gain         = BBR_UNIT * 290 / 100 + 1; /* 743, 2.902344x */
-static int bbr_startup_cwnd_gain = BBR_UNIT * 240 / 100;     /* 614, 2.398438x */
-static int bbr_drain_gain        = BBR_UNIT * 100 / 290;     /*  88, 0.343750x */
+1. `nanbbr3_*`
+2. `nanbbr1_*`
+3. `nanbbr2_*`
 
-static int bbr_pacing_gain[] = {
-        BBR_UNIT * 140 / 100, /* 358, 1.398438x */
-        BBR_UNIT * 76 / 100,  /* 194, 0.757812x */
-        BBR_UNIT * 103 / 100, /* 263, 1.027344x */
-        BBR_UNIT * 112 / 100, /* 286, 1.117188x */
-        BBR_UNIT * 103 / 100, BBR_UNIT * 103 / 100,
-        BBR_UNIT * 103 / 100, BBR_UNIT * 103 / 100
-};
+Reason: BBRv3 is already in the OMR 6.6 patch context; BBR2 needs more rebasing work.
 
-static u32 bbr_inflight_headroom = BBR_UNIT * 18 / 100; /* 46, 17.969% */
-static u32 bbr_loss_thresh       = BBR_UNIT * 3 / 100;  /*  7, 2.734% */
-static u32 bbr_beta              = BBR_UNIT * 30 / 100; /* 76, 29.688% kernel cut */
+## BBR2/3 dynamic loss gate
 
-static u32 bbr_ecn_factor       = BBR_UNIT * 1 / 3;
-static u32 bbr_ecn_thresh       = BBR_UNIT * 1 / 2;
-static u32 bbr_ecn_reprobe_gain = BBR_UNIT * 1 / 2;
-static u32 bbr_full_loss_cnt    = 5;
-static u32 bbr_full_ecn_cnt     = 2;
-```
+For `nanbbr2_*` and `nanbbr3_*`, do **not** use a single tiny static loss threshold.
+LTE/5G can show high TCP-visible loss while still delivering usable bandwidth.
 
-Probe BW mean: `(358 + 194 + 263 + 286) / 4 / 256 = 1.0751953125x`.
-With 1% pacing margin: about `1.064443359x`.
-
-## nanbbr1 balanced_edge constants
+Use:
 
 ```c
-static const int bbr_high_gain  = BBR_UNIT * 295 / 100 + 1; /* 756, 2.953125x */
-static const int bbr_drain_gain = BBR_UNIT * 100 / 295;     /*  86, 0.335938x */
-static const int bbr_cwnd_gain  = BBR_UNIT * 2;             /* 512, 2.000000x */
-
-static const int bbr_pacing_gain[] = {
-        BBR_UNIT * 145 / 100, /* 371, 1.449219x */
-        BBR_UNIT * 3 / 4,     /* 192, 0.750000x */
-        BBR_UNIT * 110 / 100, /* 281, 1.097656x */
-        BBR_UNIT * 110 / 100, /* 281, 1.097656x */
-        BBR_UNIT * 110 / 100, /* 281, 1.097656x */
-        BBR_UNIT * 130 / 100, /* 332, 1.296875x */
-        BBR_UNIT * 130 / 100, /* 332, 1.296875x */
-        BBR_UNIT * 130 / 100, /* 332, 1.296875x */
-};
-
-static const u32 bbr_lt_loss_thresh = BBR_UNIT * 5 / 100; /* 12, 4.6875% */
-static const u32 bbr_probe_rtt_mode_ms = 150;
+trigger = panic_loss || hard_loss || (soft_loss && (rtt_bad || bw_bad));
 ```
 
-Probe BW mean: `1.1728515625x`.
-With 1% pacing margin: about `1.161123047x`.
+Where:
 
-## Guardrails
+```c
+rtt_bad = sample_rtt_us >= min_rtt_us * rtt_inflation_trigger / BBR_UNIT;
+bw_bad  = bw_latest <= bw_reference * bw_drop_trigger / BBR_UNIT;
+```
 
-Do not disable loss, ECN, recovery, app-limited filtering, or ProbeRTT logic.
+If this dynamic gate is not implemented, use the `LOSS_THRESH_STATIC_FALLBACK` value from the C header, but note that it is less accurate.
 
-Do not increase `bbr_bw_probe_cwnd_gain` in BBRv3. In this BBRv2 base the matching direct knob does not exist; leave `bbr_bw_probe_pif_gain` at its base value in the first patch.
+## Quick table
 
-Keep ECN base behavior initially.
+| profile | startup | cwnd | drain | probe gains | probe mean | headroom/loss |
+|---|---:|---:|---:|---|---:|---|
+| `nanbbr3_light` | 2.801 | 2.199 | 0.355 | 1.316/0.719/1.000/1.078 | 1.028 | 29.7% / soft 5.9, hard 11.7, panic 19.9% |
+| `nanbbr3_def` | 2.902 | 2.398 | 0.344 | 1.398/0.719/1.027/1.117 | 1.065 | 23.8% / soft 7.8, hard 15.6, panic 25.0% |
+| `nanbbr3_aggr` | 3.004 | 2.648 | 0.332 | 1.477/0.699/1.047/1.180 | 1.101 | 19.9% / soft 9.8, hard 19.9, panic 27.7% |
+| `nanbbr2_light` | 2.754 | 2.098 | 0.363 | 1.277/0.719/1.000/1.059 | 1.014 | 29.7% / soft 5.9, hard 11.7, panic 19.9% |
+| `nanbbr2_def` | 2.852 | 2.297 | 0.348 | 1.348/0.727/1.020/1.098 | 1.048 | 25.8% / soft 7.8, hard 15.6, panic 25.0% |
+| `nanbbr2_aggr` | 2.953 | 2.547 | 0.336 | 1.430/0.699/1.039/1.148 | 1.079 | 21.9% / soft 9.8, hard 19.9, panic 27.7% |
+| `nanbbr1_light` | 2.754 | 2.000 | 0.363 | 1.297/0.719/3x1.000/3x1.117 | 1.046 | lt_loss 7.8%, probe_rtt 220ms |
+| `nanbbr1_def` | 2.852 | 2.000 | 0.348 | 1.379/0.719/3x1.047/3x1.199 | 1.104 | lt_loss 11.7%, probe_rtt 200ms |
+| `nanbbr1_aggr` | 2.953 | 2.000 | 0.336 | 1.449/0.699/3x1.098/3x1.297 | 1.167 | lt_loss 15.6%, probe_rtt 170ms |
 
-For `nanbbr3` and `nanbbr2`, sustained loss above about 2.7% on balanced_edge should trigger existing BBR2/3 safety behavior. For `nanbbr1`, sustained loss around 4.7% should trigger the LT policer/loss estimator.
+## Keep unchanged initially
 
-Full details and alternative profiles are in `nanbbr_final_profiles.yaml`.
+- Keep BBR2/3 ECN factor/threshold/reprobe behavior.
+- Keep `bbr_bw_probe_cwnd_gain = 1`.
+- Keep TSO/GSO/send quantum logic.
+- Keep ProbeRTT logic unless the existing local patch already changed it.
+- Do not convert the BBR2/3 soft loss threshold into unconditional loss reaction.
+
+## Files
+
+- `nanbbr_9_profiles_v3.yaml`: full machine-readable profiles.
+- `nanbbr_9_profiles_constants_v3.h`: C constants and pseudocode.

@@ -49,28 +49,31 @@ With 1% pacing margin: about `1.087646484x`.
 
 ## nanbbr2 balanced_edge constants
 
-```c
-static const int bbr_startup_pacing_gain = BBR_UNIT * 290 / 100 + 1; /* 743, 2.902344x */
-static const int bbr_startup_cwnd_gain   = BBR_UNIT * 240 / 100;     /* 614, 2.398438x */
-static const int bbr_drain_gain          = BBR_UNIT * 100 / 290;     /*  88, 0.343750x */
+Implementation note for this branch: `nanbbr2` is implemented as `9974-tcp_nanbbr2.patch`, copied from the OMR 6.6 build-tree `tcp_bbr2.c` and renamed at runtime to `nanbbr2`. That BBRv2 base uses `bbr_high_gain` for startup pacing and keeps an 8-entry `bbr_pacing_gain[]`; only the first four BBRv2 phases are semantically used, and the remaining entries are filled with cruise gain as a safe fallback.
 
-static const int bbr_pacing_gain[] = {
-        [BBR_BW_PROBE_UP]     = BBR_UNIT * 140 / 100, /* 358, 1.398438x */
-        [BBR_BW_PROBE_DOWN]   = BBR_UNIT * 76 / 100,  /* 194, 0.757812x */
-        [BBR_BW_PROBE_CRUISE] = BBR_UNIT * 103 / 100, /* 263, 1.027344x */
-        [BBR_BW_PROBE_REFILL] = BBR_UNIT * 112 / 100, /* 286, 1.117188x */
+```c
+static int bbr_high_gain         = BBR_UNIT * 290 / 100 + 1; /* 743, 2.902344x */
+static int bbr_startup_cwnd_gain = BBR_UNIT * 240 / 100;     /* 614, 2.398438x */
+static int bbr_drain_gain        = BBR_UNIT * 100 / 290;     /*  88, 0.343750x */
+
+static int bbr_pacing_gain[] = {
+        BBR_UNIT * 140 / 100, /* 358, 1.398438x */
+        BBR_UNIT * 76 / 100,  /* 194, 0.757812x */
+        BBR_UNIT * 103 / 100, /* 263, 1.027344x */
+        BBR_UNIT * 112 / 100, /* 286, 1.117188x */
+        BBR_UNIT * 103 / 100, BBR_UNIT * 103 / 100,
+        BBR_UNIT * 103 / 100, BBR_UNIT * 103 / 100
 };
 
-static const int bbr_inflight_headroom = BBR_UNIT * 18 / 100; /* 46, 17.969% */
-static const int bbr_loss_thresh       = BBR_UNIT * 3 / 100;  /*  7, 2.734% */
-static const int bbr_beta              = BBR_UNIT * 30 / 100; /* 76, 29.688% kernel cut */
+static u32 bbr_inflight_headroom = BBR_UNIT * 18 / 100; /* 46, 17.969% */
+static u32 bbr_loss_thresh       = BBR_UNIT * 3 / 100;  /*  7, 2.734% */
+static u32 bbr_beta              = BBR_UNIT * 30 / 100; /* 76, 29.688% kernel cut */
 
-static const int bbr_ecn_factor       = BBR_UNIT * 1 / 3;
-static const int bbr_ecn_thresh       = BBR_UNIT * 1 / 2;
-static const int bbr_ecn_reprobe_gain = BBR_UNIT * 1 / 2;
-static const int bbr_full_loss_cnt    = 5;
-static const int bbr_full_ecn_cnt     = 2;
-static const int bbr_bw_probe_cwnd_gain = 1;
+static u32 bbr_ecn_factor       = BBR_UNIT * 1 / 3;
+static u32 bbr_ecn_thresh       = BBR_UNIT * 1 / 2;
+static u32 bbr_ecn_reprobe_gain = BBR_UNIT * 1 / 2;
+static u32 bbr_full_loss_cnt    = 5;
+static u32 bbr_full_ecn_cnt     = 2;
 ```
 
 Probe BW mean: `(358 + 194 + 263 + 286) / 4 / 256 = 1.0751953125x`.
@@ -105,7 +108,7 @@ With 1% pacing margin: about `1.161123047x`.
 
 Do not disable loss, ECN, recovery, app-limited filtering, or ProbeRTT logic.
 
-Do not increase `bbr_bw_probe_cwnd_gain` in the first patch.
+Do not increase `bbr_bw_probe_cwnd_gain` in BBRv3. In this BBRv2 base the matching direct knob does not exist; leave `bbr_bw_probe_pif_gain` at its base value in the first patch.
 
 Keep ECN base behavior initially.
 

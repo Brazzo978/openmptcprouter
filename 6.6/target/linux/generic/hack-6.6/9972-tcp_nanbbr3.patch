@@ -261,21 +261,21 @@ diff -uprN a/net/ipv4/tcp_nanbbr3.c b/net/ipv4/tcp_nanbbr3.c
 + * and send the same number of packets per RTT that an un-paced, slow-starting
 + * Reno or CUBIC flow would:
 + */
-+static const int bbr_startup_pacing_gain = BBR_UNIT * 3000 / 1000 + 1;
++static const int bbr_startup_pacing_gain = BBR_UNIT * 295 / 100 + 1;
 +/* The gain for deriving startup cwnd: */
-+static const int bbr_startup_cwnd_gain = BBR_UNIT * 3000 / 1000 + 1;
++static const int bbr_startup_cwnd_gain = BBR_UNIT * 250 / 100;
 +/* The pacing gain in BBR_DRAIN is calculated to typically drain
 + * the queue created in BBR_STARTUP in a single round:
 + */
-+static const int bbr_drain_gain = BBR_UNIT * 1000 / 3000;
++static const int bbr_drain_gain = BBR_UNIT * 100 / 295;
 +/* The gain for deriving steady-state cwnd tolerates delayed/stretched ACKs: */
 +static const int bbr_cwnd_gain  = BBR_UNIT * 2;
 +/* The pacing_gain values for the PROBE_BW gain cycle, to discover/share bw: */
 +static const int bbr_pacing_gain[] = {
-+	BBR_UNIT * 6 / 4,	/* UP: probe aggressively for more bw */
++	BBR_UNIT * 145 / 100,	/* UP: probe aggressively for more bw */
 +	BBR_UNIT * 3 / 4,	/* DOWN: drain queue and/or yield bw */
-+	BBR_UNIT * 5 / 4,	/* CRUISE: keep modest pressure above bw */
-+	BBR_UNIT * 6 / 4,	/* REFILL: refill aggressively */
++	BBR_UNIT * 105 / 100,	/* CRUISE: keep modest pressure above bw */
++	BBR_UNIT * 115 / 100,	/* REFILL: refill aggressively */
 +};
 +enum bbr_pacing_gain_phase {
 +	BBR_BW_PROBE_UP		= 0,  /* push up inflight to probe for bw/vol */
@@ -345,7 +345,7 @@ diff -uprN a/net/ipv4/tcp_nanbbr3.c b/net/ipv4/tcp_nanbbr3.c
 +static const u32 bbr_ecn_reprobe_gain = BBR_UNIT * 1 / 2;
 +
 +/* Estimate bw probing has gone too far if loss rate exceeds this level. */
-+static const u32 bbr_loss_thresh = BBR_UNIT * 2 / 100;  /* 2% loss */
++static const u32 bbr_loss_thresh = BBR_UNIT * 3 / 100;  /* ~2.7% loss */
 +
 +/* Slow down for a packet loss recovered by TLP? */
 +static const bool bbr_loss_probe_recovery = true;
@@ -354,7 +354,7 @@ diff -uprN a/net/ipv4/tcp_nanbbr3.c b/net/ipv4/tcp_nanbbr3.c
 + * and loss rate is higher than bbr_loss_thresh.
 + * Disabled if 0.
 + */
-+static const u32 bbr_full_loss_cnt = 6;
++static const u32 bbr_full_loss_cnt = 5;
 +
 +/* Exit STARTUP if number of round trips with ECN mark rate above ecn_thresh
 + * meets this count.
@@ -362,7 +362,7 @@ diff -uprN a/net/ipv4/tcp_nanbbr3.c b/net/ipv4/tcp_nanbbr3.c
 +static const u32 bbr_full_ecn_cnt = 2;
 +
 +/* Fraction of unutilized headroom to try to leave in path upon high loss. */
-+static const u32 bbr_inflight_headroom = BBR_UNIT * 15 / 100;
++static const u32 bbr_inflight_headroom = BBR_UNIT * 16 / 100;
 +
 +/* How much do we increase cwnd_gain when probing for bandwidth in
 + * BBR_BW_PROBE_UP? This specifies the increment in units of

@@ -1,0 +1,155 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Brazzo978 <brazzo978@users.noreply.github.com>
+Date: Tue, 12 May 2026 12:00:00 +0200
+Subject: [PATCH] mptcp: expose extended MPTCP_INFO telemetry
+
+Backport the small MPTCP_INFO telemetry extension used by newer LTS
+kernels. This keeps the existing 6.6 MPTCP behaviour unchanged while
+making user space able to show:
+
+- total subflows, including the initial subflow
+- milliseconds since last MPTCP data sent
+- milliseconds since last MPTCP data received
+- milliseconds since last MPTCP ACK received
+
+The fields are appended to struct mptcp_info, preserving compatibility
+with older userspace that requests a shorter optlen.
+---
+ include/uapi/linux/mptcp.h |  5 +++++
+ net/mptcp/options.c        |  1 +
+ net/mptcp/protocol.c       |  5 +++++
+ net/mptcp/protocol.h       | 15 +++++++++++++++
+ net/mptcp/sockopt.c        | 21 +++++++++++++++------
+ 5 files changed, 41 insertions(+), 6 deletions(-)
+
+diff --git a/include/uapi/linux/mptcp.h b/include/uapi/linux/mptcp.h
+--- a/include/uapi/linux/mptcp.h	2026-05-12 12:41:17.146740703 +0200
++++ b/include/uapi/linux/mptcp.h	2026-05-12 12:41:17.174740446 +0200
+@@ -131,6 +131,11 @@
+ 	__u64	mptcpi_bytes_sent;
+ 	__u64	mptcpi_bytes_received;
+ 	__u64	mptcpi_bytes_acked;
++	__u8	mptcpi_subflows_total;
++	__u8	reserved[3];
++	__u32	mptcpi_last_data_sent;
++	__u32	mptcpi_last_data_recv;
++	__u32	mptcpi_last_ack_recv;
+ };
+ 
+ /*
+diff --git a/net/mptcp/options.c b/net/mptcp/options.c
+--- a/net/mptcp/options.c	2026-05-12 12:41:17.150740667 +0200
++++ b/net/mptcp/options.c	2026-05-12 12:41:17.174740446 +0200
+@@ -1113,6 +1113,7 @@
+ 		__mptcp_snd_una_update(msk, new_snd_una);
+ 		__mptcp_data_acked(sk);
+ 	}
++	msk->last_ack_recv = tcp_jiffies32;
+ 	mptcp_data_unlock(sk);
+ 
+ 	trace_ack_update_msk(mp_opt->data_ack,
+diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
+--- a/net/mptcp/protocol.c	2026-05-12 12:41:17.158740593 +0200
++++ b/net/mptcp/protocol.c	2026-05-12 12:41:17.174740446 +0200
+@@ -789,6 +789,7 @@
+ 		}
+ 		msk->bytes_received += end_seq - msk->ack_seq;
+ 		msk->ack_seq = end_seq;
++		msk->last_data_recv = tcp_jiffies32;
+ 		moved = true;
+ 	}
+ 	return moved;
+@@ -1569,6 +1570,7 @@
+ 	 */
+ 	if (likely(after64(snd_nxt_new, msk->snd_nxt))) {
+ 		msk->bytes_sent += snd_nxt_new - msk->snd_nxt;
++		msk->last_data_sent = tcp_jiffies32;
+ 		msk->snd_nxt = snd_nxt_new;
+ 	}
+ }
+@@ -2909,6 +2911,9 @@
+ 	msk->allow_subflows = true;
+ 	msk->recovery = false;
+ 	msk->subflow_id = 1;
++	msk->last_data_sent = tcp_jiffies32;
++	msk->last_data_recv = tcp_jiffies32;
++	msk->last_ack_recv = tcp_jiffies32;
+ 
+ 	mptcp_pm_data_init(msk);
+ 	spin_lock_init(&msk->fallback_lock);
+diff --git a/net/mptcp/protocol.h b/net/mptcp/protocol.h
+--- a/net/mptcp/protocol.h	2026-05-12 12:41:17.162740556 +0200
++++ b/net/mptcp/protocol.h	2026-05-12 12:41:17.174740446 +0200
+@@ -281,6 +281,9 @@
+ 	u64		bytes_acked;
+ 	u64		snd_una;
+ 	u64		wnd_end;
++	u32		last_data_sent;
++	u32		last_data_recv;
++	u32		last_ack_recv;
+ 	unsigned long	timer_ival;
+ 	u32		token;
+ 	int		rmem_released;
+@@ -1118,6 +1121,15 @@
+ 	return test_bit(MPTCP_FALLBACK_DONE, &msk->flags);
+ }
+ 
++static inline bool __mptcp_has_initial_subflow(const struct mptcp_sock *msk)
++{
++	struct sock *ssk = READ_ONCE(msk->first);
++
++	return ssk && ((1 << inet_sk_state_load(ssk)) &
++		       (TCPF_ESTABLISHED | TCPF_SYN_SENT |
++			TCPF_SYN_RECV | TCPF_LISTEN));
++}
++
+ static inline bool mptcp_check_fallback(const struct sock *sk)
+ {
+ 	struct mptcp_subflow_context *subflow = mptcp_subflow_ctx(sk);
+diff --git a/net/mptcp/sockopt.c b/net/mptcp/sockopt.c
+--- a/net/mptcp/sockopt.c	2026-05-12 12:41:17.166740520 +0200
++++ b/net/mptcp/sockopt.c	2026-05-12 12:41:17.190740299 +0200
+@@ -922,6 +922,7 @@
+ 	struct sock *sk = (struct sock *)msk;
+ 	u32 flags = 0;
+ 	bool slow;
++	u32 now;
+ 
+ 	memset(info, 0, sizeof(*info));
+ 
+@@ -950,21 +951,29 @@
+ 	if (READ_ONCE(msk->can_ack))
+ 		flags |= MPTCP_INFO_FLAG_REMOTE_KEY_RECEIVED;
+ 	info->mptcpi_flags = flags;
+-	mptcp_data_lock(sk);
+-	info->mptcpi_snd_una = msk->snd_una;
+-	info->mptcpi_rcv_nxt = msk->ack_seq;
+-	info->mptcpi_bytes_acked = msk->bytes_acked;
+-	mptcp_data_unlock(sk);
+ 
+ 	slow = lock_sock_fast(sk);
+-	info->mptcpi_csum_enabled = msk->csum_enabled;
++	now = tcp_jiffies32;
++	info->mptcpi_csum_enabled = READ_ONCE(msk->csum_enabled);
+ 	info->mptcpi_token = msk->token;
+ 	info->mptcpi_write_seq = msk->write_seq;
+ 	info->mptcpi_retransmits = inet_csk(sk)->icsk_retransmits;
+ 	info->mptcpi_bytes_sent = msk->bytes_sent;
+ 	info->mptcpi_bytes_received = msk->bytes_received;
+ 	info->mptcpi_bytes_retrans = msk->bytes_retrans;
++	info->mptcpi_subflows_total = info->mptcpi_subflows +
++		__mptcp_has_initial_subflow(msk);
++	info->mptcpi_last_data_sent = jiffies_to_msecs(now - msk->last_data_sent);
++	info->mptcpi_last_data_recv = jiffies_to_msecs(now - msk->last_data_recv);
+ 	unlock_sock_fast(sk, slow);
++
++	mptcp_data_lock(sk);
++	info->mptcpi_last_ack_recv = jiffies_to_msecs(now - msk->last_ack_recv);
++	info->mptcpi_snd_una = msk->snd_una;
++	info->mptcpi_rcv_nxt = msk->ack_seq;
++	info->mptcpi_bytes_acked = msk->bytes_acked;
++	mptcp_data_unlock(sk);
++
+ }
+ EXPORT_SYMBOL_GPL(mptcp_diag_fill_info);
+ 

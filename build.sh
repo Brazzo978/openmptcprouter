@@ -11,6 +11,7 @@ set -e
 
 umask 0022
 unset GREP_OPTIONS SED
+export FORCE_UNSAFE_CONFIGURE=1
 
 _get_repo() (
 	mkdir -p "$1"
@@ -47,11 +48,21 @@ SHORTCUT_FE=${SHORTCUT_FE:-no}
 DISABLE_FAILSAFE=${DISABLE_FAILSAFE:-no}
 #OMR_RELEASE=${OMR_RELEASE:-$(git describe --tags `git rev-list --tags --max-count=1` | sed 's/^\([0-9.]*\).*/\1/')}
 #OMR_RELEASE=${OMR_RELEASE:-$(git tag --sort=committerdate | tail -1)}
-OMR_RELEASE=${OMR_RELEASE:-v0.62.5-3K}
-OMR_REPO=${OMR_REPO:-http://$OMR_HOST:$OMR_PORT/release/$OMR_RELEASE-$OMR_KERNEL/$OMR_TARGET}
+OMR_RELEASE=${OMR_RELEASE:-v0.62.14-3K}
+OMR_PACKAGE_FEED_RELEASE=${OMR_PACKAGE_FEED_RELEASE:-v0.62-${OMR_KERNEL}}
+if [ -z "${OMR_REPO:-}" ]; then
+	case "$OMR_RELEASE" in
+		v0.62.*-3[Kk]*)
+			OMR_REPO="https://download.openmptcprouter.com/release/$OMR_PACKAGE_FEED_RELEASE/$OMR_TARGET"
+		;;
+		*)
+			OMR_REPO="http://$OMR_HOST:$OMR_PORT/release/$OMR_RELEASE-$OMR_KERNEL/$OMR_TARGET"
+		;;
+	esac
+fi
 
 OMR_FEED_URL="${OMR_FEED_URL:-https://github.com/Brazzo978/openmptcprouter-feeds}"
-OMR_FEED_SRC="${OMR_FEED_SRC:-omr-v0.62.5-3K-stable-local}"
+OMR_FEED_SRC="${OMR_FEED_SRC:-omr-v0.62.14-3K}"
 
 CUSTOM_FEED_URL="${CUSTOM_FEED_URL}"
 CUSTOM_FEED_URL_BRANCH="${CUSTOM_FEED_URL_BRANCH:-main}"
@@ -76,7 +87,9 @@ elif [ "$OMR_TARGET" = "wrt3200acm" ] || [ "$OMR_TARGET" = "wrt32x" ]; then
 	OMR_REAL_TARGET="arm_cortex-a9_vfpv3-d16"
 elif [ "$OMR_TARGET" = "rpi2" ] || [ "$OMR_TARGET" = "bpi-r1" ] || [ "$OMR_TARGET" = "bpi-r2" ] || [ "$OMR_TARGET" = "rutx" ] || [ "$OMR_TARGET" = "rutx12" ] || [ "$OMR_TARGET" = "rutx50" ] || [ "$OMR_TARGET" = "p2w_r619ac" ]; then
 	OMR_REAL_TARGET="arm_cortex-a7_neon-vfpv4"
-elif [ "$OMR_TARGET" = "rpi3" ] || [ "$OMR_TARGET" = "bpi-r3" ] || [ "$OMR_TARGET" = "bpi-r3-mini" ] || [ "$OMR_TARGET" = "bpi-r4" ] || [ "$OMR_TARGET" = "bpi-r4-poe" ] || [ "$OMR_TARGET" = "bpi-r64" ] || [ "$OMR_TARGET" = "espressobin" ] || [ "$OMR_TARGET" = "z8102ax_128m" ] || [ "$OMR_TARGET" = "z8102ax_64m" ] || [ "$OMR_TARGET" = "z8109ax_128m" ] || [ "$OMR_TARGET" = "bpi-r4" ] || [ "$OMR_TARGET" = "bpi-r4-poe" ] || [ "$OMR_TARGET" = "bpi-r3" ] || [ "$OMR_TARGET" = "bpi-r3-mini" ] || [ "$OMR_TARGET" = "espressobin" ] || [ "$OMR_TARGET" = "gl-mt2500" ] || [ "$OMR_TARGET" = "gl-mt6000" ]; then
+elif [ "$OMR_TARGET" = "rpi5" ]; then
+	OMR_REAL_TARGET="aarch64_cortex-a76"
+elif [ "$OMR_TARGET" = "rpi3" ] || [ "$OMR_TARGET" = "bpi-r3" ] || [ "$OMR_TARGET" = "bpi-r3-mini" ] || [ "$OMR_TARGET" = "bpi-r4" ] || [ "$OMR_TARGET" = "bpi-r4-poe" ] || [ "$OMR_TARGET" = "bpi-r64" ] || [ "$OMR_TARGET" = "espressobin" ] || [ "$OMR_TARGET" = "z8102ax_128m" ] || [ "$OMR_TARGET" = "z8102ax_64m" ] || [ "$OMR_TARGET" = "z8109ax_128m" ] || [ "$OMR_TARGET" = "bpi-r4" ] || [ "$OMR_TARGET" = "bpi-r4-poe" ] || [ "$OMR_TARGET" = "bpi-r3" ] || [ "$OMR_TARGET" = "bpi-r3-mini" ] || [ "$OMR_TARGET" = "espressobin" ] || [ "$OMR_TARGET" = "gl-mt2500" ] || [ "$OMR_TARGET" = "gl-mt3000" ] || [ "$OMR_TARGET" = "gl-mt6000" ]; then
 	OMR_REAL_TARGET="aarch64_cortex-a53"
 elif [ "$OMR_TARGET" = "x86" ]; then
 	OMR_REAL_TARGET="i386_pentium4"
@@ -231,11 +244,11 @@ fi
 if [ "$OMR_KERNEL" != "6.12" ]; then
 	if [ "$OMR_DIST" = "openmptcprouter" ]; then
 		cat > "$OMR_TARGET/${OMR_KERNEL}/source/package/system/opkg/files/customfeeds.conf" <<-EOF
-		src/gz openwrt_luci http://packages.openmptcprouter.com/${OMR_RELEASE}/${OMR_REAL_TARGET}/luci
-		src/gz openwrt_packages http://packages.openmptcprouter.com/${OMR_RELEASE}/${OMR_REAL_TARGET}/packages
-		src/gz openwrt_base http://packages.openmptcprouter.com/${OMR_RELEASE}/${OMR_REAL_TARGET}/base
-		src/gz openwrt_routing http://packages.openmptcprouter.com/${OMR_RELEASE}/${OMR_REAL_TARGET}/routing
-		src/gz openwrt_telephony http://packages.openmptcprouter.com/${OMR_RELEASE}/${OMR_REAL_TARGET}/telephony
+		src/gz openwrt_luci https://packages.openmptcprouter.com/${OMR_PACKAGE_FEED_RELEASE}/${OMR_REAL_TARGET}/luci
+		src/gz openwrt_packages https://packages.openmptcprouter.com/${OMR_PACKAGE_FEED_RELEASE}/${OMR_REAL_TARGET}/packages
+		src/gz openwrt_base https://packages.openmptcprouter.com/${OMR_PACKAGE_FEED_RELEASE}/${OMR_REAL_TARGET}/base
+		src/gz openwrt_routing https://packages.openmptcprouter.com/${OMR_PACKAGE_FEED_RELEASE}/${OMR_REAL_TARGET}/routing
+		src/gz openwrt_telephony https://packages.openmptcprouter.com/${OMR_PACKAGE_FEED_RELEASE}/${OMR_REAL_TARGET}/telephony
 		EOF
 	elif [ -n "$OMR_PACKAGES_URL" ]; then
 		cat > "$OMR_TARGET/${OMR_KERNEL}/source/package/system/opkg/files/customfeeds.conf" <<-EOF
@@ -265,11 +278,11 @@ if [ "$OMR_KERNEL" != "6.12" ]; then
 else
 	if [ "$OMR_DIST" = "openmptcprouter" ]; then
 		cat > "$OMR_TARGET/${OMR_KERNEL}/source/package/system/apk/files/customfeeds.list" <<-EOF
-		http://packages.openmptcprouter.com/${OMR_RELEASE}/${OMR_REAL_TARGET}/luci/packages.adb
-		http://packages.openmptcprouter.com/${OMR_RELEASE}/${OMR_REAL_TARGET}/packages/packages.adb
-		http://packages.openmptcprouter.com/${OMR_RELEASE}/${OMR_REAL_TARGET}/base/packages.adb
-		http://packages.openmptcprouter.com/${OMR_RELEASE}/${OMR_REAL_TARGET}/routing/packages.adb
-		http://packages.openmptcprouter.com/${OMR_RELEASE}/${OMR_REAL_TARGET}/telephony/packages.adb
+		https://packages.openmptcprouter.com/${OMR_PACKAGE_FEED_RELEASE}/${OMR_REAL_TARGET}/luci/packages.adb
+		https://packages.openmptcprouter.com/${OMR_PACKAGE_FEED_RELEASE}/${OMR_REAL_TARGET}/packages/packages.adb
+		https://packages.openmptcprouter.com/${OMR_PACKAGE_FEED_RELEASE}/${OMR_REAL_TARGET}/base/packages.adb
+		https://packages.openmptcprouter.com/${OMR_PACKAGE_FEED_RELEASE}/${OMR_REAL_TARGET}/routing/packages.adb
+		https://packages.openmptcprouter.com/${OMR_PACKAGE_FEED_RELEASE}/${OMR_REAL_TARGET}/telephony/packages.adb
 		EOF
 	elif [ -n "$OMR_PACKAGES_URL" ]; then
 		cat > "$OMR_TARGET/${OMR_KERNEL}/source/package/system/apk/files/customfeeds.list" <<-EOF
@@ -829,6 +842,46 @@ if [ "$OMR_KERNEL" = "6.6" ]; then
 		NOT_SUPPORTED="1"
 	fi
 fi
+if [ "$OMR_KERNEL" = "6.6" ]; then
+	echo "Ensure 3K BBR congestion-control patchset is present"
+	for patch_file in \
+		997-BBRv3.patch \
+		9970-BBRv1-v2-sidecar.patch \
+		9971-tcp_nanqinlang.patch \
+		9972-tcp_nanbbr3.patch \
+		9973-tcp_nanbbr1.patch \
+		9974-tcp_nanbbr2.patch \
+		9975-tcp_nanbbr_var.patch; do
+		if [ -f "../../../6.6/target/linux/generic/hack-6.6/${patch_file}" ]; then
+			cp -f "../../../6.6/target/linux/generic/hack-6.6/${patch_file}" "target/linux/generic/hack-6.6/${patch_file}"
+		fi
+	done
+	for patch_file in \
+		902-stable-page_pool-avoid-infinite-delayed-worker-loop.patch \
+		903-stable-net_sched-limit-bulk-dequeue-batches.patch; do
+		if [ -f "../../../6.6/target/linux/generic/backport-6.6/${patch_file}" ]; then
+			cp -f "../../../6.6/target/linux/generic/backport-6.6/${patch_file}" "target/linux/generic/backport-6.6/${patch_file}"
+		fi
+	done
+	for opt in \
+		CONFIG_TCP_CONG_BBR CONFIG_TCP_CONG_BBR1 CONFIG_TCP_CONG_BBR2 \
+		CONFIG_TCP_CONG_NANQINLANG \
+		CONFIG_TCP_CONG_NANBBR1_LIGHT CONFIG_TCP_CONG_NANBBR1_DEF CONFIG_TCP_CONG_NANBBR1_AGGR \
+		CONFIG_TCP_CONG_NANBBR2_LIGHT CONFIG_TCP_CONG_NANBBR2_DEF CONFIG_TCP_CONG_NANBBR2_AGGR \
+		CONFIG_TCP_CONG_NANBBR3_LIGHT CONFIG_TCP_CONG_NANBBR3_DEF CONFIG_TCP_CONG_NANBBR3_AGGR \
+		CONFIG_TCP_CONG_NANBBR1_VAR CONFIG_TCP_CONG_NANBBR2_VAR CONFIG_TCP_CONG_NANBBR3_VAR; do
+		sed -i "/^${opt}=/d;/^# ${opt} is not set/d" target/linux/generic/config-6.6
+		echo "${opt}=y" >> target/linux/generic/config-6.6
+	done
+	for opt in \
+		CONFIG_DEFAULT_NANQINLANG \
+		CONFIG_DEFAULT_NANBBR1_LIGHT CONFIG_DEFAULT_NANBBR1_DEF CONFIG_DEFAULT_NANBBR1_AGGR \
+		CONFIG_DEFAULT_NANBBR2_LIGHT CONFIG_DEFAULT_NANBBR2_DEF CONFIG_DEFAULT_NANBBR2_AGGR \
+		CONFIG_DEFAULT_NANBBR3_LIGHT CONFIG_DEFAULT_NANBBR3_DEF CONFIG_DEFAULT_NANBBR3_AGGR; do
+		sed -i "/^${opt}=/d;/^# ${opt} is not set/d" target/linux/generic/config-6.6
+		echo "# ${opt} is not set" >> target/linux/generic/config-6.6
+	done
+fi
 if [ "$OMR_KERNEL" = "6.10" ]; then
 	echo "Set to kernel 6.10 for x86 arch"
 	find target/linux/x86 -type f -name Makefile -exec sed -i 's%KERNEL_PATCHVER:=6.6%KERNEL_PATCHVER:=6.10%g' {} \;
@@ -1077,6 +1130,9 @@ fi
 #fi
 cp .config.keep .config
 scripts/feeds install kmod-macremapper
+if [ "$OMR_TARGET" = "x86_64" ]; then
+	scripts/feeds install -p packages btop
+fi
 echo "Done"
 
 if [ ! -f "../../../$OMR_TARGET_CONFIG" ] || [ "$NOT_SUPPORTED" = "1" ]; then
@@ -1086,5 +1142,24 @@ fi
 [ "$ONLY_PREPARE" = "yes" ] && exit 0
 echo "Building $OMR_DIST for the target $OMR_TARGET with kernel ${OMR_KERNEL}"
 make defconfig
-make IGNORE_ERRORS=m "$@"
+if [ "$OMR_TARGET" = "x86_64" ]; then
+	for required_package in openmptcprouter speedtestcpp htop btop; do
+		if ! grep -qx "CONFIG_PACKAGE_${required_package}=y" .config; then
+			echo "E: required x86_64 package ${required_package} is not built-in" >&2
+			exit 1
+		fi
+	done
+	if [ ! -x "../../../$OMR_FEED/openmptcprouter/files/usr/bin/speedtest" ]; then
+		echo "E: official Ookla speedtest binary is missing from the openmptcprouter package" >&2
+		exit 1
+	fi
+fi
+if [ "${OMR_SERIAL_TOOLS:-no}" = "yes" ]; then
+	make tools/compile -j1 V=s
+fi
+if [ "${OMR_SERIAL_NET_SNMP:-no}" = "yes" ]; then
+	make package/feeds/packages/net-snmp/compile -j1 V=s
+fi
+OMR_JOBS=${OMR_JOBS:-$(nproc 2>/dev/null || echo 1)}
+make -j"$OMR_JOBS" IGNORE_ERRORS=m "$@"
 echo "Done"

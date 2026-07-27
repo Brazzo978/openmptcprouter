@@ -1760,7 +1760,7 @@ Signed-off-by: Alexandre Frade <kernel@xanmod.org>
  }
  
  /* Pace using current bw estimate and a gain factor. */
-@@ -294,31 +472,38 @@ static void bbr_set_pacing_rate(struct s
+@@ -294,31 +472,46 @@ static void bbr_set_pacing_rate(struct s
  		sk->sk_pacing_rate = rate;
  }
  
@@ -1781,9 +1781,17 @@ Signed-off-by: Alexandre Frade <kernel@xanmod.org>
  {
 -	u32 segs;
 +	struct bbr *bbr = inet_csk_ca(sk);
-+	u32 segs, r;
++	struct net *net = sock_net(sk);
++	u32 segs, r, min_tso_segs = 2;
  	u64 bytes;
  
++	if (likely(net))
++		min_tso_segs = READ_ONCE(net->ipv4.sysctl_tcp_min_tso_segs);
++	if (unlikely(!mss_now))
++		return min_tso_segs;
++	if (unlikely(gso_max_size <= MAX_TCP_HEADER + 1))
++		gso_max_size = GSO_LEGACY_MAX_SIZE;
++
  	/* Budget a TSO/GSO burst size allowance based on bw (pacing_rate). */
  	bytes = sk->sk_pacing_rate >> sk->sk_pacing_shift;
  
@@ -1800,7 +1808,7 @@ Signed-off-by: Alexandre Frade <kernel@xanmod.org>
  	bytes = min_t(u32, bytes, gso_max_size - 1 - MAX_TCP_HEADER);
 -	segs = max_t(u32, bytes / mss_now, bbr_min_tso_segs(sk));
 +	segs = max_t(u32, div_u64(bytes, mss_now),
-+		     sock_net(sk)->ipv4.sysctl_tcp_min_tso_segs);
++		     min_tso_segs);
  	return segs;
  }
  

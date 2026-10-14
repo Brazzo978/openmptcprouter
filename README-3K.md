@@ -25,4 +25,12 @@ A shallow clone of this 3K branch can omit the upstream base commit required for
 
 If a checkout already has local 3K work at the official feed base `818fa5116eefc99325e0f231e819dc51b062ef85`, `OMR3K_ALLOW_LOCAL_EDITS=yes python3 bootstrap-3k.py verify` explicitly allows that one dirty feed for development. The same override can be passed to `run-build-3k.sh`. It does not materialize a release and the output says `DEVELOPMENT ONLY`. Release builds use the published feed commit `b5f28146bc807d90c2bda0da8d83111c2bf34f71` without this override.
 
-The client kernel 6.18 contains the 3K congestion modules alongside the upstream BBRv3 module (kernel name `bbr`); the intended default is BBRv3. Keep the router image and paired VPS release at their respective pinned commits when deploying them together.
+The client kernel 6.18.39 contains the 3K congestion controls alongside upstream BBRv3 (kernel name `bbr`). BBRv3 is the kernel, new-install UCI and GUI default; an existing explicit choice is preserved. Keep the router image and paired VPS release at their respective pinned commits when deploying them together.
+
+## Frozen candidate and validation
+
+The final four x86_64 images and paired VPS packages are published under https://repoomr.3klab.com/frozen3k/v0.64.2-20261013/. The release manifest records exact source commits, sizes and SHA256. `validation/` in this Git branch contains the image, BIOS/UEFI boot, BTF and HTTPS mirror reports.
+
+The strict final firmware build completed successfully with 641 packages. The final ext4 image booted in isolated BIOS QEMU with BBRv3 selected, passed real loopback TCP transfers with all 18 controls, and registered/selected all eight BPF schedulers. NanBBR VAR applied 75 with matching readback and restored BBRv3 afterward. The final squashfs EFI image booted through OVMF with kernel 6.18.39 and default `bbr`. The GUI displayed BBRv3, the VAR slider, advanced Path diagnostics and the unchanged upstream Bandwidth page. All four published images were downloaded over HTTPS and matched their hashes.
+
+These are functional VM checks. Real multi-WAN load/performance, the complete PC/phone WireGuard to VPS to OMR GUI path, and production VPS installation remain deployment checks. No production system was installed or rebooted.

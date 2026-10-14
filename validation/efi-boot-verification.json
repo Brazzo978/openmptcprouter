@@ -1,0 +1,49 @@
+{
+  "status": "pass",
+  "image_path": "/root/openmptcprouter-v0.64.2-3k-build/x86_64/6.18/source/bin/targets/x86/64/openmptcprouter-v0.64.2-3k-r0-c0e9507-x86-64-generic-squashfs-combined-efi.img.gz",
+  "image_sha256": "87ce7cf6f165631e912aa08e7eed3ece47caa96db5078a3300bde71df4bf242b",
+  "firmware_build_exit": 0,
+  "vm": {
+    "machine": "q35",
+    "acceleration": "tcg",
+    "firmware": "Debian 13 OVMF 2025.02-8+deb13u1",
+    "ovmf_deb_sha256": "78e0d54df11fc77406cb7a0bc9a39e5bca6d1cbe06556b91d9a73491c52decdf",
+    "network": "QEMU user restrict, no host bridge"
+  },
+  "guest": {
+    "uefi_present": true,
+    "kernel_release": "6.18.39",
+    "omr_version": "v0.64.2-3K",
+    "tcp_congestion_control": "bbr",
+    "tcp_available_congestion_control": [
+      "reno",
+      "bbr",
+      "bbr1",
+      "bbr2",
+      "nanqinlang",
+      "nanbbr3_light",
+      "nanbbr3_def",
+      "nanbbr3_aggr",
+      "nanbbr1_light",
+      "nanbbr1_def",
+      "nanbbr1_aggr",
+      "nanbbr2_light",
+      "nanbbr2_def",
+      "nanbbr2_aggr",
+      "nanbbr1_var",
+      "nanbbr2_var",
+      "nanbbr3_var",
+      "cubic"
+    ]
+  },
+  "evidence": [
+    "SHA256 checksum of final compressed EFI image verified before decompression",
+    "OpenMPTCProuter login prompt reached on serial console",
+    "/sys/firmware/efi exists in guest",
+    "uname -r and TCP sysctls read inside guest"
+  ],
+  "limits": [
+    "The bbr sysctl name is confirmed; BBRv3 implementation mapping is from pinned kernel source and image verification, not distinguishable by the sysctl text alone.",
+    "No WAN or production router was touched."
+  ]
+}

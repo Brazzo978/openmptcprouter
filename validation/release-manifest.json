@@ -1,0 +1,97 @@
+{
+  "release": "v0.64.2-3K-base-20261013",
+  "state": "frozen-base-ready-for-testing",
+  "tcp_default": {
+    "name": "bbr",
+    "implementation": "BBRv3"
+  },
+  "sources": {
+    "router": {
+      "url": "https://github.com/Brazzo978/openmptcprouter",
+      "code_commit": "4dd452da2d23b78b6a4a10ab95b0873b534e364b"
+    },
+    "feed": {
+      "url": "https://github.com/Brazzo978/openmptcprouter-feeds",
+      "commit": "b5f28146bc807d90c2bda0da8d83111c2bf34f71"
+    },
+    "vps": {
+      "url": "https://github.com/Brazzo978/openmptcprouter-vps",
+      "code_commit": "02ceff7ba1191e73af710b79e81f2070c2798dd2",
+      "validation_commit": "f98afde571033d0debb9fce5186f3274902c3f11"
+    }
+  },
+  "kernels": {
+    "router": "6.18.39",
+    "vps": "6.18.41-20261013.x64v3-omr-3k"
+  },
+  "vps_kernel_packages": {
+    "image": {
+      "url": "https://repoomr.3klab.com/frozen3k/v0.64.2-20261013/vps-kernel/image.deb",
+      "sha256": "b7e6d5b3e8bd94e187c5897a26f71f06cf10625d82ea308f89612cdcb79d3369",
+      "size": 112402460,
+      "package": "linux-image-6.18.41-20261013.x64v3-omr-3k",
+      "version": "6.18.41-gf72c0ed9ce8e-3",
+      "source_filename": "linux-image-6.18.41-20261013.x64v3-omr-3k_6.18.41-gf72c0ed9ce8e-3_amd64.deb"
+    },
+    "headers": {
+      "url": "https://repoomr.3klab.com/frozen3k/v0.64.2-20261013/vps-kernel/headers.deb",
+      "sha256": "811980c9c3d7f09086f09914f3e859a19615e27c7961d2c018c53dccb5d535b5",
+      "size": 10379432,
+      "package": "linux-headers-6.18.41-20261013.x64v3-omr-3k",
+      "version": "6.18.41-gf72c0ed9ce8e-3",
+      "source_filename": "linux-headers-6.18.41-20261013.x64v3-omr-3k_6.18.41-gf72c0ed9ce8e-3_amd64.deb"
+    }
+  },
+  "vps_api": {
+    "version": "0.18+20261013-3k1",
+    "sha256": "3c29f4afdfc6292a0a68641001f263694124f496d469ab98afe4a6c737f0edf8",
+    "url": "https://repoomr.3klab.com/frozen3k/v0.64.2-20261013/vps-api/omr-vps-admin_0.18+20261013-3k1_all.deb"
+  },
+  "frozen_omr_packages": 21,
+  "frozen_omr_lock_sha256": "72956c2068e105b4a1697de11593900e08832b1cce27b69634a64a2e2c8b258a",
+  "pending_deployment_validation": [
+    "real multi-WAN load and performance",
+    "complete PC/phone WireGuard to VPS to OMR GUI path",
+    "full VPS installer on production hardware"
+  ],
+  "production_installed_or_rebooted": false,
+  "client_images": [
+    {
+      "name": "openmptcprouter-v0.64.2-3k-r0-c0e9507-x86-64-generic-squashfs-combined.img.gz",
+      "size": 78953003,
+      "sha256": "b8a6e1f1727b55fc0515150e6a6b7a629e8b5784d53930f0e03211aa4af3b71a",
+      "url": "https://repoomr.3klab.com/frozen3k/v0.64.2-20261013/client/openmptcprouter-v0.64.2-3k-r0-c0e9507-x86-64-generic-squashfs-combined.img.gz"
+    },
+    {
+      "name": "openmptcprouter-v0.64.2-3k-r0-c0e9507-x86-64-generic-ext4-combined.img.gz",
+      "size": 97777060,
+      "sha256": "0044850d29c59f5cf5be44ec3c34d7c049cb0e00701bb0e7e04c89e906290228",
+      "url": "https://repoomr.3klab.com/frozen3k/v0.64.2-20261013/client/openmptcprouter-v0.64.2-3k-r0-c0e9507-x86-64-generic-ext4-combined.img.gz"
+    },
+    {
+      "name": "openmptcprouter-v0.64.2-3k-r0-c0e9507-x86-64-generic-ext4-combined-efi.img.gz",
+      "size": 97980082,
+      "sha256": "b1147002d69f783c82bf8471624ecd9fa5031452566dbac113e42c4b5ef03d17",
+      "url": "https://repoomr.3klab.com/frozen3k/v0.64.2-20261013/client/openmptcprouter-v0.64.2-3k-r0-c0e9507-x86-64-generic-ext4-combined-efi.img.gz"
+    },
+    {
+      "name": "openmptcprouter-v0.64.2-3k-r0-c0e9507-x86-64-generic-squashfs-combined-efi.img.gz",
+      "size": 79159593,
+      "sha256": "87ce7cf6f165631e912aa08e7eed3ece47caa96db5078a3300bde71df4bf242b",
+      "url": "https://repoomr.3klab.com/frozen3k/v0.64.2-20261013/client/openmptcprouter-v0.64.2-3k-r0-c0e9507-x86-64-generic-squashfs-combined-efi.img.gz"
+    }
+  ],
+  "validation": {
+    "router_bios_boot": true,
+    "router_efi_boot": true,
+    "router_tcp_controls": 18,
+    "router_bpf_schedulers": 8,
+    "vps_tcp_controls": 18,
+    "vps_custom_modules": 15,
+    "vps_native_var_profiles": 3,
+    "api_tests_passed": 980,
+    "api_tests_skipped": 9,
+    "client_mirror_verified": true,
+    "vps_mirror_verified": true
+  }
+}

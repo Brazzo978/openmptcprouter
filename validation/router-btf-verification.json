@@ -1,0 +1,49 @@
+{
+  "bbr1_kfunc_btf_ids": {},
+  "bbr1_kfunc_count": 0,
+  "bbr1_kfunc_mode": "disabled_by_kernel_config",
+  "bbr1_kfunc_patch_applied": true,
+  "bbr1_source_kfunc_count": 8,
+  "custom_controls_built_in": [
+    "bbr1",
+    "bbr2",
+    "nanqinlang",
+    "nanbbr1_light",
+    "nanbbr1_def",
+    "nanbbr1_aggr",
+    "nanbbr1_var",
+    "nanbbr2_light",
+    "nanbbr2_def",
+    "nanbbr2_aggr",
+    "nanbbr2_var",
+    "nanbbr3_light",
+    "nanbbr3_def",
+    "nanbbr3_aggr",
+    "nanbbr3_var"
+  ],
+  "custom_controls_built_in_count": 15,
+  "default_implementation": "BBRv3",
+  "default_tcp_congestion_control": "bbr",
+  "kernel": "6.18.39",
+  "namespace_patch_applied": true,
+  "patch_sha256": {
+    "9999-tcp-custom-cc-3k.patch": "ae526abf0900d4c9ed6f62561e593b5fae84fb2d696cb6fffbc362bf642da254",
+    "9999-z-tcp-custom-cc-namespaces.patch": "4218603b59d23d874351d90ed3c326bc5aa937cf783708f07e05a929170678a3",
+    "9999-zz-tcp-custom-cc-module-metadata.patch": "44790726f93dbfda632c97625ebfbbd752c855168c91b122dfc4695badf31d07",
+    "9999-zzz-tcp-bbr1-kfunc.patch": "f67802a61d02a37c905c6acb393b69074922b2b1c678644dfe4e56f1a75c2f0a"
+  },
+  "status": "pass",
+  "stock_bbr_kfunc_btf_ids": {
+    "bbr_cwnd_event": 56717,
+    "bbr_init": 56722,
+    "bbr_main": 56726,
+    "bbr_set_state": 56731,
+    "bbr_skb_marked_lost": 56733,
+    "bbr_sndbuf_expand": 56735,
+    "bbr_ssthresh": 56737,
+    "bbr_tso_segs": 56740,
+    "bbr_undo_cwnd": 56742
+  },
+  "stock_bbr_kfunc_count": 9,
+  "vmlinux_sha256": "8531a95bc856105424b0a089e9744f640c626a2beeace6f5989acf077f530bf1"
+}

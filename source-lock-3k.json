@@ -1,14 +1,14 @@
 {
   "client_feed_release": {
     "branch_for_review": "omr-v0.64.2-3K",
-    "commit": "b5f28146bc807d90c2bda0da8d83111c2bf34f71",
+    "commit": "71208ff19f948ad18eff12331e53cf733095ae2d",
     "path": "feeds/openmptcprouter",
     "upstream_base": "818fa5116eefc99325e0f231e819dc51b062ef85",
     "url": "https://github.com/Brazzo978/openmptcprouter-feeds.git"
   },
   "kernel": "6.18",
   "policy": "Strict release feed commit and exact upstream SHAs; preserve dirty local edits at pinned HEAD. Development-only override OMR3K_ALLOW_LOCAL_EDITS=yes accepts dirty official feed at 818fa... for local testing, never for materialize.",
-  "release": "v0.64.2-3K",
+  "release": "v0.64.2-3K-rc2",
   "root_upstream_base": "74eacd096f9f0500fc3e8b3ca1c6c40cd227ffa1",
   "root_upstream_repository": "https://github.com/Ysurac/openmptcprouter.git",
   "schema": 1,

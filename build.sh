@@ -188,6 +188,23 @@ if [ -n "$CUSTOM_FEED" ] && [ -d ${CUSTOM_FEED}/source/${OMR_TARGET}/${OMR_KERNE
 	cp -rf ${CUSTOM_FEED}/source/${OMR_TARGET}/${OMR_KERNEL}/* "$OMR_TARGET/${OMR_KERNEL}/source"
 fi
 
+if [ "${OMR_3K:-no}" = "yes" ]; then
+    base_files_makefile="$OMR_TARGET/${OMR_KERNEL}/source/package/base-files/Makefile"
+    # The upstream generator assumes an OpenWrt directory layout. Ysurac APK
+    # repositories are flat and already pinned in apk/files/customfeeds.list.
+    python3 - "$base_files_makefile" <<'PY3KAPK'
+from pathlib import Path
+import sys
+path = Path(sys.argv[1])
+text = path.read_text()
+include = "include $(TOPDIR)/package/base-files/3k-apk-repositories.mk"
+anchor = "$(eval $(call BuildPackage,base-files))"
+if include not in text:
+    if text.count(anchor) != 1:
+        raise SystemExit("Cannot locate base-files package evaluation")
+    path.write_text(text.replace(anchor, include + "\n\n" + anchor))
+PY3KAPK
+fi
 cat >> "$OMR_TARGET/${OMR_KERNEL}/source/package/base-files/files/etc/banner" <<EOF
 -----------------------------------------------------
  PACKAGE:     $OMR_DIST

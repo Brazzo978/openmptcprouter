@@ -39,7 +39,7 @@ CONFIG_HAS_BPF_TOOLCHAIN=y
 CONFIG_BPF_TOOLCHAIN_HOST=y
 CONFIG_KERNEL_BPF_EVENTS=y
 CONFIG_KERNEL_DEBUG_INFO_BTF=y
-CONFIG_VERSION_NUMBER="v0.64.2-3K"
+CONFIG_VERSION_NUMBER="v0.64.2-3K-rc2"
 REQUIRED
 
 if grep -Eq '^CONFIG_(ALL_KMODS|ALL|ALL_NONSHARED)=[ym]$' "$conf"; then
@@ -75,5 +75,8 @@ fi
     echo "APK feed list is incomplete" >&2
     exit 1
 }
+
+
+grep -Fqx 'include $(TOPDIR)/package/base-files/3k-apk-repositories.mk' "$config/package/base-files/Makefile" || { echo "missing 3K APK repository generator override" >&2; exit 1; }
 
 echo "3K defconfig passed: stock schedulers/BPF/BTF and tools selected; no modem or extra LuCI language; upstream APK feed pinned"

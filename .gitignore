@@ -1,3 +1,7 @@
 sdk
 source
 feeds
+review/
+vps/
+__pycache__/
+*.pyc

@@ -48,6 +48,7 @@ DISABLE_FAILSAFE=${DISABLE_FAILSAFE:-no}
 #OMR_RELEASE=${OMR_RELEASE:-$(git describe --tags `git rev-list --tags --max-count=1` | sed 's/^\([0-9.]*\).*/\1/')}
 #OMR_RELEASE=${OMR_RELEASE:-$(git tag --sort=committerdate | tail -1)}
 OMR_RELEASE=${OMR_RELEASE:-$(git describe --tags `git rev-list --tags --max-count=1` | tail -1)}
+OMR_PACKAGE_RELEASE=${OMR_PACKAGE_RELEASE:-$OMR_RELEASE}
 OMR_REPO=${OMR_REPO:-http://$OMR_HOST:$OMR_PORT/release/$OMR_RELEASE-$OMR_KERNEL/$OMR_TARGET}
 
 OMR_FEED_URL="${OMR_FEED_URL:-https://github.com/ysurac/openmptcprouter-feeds}"
@@ -246,11 +247,11 @@ if [ "$OMR_KERNEL" != "6.12" ] && [ "$OMR_KERNEL" != "6.18" ]; then
 else
 	if [ "$OMR_DIST" = "openmptcprouter" ]; then
 		cat > "$OMR_TARGET/${OMR_KERNEL}/source/package/system/apk/files/customfeeds.list" <<-EOF
-		http://packages.openmptcprouter.com/${OMR_RELEASE}/${OMR_REAL_TARGET}/luci/packages.adb
-		http://packages.openmptcprouter.com/${OMR_RELEASE}/${OMR_REAL_TARGET}/packages/packages.adb
-		http://packages.openmptcprouter.com/${OMR_RELEASE}/${OMR_REAL_TARGET}/base/packages.adb
-		http://packages.openmptcprouter.com/${OMR_RELEASE}/${OMR_REAL_TARGET}/routing/packages.adb
-		http://packages.openmptcprouter.com/${OMR_RELEASE}/${OMR_REAL_TARGET}/telephony/packages.adb
+		https://packages.openmptcprouter.com/${OMR_PACKAGE_RELEASE}/${OMR_REAL_TARGET}/luci/packages.adb
+		https://packages.openmptcprouter.com/${OMR_PACKAGE_RELEASE}/${OMR_REAL_TARGET}/packages/packages.adb
+		https://packages.openmptcprouter.com/${OMR_PACKAGE_RELEASE}/${OMR_REAL_TARGET}/base/packages.adb
+		https://packages.openmptcprouter.com/${OMR_PACKAGE_RELEASE}/${OMR_REAL_TARGET}/routing/packages.adb
+		https://packages.openmptcprouter.com/${OMR_PACKAGE_RELEASE}/${OMR_REAL_TARGET}/telephony/packages.adb
 		EOF
 	elif [ -n "$OMR_PACKAGES_URL" ]; then
 		cat > "$OMR_TARGET/${OMR_KERNEL}/source/package/system/apk/files/customfeeds.list" <<-EOF
@@ -278,7 +279,7 @@ if [ -f $OMR_TARGET_CONFIG ]; then
 	CONFIG_VERSIONOPT=y
 	CONFIG_VERSION_DIST="$OMR_DIST"
 	CONFIG_VERSION_REPO="$OMR_REPO"
-	CONFIG_VERSION_NUMBER="${OMR_RELEASE}-${OMR_KERNEL}"
+	CONFIG_VERSION_NUMBER="${OMR_VERSION_NUMBER:-${OMR_RELEASE}-${OMR_KERNEL}}"
 	EOF
 else
 	cat config -> "$OMR_TARGET/${OMR_KERNEL}/source/.config" <<-EOF
@@ -288,6 +289,9 @@ else
 	CONFIG_VERSION_REPO="$OMR_REPO"
 	CONFIG_VERSION_NUMBER="${OMR_RELEASE}-${OMR_FEED_SRC}-$(git -C "$OMR_FEED" rev-parse --short HEAD)"
 	EOF
+fi
+if [ "${OMR_3K:-no}" = "yes" ]; then
+	cat config-3k >> "$OMR_TARGET/${OMR_KERNEL}/source/.config"
 fi
 #if [ "${OMR_KERNEL}" = "5.14" ]; then
 #	echo 'CONFIG_KERNEL_GIT_CLONE_URI="https://github.com/multipath-tcp/mptcp_net-next.git"' >> "$OMR_TARGET/${OMR_KERNEL}/source/.config"
@@ -799,6 +803,10 @@ else
 fi
 cp .config.keep .config
 scripts/feeds install kmod-macremapper
+if [ "${OMR_3K:-no}" = "yes" ]; then
+	scripts/feeds install -p packages btop
+	scripts/feeds install -f -p openmptcprouter speedtestcpp
+fi
 echo "Done"
 
 if [ ! -f "../../../$OMR_TARGET_CONFIG" ] || [ "$NOT_SUPPORTED" = "1" ]; then

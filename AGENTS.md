@@ -1,0 +1,16 @@
+# OpenMPTCProuter 0.64.2-3K base
+- Keep this first iteration based on upstream v0.64.2, kernel 6.18, x86_64.
+- Preserve the official MPTCP/MQVPN scheduler stack and matching client/VPS API.
+- OMR must not control cellular modems: exclude ModemManager, MBIM, QMI, NCM modem control and APN/SIM/operator configuration. External modems provide ordinary Ethernet WAN connections.
+- Preserve DHCP, static WANs, PPPoE, ordinary Ethernet/USB Ethernet and Wi-Fi.
+- Include only English LuCI and ship speedtest, speedtestcpp and btop by default.
+- Image release suffix is -3K; package feeds must remain on real upstream v0.64.2-6.18 URLs.
+- Never reset the modified OMR feed by fetching/checking out upstream during a build.
+- Confirm resolved defconfig excludes modem and translation packages and retains scheduler/BPF/BTF requirements.
+- Preserve upstream MPTCP Bandwidth. Port the complete custom .14 advanced Path live diagnostics into native LuCI/UBus without reducing fields, UI, graphs or calculations.
+- Preserve stock MQVPN 0.16.2. Port old TCP bbr1, bbr2, nanqinlang and all 12 NANBBR variants to kernel 6.18 while retaining stock BBRv3/CUBIC/Reno; this is authorized by the latest user instruction.
+- The old /root/openmptcprouter-v0.62-build tree is a read-only reference for this task.
+- Remove MLVPN and OpenVPN bonding from the client; retain ordinary OpenVPN.
+- Preserve effective TCP XRay reverse port forwarding and remote GUI access from a WireGuard PC/phone through the VPS and OMR tunnel.
+- Use fixed SQM 90%; autorate max/base/min 100%/65%/25%.
+- Default TCP congestion control is BBRv3 (kernel name bbr) on fresh router and VPS installations; preserve explicit saved choices.

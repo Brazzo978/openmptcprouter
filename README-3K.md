@@ -23,7 +23,7 @@ A shallow clone of this 3K branch can omit the upstream base commit required for
 
 ## Existing development checkout
 
-If a checkout already has local 3K work at the official feed base `818fa5116eefc99325e0f231e819dc51b062ef85`, `OMR3K_ALLOW_LOCAL_EDITS=yes python3 bootstrap-3k.py verify` explicitly allows that one dirty feed for development. The same override can be passed to `run-build-3k.sh`. It does not materialize a release and the output says `DEVELOPMENT ONLY`. Release builds use the published feed commit `71208ff19f948ad18eff12331e53cf733095ae2d` without this override.
+If a checkout already has local 3K work at the official feed base `818fa5116eefc99325e0f231e819dc51b062ef85`, `OMR3K_ALLOW_LOCAL_EDITS=yes python3 bootstrap-3k.py verify` explicitly allows that one dirty feed for development. The same override can be passed to `run-build-3k.sh`. It does not materialize a release and the output says `DEVELOPMENT ONLY`. Release builds use the published feed commit `3b21452ab4c572adc355ba5e80fe67757e57e07b` without this override.
 
 The client kernel 6.18.39 contains the 3K congestion controls alongside upstream BBRv3 (kernel name `bbr`). BBRv3 is the kernel, new-install UCI and GUI default; an existing explicit choice is preserved. Keep the router image and paired VPS release at their respective pinned commits when deploying them together.
 

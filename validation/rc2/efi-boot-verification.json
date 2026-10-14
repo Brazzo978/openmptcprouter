@@ -1,0 +1,34 @@
+{
+  "test": "RC2 isolated UEFI squashfs boot smoke",
+  "input_image": "/root/openmptcprouter-v0.64.2-3k-build/x86_64/6.18/source/bin/targets/x86/64/openmptcprouter-v0.64.2-3k-rc2-r0-c0e9507-x86-64-generic-squashfs-combined-efi.img.gz",
+  "image_size": 79161871,
+  "image_sha256": "d4aeda59d02500eaad70b1a7bdd66609f1a685b6508cef7dde03cda752fe4c86",
+  "manifest_sha256": "d4aeda59d02500eaad70b1a7bdd66609f1a685b6508cef7dde03cda752fe4c86",
+  "vm": {
+    "firmware": "OVMF 4M",
+    "machine": "q35",
+    "accelerator": "TCG",
+    "disk_mode": "QEMU snapshot",
+    "network": "user restricted loopback forwards 18086/18026"
+  },
+  "guest": {
+    "version": "v0.64.2-3K-rc2",
+    "kernel": "6.18.39",
+    "default_tcp_congestion_control": "bbr",
+    "firmware": "UEFI"
+  },
+  "checks": {
+    "build_gate_zero": true,
+    "manifest_sha256_match": true,
+    "manifest_size_match": true,
+    "ovmf_uefi_boot": true,
+    "version_rc2": true,
+    "kernel_6_18_39": true,
+    "default_bbr": true,
+    "no_kernel_panic": true,
+    "probe_completed": true
+  },
+  "pass": true,
+  "console_log": "/root/openmptcprouter-v0.64.2-3k-build/review/rc2/efi-qa/console.log",
+  "scope": "Boot and local guest facts only; WAN/VPS integration outside this smoke test."
+}

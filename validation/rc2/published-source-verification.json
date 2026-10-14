@@ -1,0 +1,27 @@
+{
+  "method": "SHA256 of all code files changed from pinned upstream, compared to published source commits; CRLF-only differences recorded separately",
+  "metadata_excluded": [
+    "validation/",
+    ".github/",
+    "README-3K.md",
+    ".gitattributes"
+  ],
+  "production_modified": false,
+  "repositories": {
+    "router": {
+      "commit": "93227f017206b7f107f292971a6af97f4da834c9",
+      "files_checked": 19,
+      "mismatches": [],
+      "line_endings_only": [
+        "common/package/kernel/linux/modules/ovpn.mk"
+      ]
+    },
+    "feed": {
+      "commit": "3b21452ab4c572adc355ba5e80fe67757e57e07b",
+      "files_checked": 49,
+      "mismatches": [],
+      "line_endings_only": []
+    }
+  },
+  "passed": true
+}

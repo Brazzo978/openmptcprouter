@@ -27,7 +27,7 @@ If a checkout already has local 3K work at the official feed base `818fa5116eefc
 
 The client kernel 6.18.39 contains the 3K congestion controls alongside upstream BBRv3 (kernel name `bbr`). BBRv3 is the kernel, new-install UCI and GUI default; an existing explicit choice is preserved. Keep the router image and paired VPS release at their respective pinned commits when deploying them together.
 
-## Frozen candidate and validation
+## RC1 frozen candidate and validation
 
 The final four x86_64 images and paired VPS packages are published under https://repoomr.3klab.com/frozen3k/v0.64.2-20261013/. The release manifest records exact source commits, sizes and SHA256. `validation/` in this Git branch contains the image, BIOS/UEFI boot, BTF and HTTPS mirror reports.
 
@@ -40,3 +40,15 @@ These are functional VM checks. Real multi-WAN load/performance, the complete PC
 RC2 restores the .62 calculated path MTU in the Status page, including the link MTU, using DF probes towards the VPS with a bounded status budget and cache. The .62 IPv4/IPv6 omr-test-speed host lists are included again and protected as configuration files.
 
 Runtime APK repositories use the five flat Ysurac v0.64.2-6.18/x86_64 feeds. The 3K base-files override suppresses OpenWrt-generated target/feed paths that do not exist on that server. This does not change the frozen build source checkouts. The actual image APK client successfully updated the five indexes with signature checks enabled and simulated adding tree in an isolated filesystem.
+
+The RC2 release is https://github.com/Brazzo978/openmptcprouter/releases/tag/v0.64.2-3K-rc2. Use the immutable tag for a frozen rebuild:
+
+```sh
+git clone --branch v0.64.2-3K-rc2 https://github.com/Brazzo978/openmptcprouter.git
+cd openmptcprouter
+python3 bootstrap-3k.py materialize
+./run-build-3k.sh prepare
+./run-build-3k.sh build
+```
+
+RC2 firmware, BIOS/EFI, native Status RPC and VMware offline import reports are under `validation/rc2/`. The kernel is byte-identical to RC1.

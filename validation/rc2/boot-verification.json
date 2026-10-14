@@ -1,0 +1,98 @@
+{
+  "passed": true,
+  "environment": "isolated QEMU TCG BIOS, snapshot, 3 E1000",
+  "version": "v0.64.2-3K-rc2",
+  "version_confirmed": true,
+  "kernel": "6.18.39",
+  "tcp_default": "bbr",
+  "tcp_available": [
+    "reno",
+    "bbr",
+    "bbr1",
+    "bbr2",
+    "nanqinlang",
+    "nanbbr3_light",
+    "nanbbr3_def",
+    "nanbbr3_aggr",
+    "nanbbr1_light",
+    "nanbbr1_def",
+    "nanbbr1_aggr",
+    "nanbbr2_light",
+    "nanbbr2_def",
+    "nanbbr2_aggr",
+    "nanbbr1_var",
+    "nanbbr2_var",
+    "nanbbr3_var",
+    "cubic"
+  ],
+  "production_deployed": false,
+  "status_rpc": {
+    "statusinterfaces": {
+      "exit": 0,
+      "duration_seconds": 2.628,
+      "wans": [
+        {
+          "ifname": "eth1",
+          "mtu": "1500",
+          "status": "OK",
+          "name": "wan1",
+          "link_mtu": "1500",
+          "ipaddr": "10.10.1.10",
+          "state": "up",
+          "gateway": "10.10.1.2"
+        },
+        {
+          "ifname": "eth2",
+          "mtu": "",
+          "status": "ERROR",
+          "name": "wan2",
+          "link_mtu": "",
+          "ipaddr": "",
+          "state": "down",
+          "gateway": ""
+        }
+      ],
+      "pmtu_fields_present": true
+    },
+    "status": {
+      "exit": 0,
+      "duration_seconds": 4.47,
+      "wans": [
+        {
+          "ifname": "eth1",
+          "mtu": "1500",
+          "status": "OK",
+          "name": "wan1",
+          "link_mtu": "1500",
+          "ipaddr": "10.10.1.10",
+          "state": "up",
+          "gateway": "10.10.1.2"
+        },
+        {
+          "ifname": "eth2",
+          "mtu": "",
+          "status": "ERROR",
+          "name": "wan2",
+          "link_mtu": "",
+          "ipaddr": "",
+          "state": "down",
+          "gateway": ""
+        }
+      ],
+      "pmtu_fields_present": true
+    }
+  },
+  "limits": [
+    "QEMU WAN gateway used as synthetic VPS target; no live WAN/VPS path measurement",
+    "actual VMware guest boot remains user deployment validation"
+  ],
+  "pmtu_cache": [
+    "1791985456 1500"
+  ],
+  "kernel_faults": false,
+  "image": {
+    "name": "openmptcprouter-v0.64.2-3k-rc2-r0-c0e9507-x86-64-generic-ext4-combined.img.gz",
+    "sha256": "f050a8d528b0724f83b9f44daa23cf47ae76482dc9d2c1765b7522001db71614",
+    "size": 97779779
+  }
+}

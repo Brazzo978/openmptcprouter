@@ -1,7 +1,7 @@
 {
   "client_feed_release": {
     "branch_for_review": "omr-v0.64.2-3K",
-    "commit": "d501e9c4c3af4dbe7061bd90955a2f06006395d3",
+    "commit": "f12f6d3f9c1d4a508d483b524b6d4e0e5fc805ca",
     "path": "feeds/openmptcprouter",
     "upstream_base": "818fa5116eefc99325e0f231e819dc51b062ef85",
     "url": "https://github.com/Brazzo978/openmptcprouter-feeds.git"

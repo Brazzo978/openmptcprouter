@@ -58,3 +58,11 @@ On the live router, the corrected generator followed by apk update succeeded wit
 These tests validate this feature on the current VMware router and test VPS. They do not certify a final image that has not yet been rebuilt. Build the final v0.64.2-3K image from the updated locked feed, verify the packaged native binary and defaults after first boot, test reboot/WAN failover and the required scheduler scenarios, and package the VPS native binary into a new candidate frozen bundle before any release. Keep the existing published VPS bundle unchanged.
 
 Test-only router SNAT, Windows HTTP canary process, external WireGuard namespace and browser session were removed/closed. No credentials or private WireGuard keys are included in this report.
+
+## Follow-up operational check at 13:55-14:04 UTC
+
+The native MQVPN binary/hash, registered LAN prefix and single active user session were rechecked. Tunnel ping had zero loss at about 10 ms; Internet still exited with the VPS public IPv4, and tunnel GUI returned HTTP 200. WireGuard LAN remained disabled with an empty allowed-LAN nft set.
+
+The separate Xray public-port forward intermittently timed out despite accepted VPS access logs. Local loopback worked once, then also timed out following client reconnects. Restarting VPS Xray restored three consecutive external HTTP 200 responses. Three further individual client restart cycles each returned external HTTP 200; the failure was not reproduced in these bounded checks. Exact v26.7.11 source inspection rules out selecting an already closed mux worker: IsFull also checks Closed. The VLESS reverse dispatch path discards the mux dispatch error, so an accepted access log alone does not prove delivery. The cause remains unresolved; no speculative engine patch or periodic restart was introduced. Temporary client DEBUG logging was restored to the original warning level.
+
+Final release must remain gated on Xray reverse stability through idle periods, reconnects and WAN interruption, in addition to final image and frozen VPS bundle checks above. These follow-up observations supersede any implication that the earlier successful Xray test established complete operational readiness.

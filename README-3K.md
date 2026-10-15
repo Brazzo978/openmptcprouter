@@ -52,3 +52,9 @@ python3 bootstrap-3k.py materialize
 ```
 
 RC2 firmware, BIOS/EFI, native Status RPC and VMware offline import reports are under `validation/rc2/`. The kernel is byte-identical to RC1.
+
+## RC3 diagnostic logging
+
+RC3 restores the earlier OMR diagnostic logging workflow: a bounded local collector, the read-only diagnostic RPC and a **Diagnostic logs** page in LuCI. The collector writes to RAM or persistent storage according to its configured storage setting; the support report applies the diagnostic module's redaction and output limits. RC3 keeps the RC2 Status PMTU, speedtest host lists and APK repository corrections.
+
+The RC3 image gate checks that the collector, init script, Lua module, RPC endpoint, menu, read ACL and LuCI page are present in the assembled image and match their source files. It also checks executable permissions, the Lua module's 0644 mode and the startup link when the image root contains OpenWrt init links. These are build and packaging checks. Actual ESXi guest boot and live multi-WAN/WireGuard operation remain deployment validation.

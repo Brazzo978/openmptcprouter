@@ -1,0 +1,33 @@
+{
+  "scope": "Custom speedtest host lists on the v0.64.2-3K router; no VPS speedtest changes",
+  "changed_files": [
+    "feeds/openmptcprouter/openmptcprouter/files/bin/omr-test-speed",
+    "feeds/openmptcprouter/openmptcprouter/files/etc/omr-test-speed-hosts.list",
+    "feeds/openmptcprouter/openmptcprouter/files/etc/omr-test-speed-hosts6.list"
+  ],
+  "host_lists": [
+    {
+      "file": "omr-test-speed-hosts.list",
+      "old_sha256": "5350ffd133fa4caed7a6b35b8a0e778a5a7722d083c30f8bdb397555e8a6eedd",
+      "new_sha256": "5350ffd133fa4caed7a6b35b8a0e778a5a7722d083c30f8bdb397555e8a6eedd",
+      "byte_identical": true
+    },
+    {
+      "file": "omr-test-speed-hosts6.list",
+      "old_sha256": "7648b64bde6c908a7b6d8600bbcc7a74046fa3d1f78587086ccdbd8251c0e40d",
+      "new_sha256": "7648b64bde6c908a7b6d8600bbcc7a74046fa3d1f78587086ccdbd8251c0e40d",
+      "byte_identical": true
+    }
+  ],
+  "checks": {
+    "fixture": "review/test-speedtest-hosts.py",
+    "fixture_result": "PASS: custom IPv4/IPv6 lists exact, URL filtering, missing/invalid fallback, v6 symlink",
+    "parser_scenarios": ["valid IPv4 and IPv6 files", "HTTP(S) URL selection", "comment and blank line exclusion", "invalid scheme and option-like line exclusion", "embedded whitespace exclusion", "missing file fallback", "invalid-only file fallback", "IPv6 entrypoint symlink"],
+    "shell_syntax": "sh -n passed for omr-test-speed and omr-test-speedv6",
+    "diff_whitespace": "git diff --check passed",
+    "package_conffiles": "/etc/omr-test-speed-hosts.list and /etc/omr-test-speed-hosts6.list present in Package/openmptcprouter/conffiles"
+  },
+  "network_benchmark_run": false,
+  "global_build_run_for_this_check": false,
+  "patch": "review/speedtest-custom-hosts.patch"
+}

@@ -1,0 +1,18 @@
+{
+  "before_update_exit": 5,
+  "after_update_exit": 0,
+  "simulate_install_exit": 0,
+  "signature_checks": true,
+  "certificate_checks": true,
+  "installed_packages_modified": false,
+  "production_modified": false,
+  "index_count": 10420,
+  "test_package": "tree",
+  "repositories": [
+    "https://packages.openmptcprouter.com/v0.64.2-6.18/x86_64/luci/packages.adb",
+    "https://packages.openmptcprouter.com/v0.64.2-6.18/x86_64/packages/packages.adb",
+    "https://packages.openmptcprouter.com/v0.64.2-6.18/x86_64/base/packages.adb",
+    "https://packages.openmptcprouter.com/v0.64.2-6.18/x86_64/routing/packages.adb",
+    "https://packages.openmptcprouter.com/v0.64.2-6.18/x86_64/telephony/packages.adb"
+  ]
+}

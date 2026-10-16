@@ -1,0 +1,46 @@
+{
+  "manifest": "openmptcprouter-v0.64.2-3k-rc2-r0-c0e9507-x86-64-generic.manifest",
+  "packages_count": 641,
+  "missing_packages": [],
+  "banned_packages": [],
+  "missing_files": [],
+  "unexpected_removed_files": [],
+  "stock_bandwidth_unchanged": true,
+  "missing_congestion_controls": [],
+  "default_bbr_v3": true,
+  "images": [
+    {
+      "name": "openmptcprouter-v0.64.2-3k-rc2-r0-c0e9507-x86-64-generic-ext4-combined-efi.img.gz",
+      "size": 97985208,
+      "sha256": "ca2bdc321c31ed384440b2da3d6f7d7aac1658d6e842b2a7bf06d92e7cb3f6ed"
+    },
+    {
+      "name": "openmptcprouter-v0.64.2-3k-rc2-r0-c0e9507-x86-64-generic-ext4-combined.img.gz",
+      "size": 97779779,
+      "sha256": "f050a8d528b0724f83b9f44daa23cf47ae76482dc9d2c1765b7522001db71614"
+    },
+    {
+      "name": "openmptcprouter-v0.64.2-3k-rc2-r0-c0e9507-x86-64-generic-squashfs-combined.img.gz",
+      "size": 78955102,
+      "sha256": "d886ba8dc856127462b01e2b0d680391062f9a1e5dee900d4c9d7f3df110e492"
+    },
+    {
+      "name": "openmptcprouter-v0.64.2-3k-rc2-r0-c0e9507-x86-64-generic-squashfs-combined-efi.img.gz",
+      "size": 79161871,
+      "sha256": "d4aeda59d02500eaad70b1a7bdd66609f1a685b6508cef7dde03cda752fe4c86"
+    }
+  ],
+  "production_deployed": false,
+  "source_runtime_match": true,
+  "apk_repositories": [
+    "https://packages.openmptcprouter.com/v0.64.2-6.18/x86_64/luci/packages.adb",
+    "https://packages.openmptcprouter.com/v0.64.2-6.18/x86_64/packages/packages.adb",
+    "https://packages.openmptcprouter.com/v0.64.2-6.18/x86_64/base/packages.adb",
+    "https://packages.openmptcprouter.com/v0.64.2-6.18/x86_64/routing/packages.adb",
+    "https://packages.openmptcprouter.com/v0.64.2-6.18/x86_64/telephony/packages.adb"
+  ],
+  "apk_repository_layout_ok": true,
+  "custom_speedtest_host_lists": true,
+  "status_pmtu_restored": true,
+  "passed": true
+}

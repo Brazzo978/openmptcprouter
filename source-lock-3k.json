@@ -1,0 +1,38 @@
+{
+  "client_feed_release": {
+    "branch_for_review": "omr-v0.64.2-3K",
+    "commit": "0060b841b1130be31db8b6826d14d3d02520add6",
+    "path": "feeds/openmptcprouter",
+    "upstream_base": "818fa5116eefc99325e0f231e819dc51b062ef85",
+    "url": "https://github.com/Brazzo978/openmptcprouter-feeds.git"
+  },
+  "kernel": "6.18",
+  "policy": "Strict release feed commit and exact upstream SHAs; preserve dirty local edits at pinned HEAD. Development-only override OMR3K_ALLOW_LOCAL_EDITS=yes accepts dirty official feed at 818fa... for local testing, never for materialize.",
+  "release": "v0.64.2-3K",
+  "root_upstream_base": "74eacd096f9f0500fc3e8b3ca1c6c40cd227ffa1",
+  "root_upstream_repository": "https://github.com/Ysurac/openmptcprouter.git",
+  "schema": 1,
+  "target": "x86_64",
+  "upstream": {
+    "luci": {
+      "commit": "a3cc0e14419c96ca74578b792d306cba017b9e6d",
+      "path": "feeds/6.18/luci",
+      "url": "https://github.com/openwrt/luci.git"
+    },
+    "openwrt": {
+      "commit": "c0e9507c32f5f3729b324fe27308a9a63007f6c0",
+      "path": "x86_64/6.18/source",
+      "url": "https://github.com/openwrt/openwrt.git"
+    },
+    "packages": {
+      "commit": "42be0c979ddb3a39861df1f722fef62a60158f86",
+      "path": "feeds/6.18/packages",
+      "url": "https://github.com/openwrt/packages.git"
+    },
+    "routing": {
+      "commit": "c7872431105f69894201dc522b7560e47d1e8ba9",
+      "path": "feeds/6.18/routing",
+      "url": "https://github.com/openwrt/routing.git"
+    }
+  }
+}

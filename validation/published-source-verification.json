@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "method": "SHA256 comparison of all files changed from upstream against the published release commits",
+  "router_code_commit": "4dd452da2d23b78b6a4a10ab95b0873b534e364b",
+  "feed_commit": "b5f28146bc807d90c2bda0da8d83111c2bf34f71",
+  "router_files_checked": 20,
+  "feed_files_checked": 53,
+  "code_mismatches": [],
+  "metadata_only_differences": [
+    "router/.gitattributes",
+    "feed/.gitattributes",
+    "feed/README-3K.md"
+  ]
+}

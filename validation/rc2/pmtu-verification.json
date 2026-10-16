@@ -1,0 +1,83 @@
+{
+  "checked_at_utc": "2026-10-14T12:58:59.850017+00:00",
+  "status": "pass",
+  "source_version": "v0.62.14-3K PMTU semantics",
+  "target_version": "v0.64.2-3K RC2 feed",
+  "files": [
+    {
+      "path": "/root/openmptcprouter-v0.64.2-3k-build/feeds/openmptcprouter/openmptcprouter-api/files/usr/libexec/rpcd/openmptcprouter",
+      "exists": true,
+      "sha256": "4f4537c8262476979db475ce3271083b877a852a712fb5a88b44c6ca1988a40a"
+    },
+    {
+      "path": "/root/openmptcprouter-v0.64.2-3k-build/feeds/openmptcprouter/luci-app-openmptcprouter/htdocs/luci-static/resources/view/openmptcprouter/wanstatus.js",
+      "exists": true,
+      "sha256": "4927c0d6e897a51633b0d94c4ea85db4f8aad40001e69f6e0e9ac233c46c2965"
+    }
+  ],
+  "patch": {
+    "path": "/root/openmptcprouter-v0.64.2-3k-build/review/mtu-status/mtu-status.patch",
+    "sha256": "35e0b1577365daf0256a2af184aa0b4e7e4484f2ee2b109b05a8f2d5b44488a1",
+    "reverse_apply_check": "pass"
+  },
+  "test_log": "/root/openmptcprouter-v0.64.2-3k-build/review/mtu-status/test-results.log",
+  "checks": [
+    {
+      "name": "Lua 5.1 syntax",
+      "result": "pass"
+    },
+    {
+      "name": "LuCI JS syntax",
+      "result": "pass"
+    },
+    {
+      "name": "PMTU 1420 with link MTU 1500",
+      "result": "pass"
+    },
+    {
+      "name": "Cached PMTU without new probe",
+      "result": "pass"
+    },
+    {
+      "name": "DF minimum blocked fallback to link MTU",
+      "result": "pass"
+    },
+    {
+      "name": "Missing target and missing link with UCI fallback",
+      "result": "pass"
+    },
+    {
+      "name": "Status RPC deadline fallback",
+      "result": "pass"
+    },
+    {
+      "name": "VPS target selection",
+      "result": "pass"
+    },
+    {
+      "name": "LuCI PMTU display with differing, equal and absent link MTU",
+      "result": "pass"
+    },
+    {
+      "name": "Both RPC handlers define a clamped local shared deadline before PMTU calls",
+      "result": "pass"
+    }
+  ],
+  "limits": [
+    "No live WAN/VPS path MTU probe was performed.",
+    "RC2 firmware build and boot are outside this scoped PMTU check."
+  ],
+  "budget_fix_patch": {
+    "path": "/root/openmptcprouter-v0.64.2-3k-build/review/mtu-status/mtu-status-budget-fix.patch",
+    "sha256": "fbdd602cd31e7e8c6a5a8da6b0c8b9e8eb7b156922dd62282155b3b268594858",
+    "reverse_apply_check": "pass"
+  },
+  "wiring_test": {
+    "path": "/root/openmptcprouter-v0.64.2-3k-build/review/mtu-status/test-wiring.py",
+    "result": "pass",
+    "handlers": [
+      "interfaces_status",
+      "interfaces_only_status"
+    ]
+  }
+}

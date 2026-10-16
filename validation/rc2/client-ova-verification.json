@@ -1,0 +1,28 @@
+{
+  "ova_name": "openmptcprouter-0.64.2-3K-rc2.ova",
+  "ova_size": 107571200,
+  "ova_sha256": "386490e9fc7a23c5b6a32204fafb899f3546e2f4ad81129696440462c2cedb58",
+  "disk_size": 107556352,
+  "disk_sha256": "b1477f2e9cc6de16ab848d68d66e01601b1551c815a927f721d4524ab5a2625a",
+  "vmware_hardware": "vmx-13",
+  "firmware": "bios",
+  "cpu": 2,
+  "memory_mib": 2048,
+  "network_adapters": [
+    "E1000 LAN eth0",
+    "E1000 WAN1 eth1",
+    "E1000 WAN2 eth2"
+  ],
+  "passed": true,
+  "ovf_tool": "4.6.2 build-22220919",
+  "ovf_tool_import_exit": 0,
+  "schema_validation": true,
+  "manifest_validation": true,
+  "full_offline_vmx_import": true,
+  "disk_canonicalized_by": "VMware Workstation vmware-vdiskmanager -t 5",
+  "disk_matches_original_raw": true,
+  "disk_comparison": "qemu-img compare: Images are identical.",
+  "guest_boot_validation": "RC2 ext4 image BIOS QEMU; canonical VMDK byte-identical virtual contents",
+  "actual_vmware_guest_boot_tested": false,
+  "production_deployed": false
+}

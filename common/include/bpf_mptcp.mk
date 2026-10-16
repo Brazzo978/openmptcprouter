@@ -83,6 +83,12 @@ endif
 endif
 
 define CompileBPF
+	@set -eu; \
+	  test -s "$(LINUX_DIR)/vmlinux" || { echo "MPTCP BPF: missing kernel vmlinux/BTF at $(LINUX_DIR)/vmlinux" >&2; exit 1; }; \
+	  test -x "$(STAGING_DIR_HOST)/usr/sbin/bpftool" || { echo "MPTCP BPF: missing host bpftool" >&2; exit 1; }; \
+	  rm -f "$(PKG_BUILD_DIR)/vmlinux.h"; \
+	  "$(STAGING_DIR_HOST)/usr/sbin/bpftool" btf dump file "$(LINUX_DIR)/vmlinux" format c > "$(PKG_BUILD_DIR)/vmlinux.h"; \
+	  test -s "$(PKG_BUILD_DIR)/vmlinux.h" || { echo "MPTCP BPF: empty generated vmlinux.h" >&2; exit 1; }
 	$(CLANG) -g --target=bpf $(BPF_CFLAGS) $(2) \
 		-c $(1) -o $(patsubst %.c,%.bc,$(1))
 	$(LLVM_OPT) -O2 -mtriple=$(BPF_TARGET) < $(patsubst %.c,%.bc,$(1)) > $(patsubst %.c,%.opt,$(1))

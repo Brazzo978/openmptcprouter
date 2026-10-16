@@ -7,10 +7,16 @@
 - Image release suffix is -3K; package feeds must remain on real upstream v0.64.2-6.18 URLs.
 - Never reset the modified OMR feed by fetching/checking out upstream during a build.
 - Confirm resolved defconfig excludes modem and translation packages and retains scheduler/BPF/BTF requirements.
-- Preserve upstream MPTCP Bandwidth. Port the complete custom .14 advanced Path live diagnostics into native LuCI/UBus without reducing fields, UI, graphs or calculations.
-- Preserve stock MQVPN 0.16.2. Port old TCP bbr1, bbr2, nanqinlang and all 12 NANBBR variants to kernel 6.18 while retaining stock BBRv3/CUBIC/Reno; this is authorized by the latest user instruction.
+- Restore the custom .14 MPTCP Bandwidth and Monitoring functionality on the modern LuCI/SVG/UBus implementation, as requested on 2026-10-16. Preserve the complete custom advanced Path live diagnostics.
+- Keep MQVPN 0.16.2 as the pinned source base, with the matching client/VPS native LAN-routing and FEC capability patches. Port old TCP bbr1, bbr2, nanqinlang and all 12 NANBBR variants to kernel 6.18 while retaining stock BBRv3/CUBIC/Reno; this is authorized by the latest user instruction.
 - The old /root/openmptcprouter-v0.62-build tree is a read-only reference for this task.
 - Remove MLVPN and OpenVPN bonding from the client; retain ordinary OpenVPN.
 - Preserve effective TCP XRay reverse port forwarding and remote GUI access from a WireGuard PC/phone through the VPS and OMR tunnel.
 - Use fixed SQM 90%; autorate max/base/min 100%/65%/25%.
 - Default TCP congestion control is BBRv3 (kernel name bbr) on fresh router and VPS installations; preserve explicit saved choices.
+
+- Remove the VPS backup tab, client upload/restore commands and VPS backup API endpoints; preserve ordinary local OpenWrt backup and server failover.
+- Settings Wizard must be a single scrollable page with one Save & Apply action.
+- Compile MQVPN/XQUIC with FEC, XOR, RSC and PKM support. Runtime FEC remains configurable. Include the guarded NTP step recovery hook.
+- The user validated the 2026-10-16 build on fiber + 5G and authorized the final rebuild and publication. Include the subsequent live audit fixes; pass final image, boot and OVA checks before publishing.
+- This deployment uses one primary router at a time: VPS MQVPN 10.255.220.1 and primary router fixed_ip 10.255.220.2. Preserve explicit existing assignments and correct authenticated hotplug VPN-IP synchronization.

@@ -6,7 +6,11 @@ Build status is separate from runtime validation. A compiled image is not a hard
 
 ## Build one board
 
-Use a full clone, a Linux OpenWrt build environment and the exact source lock:
+Use a full clone, a Linux OpenWrt build environment and the exact source lock. Rockchip U-Boot requires the host Python `elftools` module (Debian package `python3-pyelftools`), Python development headers, setuptools and SWIG. Install the standard OpenWrt prerequisites before starting the queue.
+
+The generic ARM64 image uses a 512 MiB root partition: the full 3K filesystem does not fit in the upstream 104 MiB default.
+
+Build a selected board with:
 
 ```sh
 git clone --branch omr-v0.64.2-3K-arm https://github.com/Brazzo978/openmptcprouter.git

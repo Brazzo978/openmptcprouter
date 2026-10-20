@@ -3,3 +3,5 @@ CONFIG_TARGET_armsr_armv8=y
 CONFIG_TARGET_armsr_armv8_DEVICE_generic=y
 CONFIG_KERNEL_ARM64_MODULE_PLTS=y
 CONFIG_KERNEL_TCP_CONG_BBR2=y
+# The full 3K root filesystem exceeds the upstream 104 MiB default.
+CONFIG_TARGET_ROOTFS_PARTSIZE=512

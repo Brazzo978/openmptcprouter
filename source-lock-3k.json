@@ -12,6 +12,17 @@
   "root_upstream_base": "74eacd096f9f0500fc3e8b3ca1c6c40cd227ffa1",
   "root_upstream_repository": "https://github.com/Ysurac/openmptcprouter.git",
   "schema": 1,
+  "supported_targets": [
+    "x86_64", "armsr64", "bpi-r1", "bpi-r2", "bpi-r3", "bpi-r3-mini",
+    "bpi-r4", "bpi-r4-poe", "bpi-r64", "cudy_tr3000-256mb-v1",
+    "cznic_turris-omnia", "espressobin", "gl-mt2500", "gl-mt2500-airoha",
+    "gl-mt3000", "gl-mt3600be", "gl-mt5000", "gl-mt6000", "gl-x3000",
+    "gl-xe3000", "p2w_r619ac", "qnap-301w", "r2s", "r3s", "r4s",
+    "r5c", "r5s", "r6s", "r7800", "rpi2", "rpi3", "rpi4", "rpi5",
+    "rutx", "rutx12", "rutx50", "wrt3200acm", "wrt32x",
+    "z8102ax_128m", "z8102ax_64m", "z8102ax-emmc", "z8109ax_128m",
+    "z8109ax_512m", "z8802be_128m", "z8803be"
+  ],
   "target": "x86_64",
   "upstream": {
     "luci": {

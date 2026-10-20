@@ -20,15 +20,37 @@ def git(path, *args):
     return subprocess.check_output(["git", "-C", str(path), *args],
                                    text=True, stderr=subprocess.PIPE).strip()
 
-def validate(data):
+def target_rows(data, target):
+    """Select one OpenWrt worktree without changing any locked commit or URL."""
+    if target not in data.get("supported_targets", []):
+        raise ValueError("unsupported 3K target: " + target)
+    rows = [dict(data["client_feed_release"])]
+    for name, original in data["upstream"].items():
+        row = dict(original)
+        if name == "openwrt":
+            if row["path"] != "x86_64/6.18/source":
+                raise ValueError("unexpected locked OpenWrt path")
+            row["path"] = f"{target}/6.18/source"
+        rows.append(row)
+    return rows
+
+
+def validate(data, target):
     if data.get("schema") != 1 or data.get("target") != "x86_64" or data.get("kernel") != "6.18":
         raise ValueError("unsupported source lock")
+    if len(set(data.get("supported_targets", []))) != len(data.get("supported_targets", [])):
+        raise ValueError("duplicate supported target")
+    if not all(re.fullmatch(r"[a-z0-9][a-z0-9_-]*", name)
+               for name in data.get("supported_targets", [])):
+        raise ValueError("invalid supported target")
+    if "x86_64" not in data.get("supported_targets", []):
+        raise ValueError("default target missing from source lock")
     if not SHA.fullmatch(data.get("root_upstream_base", "")):
         raise ValueError("invalid root base commit")
     feed = data["client_feed_release"]
     if not feed.get("url") or not SHA.fullmatch(feed.get("commit") or ""):
         raise ValueError("unpublished client feed: fill exact release URL and 40-character commit before build/bootstrap")
-    rows = [feed, *data["upstream"].values()]
+    rows = target_rows(data, target)
     for row in rows:
         if not SHA.fullmatch(row["commit"]):
             raise ValueError("invalid pinned commit: " + row["path"])
@@ -95,9 +117,11 @@ def materialize(row):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("action", choices=["verify", "materialize"])
+    parser.add_argument("--target", default=os.environ.get("OMR_TARGET", "x86_64"),
+                        help="one explicitly supported board target (default: OMR_TARGET or x86_64)")
     args = parser.parse_args()
     data = json.loads(LOCK.read_text())
-    rows = validate(data)
+    rows = validate(data, args.target)
     if args.action == "materialize":
         verify_root(data)
         for row in rows:

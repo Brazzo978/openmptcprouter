@@ -1,0 +1,82 @@
+{
+  "schema": 1,
+  "release": "v0.64.2-3K-arm",
+  "boards": 44,
+  "platform_groups": 15,
+  "groups": {
+    "armsr_armv8": [
+      "armsr64"
+    ],
+    "sunxi_cortexa7": [
+      "bpi-r1"
+    ],
+    "mediatek_mt7623": [
+      "bpi-r2"
+    ],
+    "mediatek_filogic": [
+      "bpi-r3",
+      "bpi-r3-mini",
+      "bpi-r4",
+      "bpi-r4-poe",
+      "cudy_tr3000-256mb-v1",
+      "gl-mt2500",
+      "gl-mt2500-airoha",
+      "gl-mt3000",
+      "gl-mt3600be",
+      "gl-mt5000",
+      "gl-mt6000",
+      "gl-x3000",
+      "gl-xe3000",
+      "z8102ax_128m",
+      "z8102ax_64m",
+      "z8102ax-emmc",
+      "z8109ax_128m",
+      "z8109ax_512m",
+      "z8802be_128m",
+      "z8803be"
+    ],
+    "mediatek_mt7622": [
+      "bpi-r64"
+    ],
+    "mvebu_cortexa9": [
+      "cznic_turris-omnia",
+      "wrt3200acm",
+      "wrt32x"
+    ],
+    "mvebu_cortexa53": [
+      "espressobin"
+    ],
+    "ipq40xx_generic": [
+      "p2w_r619ac",
+      "rutx",
+      "rutx12",
+      "rutx50"
+    ],
+    "qualcommax_ipq807x": [
+      "qnap-301w"
+    ],
+    "rockchip_armv8": [
+      "r2s",
+      "r3s",
+      "r4s",
+      "r5c",
+      "r5s",
+      "r6s"
+    ],
+    "ipq806x_generic": [
+      "r7800"
+    ],
+    "bcm27xx_bcm2709": [
+      "rpi2"
+    ],
+    "bcm27xx_bcm2710": [
+      "rpi3"
+    ],
+    "bcm27xx_bcm2711": [
+      "rpi4"
+    ],
+    "bcm27xx_bcm2712": [
+      "rpi5"
+    ]
+  }
+}

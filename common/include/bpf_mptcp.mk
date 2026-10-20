@@ -28,10 +28,12 @@ LLVM_DIS:=$(LLVM_PATH)/llvm-dis$(LLVM_VER)
 LLVM_OPT:=$(LLVM_PATH)/opt$(LLVM_VER)
 LLVM_STRIP:=$(LLVM_PATH)/llvm-strip$(LLVM_VER)
 
+# OpenWrt bpf-headers intentionally generates architecture-neutral UAPI from
+# synthetic MIPS headers. Keep that header ABI while targeting tracing helpers
+# and CO-RE types at the actual kernel architecture.
 BPF_KARCH:=mips
-#BPF_KARCH:=$(LINUX_KARCH)
 BPF_ARCH:=mips$(if $(CONFIG_ARCH_64BIT),64)$(if $(CONFIG_BIG_ENDIAN),,el)
-#BPF_ARCH:=$(ARCH)
+BPF_TRACING_ARCH:=$(LINUX_KARCH)
 BPF_TARGET:=bpf$(if $(CONFIG_BIG_ENDIAN),eb,el)
 
 BPF_HEADERS_DIR:=$(STAGING_DIR)/bpf-headers
@@ -57,7 +59,7 @@ BPF_KERNEL_INCLUDE := \
 BPF_CFLAGS := \
 	$(BPF_KERNEL_INCLUDE) -I$(PKG_BUILD_DIR) \
 	-D__KERNEL__ -D__BPF_TRACING__ -DCONFIG_GENERIC_CSUM -DCONFIG_PAGE_SIZE_64KB \
-	-D__TARGET_ARCH_${BPF_KARCH} \
+	-D__TARGET_ARCH_${BPF_TRACING_ARCH} \
 	-D$(if $(CONFIG_BIG_ENDIAN),__MIPSEB__,__MIPSEL__) \
 	-m$(if $(CONFIG_BIG_ENDIAN),big,little)-endian \
 	-fno-stack-protector -Wall \

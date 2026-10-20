@@ -1,5 +1,5 @@
 # OpenMPTCProuter 0.64.2-3K base
-- Keep this first iteration based on upstream v0.64.2, kernel 6.18, x86_64.
+- Keep upstream v0.64.2 and kernel 6.18 pinned. The published x86_64 release is retained; the user authorized a second ARM release covering all upstream ARM configurations on 2026-10-20.
 - Preserve the official MPTCP/MQVPN scheduler stack and matching client/VPS API.
 - OMR must not control cellular modems: exclude ModemManager, MBIM, QMI, NCM modem control and APN/SIM/operator configuration. External modems provide ordinary Ethernet WAN connections.
 - Preserve DHCP, static WANs, PPPoE, ordinary Ethernet/USB Ethernet and Wi-Fi.

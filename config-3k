@@ -1,4 +1,4 @@
-# Applied after the common configuration for the x86_64 v0.64.2-3K image.
+# Applied after the common configuration for the selected v0.64.2-3K image.
 # Keep generic Ethernet, Wi-Fi, PPPoE and USB Ethernet support.
 # CONFIG_ALL_KMODS is not set
 # CONFIG_ALL is not set

@@ -1,16 +1,38 @@
 #!/bin/sh
 set -eu
 
-config=${1:?usage: validate-3k-config.sh SOURCE-DIR}
+config=${1:?usage: validate-3k-config.sh SOURCE-DIR [TARGET]}
+target=${2:-${OMR_TARGET:-x86_64}}
+case "$target" in
+    ''|*[!A-Za-z0-9_-]*) echo "invalid 3K target: $target" >&2; exit 2 ;;
+esac
+template="$(dirname "$0")/config-$target"
+[ -f "$template" ] || { echo "missing board configuration: $template" >&2; exit 1; }
 conf="$config/.config"
 feed="$config/package/system/apk/files/customfeeds.list"
 [ -f "$conf" ] || { echo "missing defconfig output: $conf" >&2; exit 1; }
 [ -f "$feed" ] || { echo "missing APK feed list: $feed" >&2; exit 1; }
 
+# An absent kernel board or device can make defconfig silently pick a fallback.
+# Preserve all three target selections from the board template.
+selections=$(grep -E '^CONFIG_TARGET_[A-Za-z0-9_-]+=y$' "$template" | head -n 3)
+[ "$(printf '%s\n' "$selections" | grep -c '^CONFIG_TARGET_')" -eq 3 ] || {
+    echo "incomplete board target in $template" >&2; exit 1;
+}
+printf '%s\n' "$selections" | while IFS= read -r setting; do
+    grep -Fqx "$setting" "$conf" || { echo "target selection lost: $setting" >&2; exit 1; }
+done
+
+# Every explicit 3K package and kernel capability must survive defconfig,
+# including on ARM32; never quietly omit a requested feature by architecture.
+grep -E '^CONFIG_(PACKAGE_[A-Za-z0-9_-]+|KERNEL_[A-Za-z0-9_]+|HAS_BPF_TOOLCHAIN|BPF_TOOLCHAIN_HOST)=y$' "$(dirname "$0")/config-3k" |
+while IFS= read -r setting; do
+    grep -Fqx "$setting" "$conf" || { echo "3K selection unavailable on $target: $setting" >&2; exit 1; }
+done
+
 while IFS= read -r setting; do
     grep -Fqx "$setting" "$conf" || { echo "required selection missing: $setting" >&2; exit 1; }
 done <<'REQUIRED'
-CONFIG_TARGET_x86_64=y
 CONFIG_PACKAGE_openmptcprouter-full=y
 CONFIG_PACKAGE_btop=y
 CONFIG_PACKAGE_openvpn-openssl=y
@@ -66,13 +88,21 @@ if [ -n "$bad_langs$bad_i18n" ]; then
     exit 1
 fi
 
-if grep -Fv '/v0.64.2-6.18/x86_64/' "$feed" >/dev/null; then
-    echo "APK feed list has an unpinned package URL:" >&2
+arch=$(sed -n 's/^CONFIG_TARGET_ARCH_PACKAGES="\([A-Za-z0-9_-]*\)"$/\1/p' "$conf" | head -n 1)
+case "$arch" in
+    arm_*|aarch64_*|x86_64) ;;
+    *) echo "unsupported or unresolved package architecture: $arch" >&2; exit 1 ;;
+esac
+repo="https://packages.openmptcprouter.com/v0.64.2-6.18/$arch"
+grep -Fqx "CONFIG_VERSION_REPO=\"$repo\"" "$conf" || {
+    echo "runtime package repository does not match $arch" >&2; exit 1;
+}
+expected=$(for component in luci packages base routing telephony; do
+    printf '%s/%s/packages.adb\n' "$repo" "$component"
+done)
+[ "$(cat "$feed")" = "$expected" ] || {
+    echo "APK feed list does not match pinned $arch repositories:" >&2
     cat "$feed" >&2
-    exit 1
-fi
-[ "$(grep -c '^https://' "$feed")" -ge 4 ] || {
-    echo "APK feed list is incomplete" >&2
     exit 1
 }
 

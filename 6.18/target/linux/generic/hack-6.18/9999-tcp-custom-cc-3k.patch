@@ -1763,7 +1763,7 @@ Subject: [PATCH] tcp: retain 15 custom BBR congestion controls on 6.18
 +		 bbr_rate_kbps(sk, bbr_max_bw(sk)), /* bw: max bw */
 +		 0ULL,				    /* lb: [obsolete] */
 +		 0ULL,				    /* ib: [obsolete] */
-+		 (u64)sk->sk_pacing_rate * 8 / 1000,
++		 div_u64((u64)sk->sk_pacing_rate * 8, 1000),
 +		 acked,
 +		 tcp_packets_in_flight(tp),
 +		 rs->is_ack_delayed ? 'd' : '.',
@@ -1860,7 +1860,7 @@ Subject: [PATCH] tcp: retain 15 custom BBR congestion controls on 6.18
 +			bytes += GSO_MAX_SIZE >> r;
 +	}
 +	bytes = min_t(u32, bytes, gso_max_size - 1 - MAX_TCP_HEADER);
-+	segs = max_t(u32, bytes / mss_now, bbr_min_tso_segs(sk));
++	segs = max_t(u32, div_u64(bytes, mss_now), bbr_min_tso_segs(sk));
 +	return segs;
 +}
 +/* Custom tcp_tso_autosize() for BBR, used at transmit time to cap skb size. */
@@ -10143,7 +10143,7 @@ Subject: [PATCH] tcp: retain 15 custom BBR congestion controls on 6.18
 +		 bbr_rate_kbps(sk, bbr_max_bw(sk)), /* bw: max bw */
 +		 0ULL,				    /* lb: [obsolete] */
 +		 0ULL,				    /* ib: [obsolete] */
-+		 (u64)sk->sk_pacing_rate * 8 / 1000,
++		 div_u64((u64)sk->sk_pacing_rate * 8, 1000),
 +		 acked,
 +		 tcp_packets_in_flight(tp),
 +		 rs->is_ack_delayed ? 'd' : '.',
@@ -10240,7 +10240,7 @@ Subject: [PATCH] tcp: retain 15 custom BBR congestion controls on 6.18
 +			bytes += GSO_MAX_SIZE >> r;
 +	}
 +	bytes = min_t(u32, bytes, gso_max_size - 1 - MAX_TCP_HEADER);
-+	segs = max_t(u32, bytes / mss_now, bbr_min_tso_segs(sk));
++	segs = max_t(u32, div_u64(bytes, mss_now), bbr_min_tso_segs(sk));
 +	return segs;
 +}
 +/* Custom tcp_tso_autosize() for BBR, used at transmit time to cap skb size. */
@@ -12558,7 +12558,7 @@ Subject: [PATCH] tcp: retain 15 custom BBR congestion controls on 6.18
 +		 bbr_rate_kbps(sk, bbr_max_bw(sk)), /* bw: max bw */
 +		 0ULL,				    /* lb: [obsolete] */
 +		 0ULL,				    /* ib: [obsolete] */
-+		 (u64)sk->sk_pacing_rate * 8 / 1000,
++		 div_u64((u64)sk->sk_pacing_rate * 8, 1000),
 +		 acked,
 +		 tcp_packets_in_flight(tp),
 +		 rs->is_ack_delayed ? 'd' : '.',
@@ -12655,7 +12655,7 @@ Subject: [PATCH] tcp: retain 15 custom BBR congestion controls on 6.18
 +			bytes += GSO_MAX_SIZE >> r;
 +	}
 +	bytes = min_t(u32, bytes, gso_max_size - 1 - MAX_TCP_HEADER);
-+	segs = max_t(u32, bytes / mss_now, bbr_min_tso_segs(sk));
++	segs = max_t(u32, div_u64(bytes, mss_now), bbr_min_tso_segs(sk));
 +	return segs;
 +}
 +/* Custom tcp_tso_autosize() for BBR, used at transmit time to cap skb size. */
@@ -14973,7 +14973,7 @@ Subject: [PATCH] tcp: retain 15 custom BBR congestion controls on 6.18
 +		 bbr_rate_kbps(sk, bbr_max_bw(sk)), /* bw: max bw */
 +		 0ULL,				    /* lb: [obsolete] */
 +		 0ULL,				    /* ib: [obsolete] */
-+		 (u64)sk->sk_pacing_rate * 8 / 1000,
++		 div_u64((u64)sk->sk_pacing_rate * 8, 1000),
 +		 acked,
 +		 tcp_packets_in_flight(tp),
 +		 rs->is_ack_delayed ? 'd' : '.',
@@ -15070,7 +15070,7 @@ Subject: [PATCH] tcp: retain 15 custom BBR congestion controls on 6.18
 +			bytes += GSO_MAX_SIZE >> r;
 +	}
 +	bytes = min_t(u32, bytes, gso_max_size - 1 - MAX_TCP_HEADER);
-+	segs = max_t(u32, bytes / mss_now, bbr_min_tso_segs(sk));
++	segs = max_t(u32, div_u64(bytes, mss_now), bbr_min_tso_segs(sk));
 +	return segs;
 +}
 +/* Custom tcp_tso_autosize() for BBR, used at transmit time to cap skb size. */
@@ -17444,7 +17444,7 @@ Subject: [PATCH] tcp: retain 15 custom BBR congestion controls on 6.18
 +		 bbr_rate_kbps(sk, bbr_max_bw(sk)), /* bw: max bw */
 +		 0ULL,				    /* lb: [obsolete] */
 +		 0ULL,				    /* ib: [obsolete] */
-+		 (u64)sk->sk_pacing_rate * 8 / 1000,
++		 div_u64((u64)sk->sk_pacing_rate * 8, 1000),
 +		 acked,
 +		 tcp_packets_in_flight(tp),
 +		 rs->is_ack_delayed ? 'd' : '.',
@@ -19819,7 +19819,7 @@ Subject: [PATCH] tcp: retain 15 custom BBR congestion controls on 6.18
 +	}
 +
 +	bytes = min_t(u32, bytes, gso_max_size - 1 - MAX_TCP_HEADER);
-+	segs = max_t(u32, bytes / mss_now,
++	segs = max_t(u32, div_u64(bytes, mss_now),
 +		     sock_net(sk)->ipv4.sysctl_tcp_min_tso_segs);
 +	return segs;
 +}
@@ -22242,7 +22242,7 @@ Subject: [PATCH] tcp: retain 15 custom BBR congestion controls on 6.18
 +	}
 +
 +	bytes = min_t(u32, bytes, gso_max_size - 1 - MAX_TCP_HEADER);
-+	segs = max_t(u32, bytes / mss_now,
++	segs = max_t(u32, div_u64(bytes, mss_now),
 +		     sock_net(sk)->ipv4.sysctl_tcp_min_tso_segs);
 +	return segs;
 +}
@@ -24665,7 +24665,7 @@ Subject: [PATCH] tcp: retain 15 custom BBR congestion controls on 6.18
 +	}
 +
 +	bytes = min_t(u32, bytes, gso_max_size - 1 - MAX_TCP_HEADER);
-+	segs = max_t(u32, bytes / mss_now,
++	segs = max_t(u32, div_u64(bytes, mss_now),
 +		     sock_net(sk)->ipv4.sysctl_tcp_min_tso_segs);
 +	return segs;
 +}

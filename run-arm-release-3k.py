@@ -47,6 +47,71 @@ def matrix(root):
     require(set(groups)==set(ORDER), "unexpected platform")
     return groups
 
+
+def verify_completed_artifacts(record):
+    out=Path(record["artifact_directory"]).resolve(strict=True)
+    proof=json.loads((out/"artifact-manifest.json").read_text())
+    require(proof.get("passed") and proof.get("static_checks_only"),"completed artifact proof missing")
+    for item in proof["files"]:
+        path=out/item["path"]
+        require(path.resolve().is_relative_to(out) and path.is_file(),"completed artifact path missing or unsafe")
+        require(path.stat().st_size==item["size"] and sha(path)==item["sha256"],"completed artifact hash mismatch: "+str(path))
+    require(bool(proof["files"]),"empty completed artifact manifest")
+
+def overlay_untracked_files(source):
+    names=subprocess.check_output(["git","ls-files","--others","--exclude-standard","-z"],cwd=source).split(b"\0")
+    files=[]
+    for raw in names:
+        if not raw:
+            continue
+        path=source/os.fsdecode(raw)
+        if path.is_symlink():
+            files.append({"path":os.fsdecode(raw),"symlink":os.readlink(path)})
+        else:
+            require(path.is_file(),"untracked source input missing")
+            files.append({"path":os.fsdecode(raw),"size":path.stat().st_size,"sha256":sha(path)})
+    return files
+
+
+def retire_completed_kernels(root, source, job, groups, state, active):
+    cache_root=(source/"build_dir").resolve()
+    compressor=source/"staging_dir/host/bin/zstd"
+    if not compressor.is_file():
+        return
+    archive_root=job/"cache-archives"
+    archive_root.mkdir(mode=0o700,exist_ok=True)
+    for platform,rows in groups.items():
+        if platform==active or not all(state["targets"].get(row["target"],{}).get("phase")=="built_static_checks_passed" for row in rows):
+            continue
+        directories=list(cache_root.glob("target-*/linux-"+platform))
+        if directories:
+            for row in rows:
+                verify_completed_artifacts(state["targets"][row["target"]])
+        for directory in directories:
+            require(directory.is_dir() and not directory.is_symlink() and directory.resolve().is_relative_to(cache_root),"unsafe cache archive path")
+            archive=archive_root/(directory.parent.name+"--"+directory.name+".tar.zst")
+            partial=archive.with_suffix(archive.suffix+".partial")
+            require(not archive.exists() and not partial.exists(),"inspect existing kernel cache archive before retry")
+            log=archive_root/(directory.parent.name+"--"+platform+".log")
+            try:
+                with log.open("wb") as output:
+                    subprocess.run(["tar","--use-compress-program="+str(compressor)+" -T2 -3","-cf",str(partial),"-C",str(directory.parent),directory.name],stdout=output,stderr=subprocess.STDOUT,check=True)
+                    subprocess.run([str(compressor),"--test",str(partial)],stdout=output,stderr=subprocess.STDOUT,check=True)
+                    subprocess.run(["tar","--use-compress-program="+str(compressor),"-tf",str(partial)],stdout=subprocess.DEVNULL,stderr=output,check=True)
+                    subprocess.run(["tar","--use-compress-program="+str(compressor),"--compare","-f",str(partial),"-C",str(directory.parent)],stdout=output,stderr=subprocess.STDOUT,check=True)
+                partial.replace(archive)
+                proof={"platform":platform,"archive":str(archive),"sha256":sha(archive),"size":archive.stat().st_size,"original_directory":str(directory),"verified_archive":True}
+                record=archive.with_suffix(archive.suffix+".json")
+                record.write_text(json.dumps(proof,indent=2)+"\n")
+                require(directory.resolve().is_relative_to(cache_root) and not directory.is_symlink(),"cache path changed")
+                shutil.rmtree(directory)
+                proof["cache_removed_after_archive_verification"]=True
+                record.write_text(json.dumps(proof,indent=2)+"\n")
+            except Exception:
+                if partial.exists():
+                    partial.unlink()
+                raise
+
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument("--root",type=Path,required=True)
@@ -72,7 +137,7 @@ def main():
     status_file=job/"status.json"
     root_commit=subprocess.check_output(["git","rev-parse","HEAD"],cwd=root,text=True).strip()
     lock_data=json.loads((root/"source-lock-3k.json").read_text())
-    require(not subprocess.check_output(["git","diff","--name-only","HEAD"],cwd=root,text=True).strip(), "tracked root changes must be committed")
+    require(not subprocess.check_output(["git","status","--porcelain","--untracked-files=all"],cwd=root,text=True).strip(), "root changes must be committed or explicitly ignored")
     require(subprocess.check_output(["git","rev-parse","HEAD"],cwd=source,text=True).strip()==lock_data["upstream"]["openwrt"]["commit"], "OpenWrt source pin changed")
     state=json.loads(status_file.read_text()) if status_file.exists() else {
         "release":"v0.64.2-3K-arm","boards":44,"platform_groups":15,
@@ -104,6 +169,7 @@ def main():
         out=job/"artifacts"/representative;out.mkdir(parents=True,exist_ok=True)
         log=job/(representative+".log")
         try:
+            retire_completed_kernels(root,source,job,groups,state,key)
             require(shutil.disk_usage(root).free >= 15*1024**3, "less than 15 GiB free; stopping before disk exhaustion")
             adopted=representative=="armsr64" and a.adopt_first_exit is not None
             if adopted:
@@ -129,6 +195,7 @@ def main():
                     f.write('\nCONFIG_BINARY_FOLDER="'+str(binary)+'"\n')
                 require(run(["make","defconfig"],source,log,env)==0,"group defconfig failed")
                 resolved=(source/".config").read_text()
+                require('CONFIG_BINARY_FOLDER="'+str(binary)+'"' in resolved.splitlines(),"isolated binary output path missing after defconfig")
                 for row in rows:
                     require("CONFIG_TARGET_"+row["device"]+"=y" in resolved,
                             "device absent from pinned OpenWrt: "+row["target"])
@@ -139,8 +206,12 @@ def main():
             resolved=(source/".config").read_text()
             architecture=re.search(r'^CONFIG_TARGET_ARCH_PACKAGES="([^"]+)"$',resolved,re.M).group(1)
             board,subtarget=key.split("_",1)
+            arch_parts=architecture.split("_",2)
+            build_arch="_".join(arch_parts[:2])+("+"+arch_parts[2] if len(arch_parts)==3 else "")
             binary_match=re.search(r'^CONFIG_BINARY_FOLDER="([^"]+)"$',resolved,re.M)
             output_root=Path(binary_match.group(1)) if binary_match else source/"bin"
+            if not adopted:
+                require(output_root==job/"binary-output"/representative,"isolated binary output path changed during build")
             output=output_root/"targets"/board/subtarget
             require(output.is_dir(),"target output directory missing")
             profiles=json.loads((output/"profiles.json").read_text())["profiles"]
@@ -154,7 +225,7 @@ def main():
                     if image.get("sha256"):
                         require(sha(path)==image["sha256"],"profile image hash mismatch: "+image["name"])
 
-            roots=list((source/"build_dir").glob("target-"+architecture+"_*/root-"+board))
+            roots=list((source/"build_dir").glob("target-"+build_arch+"_*/root-"+board))
             require(len(roots)==1,"one installed root filesystem expected")
             installed=roots[0]
             required=["usr/bin/speedtest","usr/bin/btop","usr/sbin/mqvpn",
@@ -173,7 +244,7 @@ def main():
                         "wrong executable architecture: "+path)
             schedulers=sorted((installed/"usr/share/bpf/scheduler").glob("mptcp_bpf_*.o"))
             require(len(schedulers)==8,"eight compiled BPF schedulers required")
-            kernels=list((source/"build_dir").glob("target-"+architecture+"_*/linux-"+key+"/linux-6.18.39/.config"))
+            kernels=list((source/"build_dir").glob("target-"+build_arch+"_*/linux-"+key+"/linux-6.18.39/.config"))
             require(len(kernels)==1,"built kernel config missing")
             kernel=kernels[0].read_text()
             controls=["BBR","BBR1","BBR2","NANQINLANG","CUBIC"]+[
@@ -204,8 +275,23 @@ def main():
             proof={"passed":True,"static_checks_only":True,"hardware_boot_tested":False,
                    "platform":key,"architecture":architecture,"boards":record["boards"],
                    "build_root_commit":state["build_root_commit"],"openwrt_commit":state["openwrt_commit"],"feed_commit":state["feed_commit"],
-                   "congestion_controls":len(controls)+1,"reno_builtin_symbol_verified":True,"bpf_schedulers":8,"source_lock":lock_data,"openwrt_overlay_diff_sha256":hashlib.sha256(subprocess.check_output(["git","diff","--binary","HEAD"],cwd=source)).hexdigest(),"files":files}
+                   "congestion_controls":len(controls)+1,"reno_builtin_symbol_verified":True,"bpf_schedulers":8,"source_lock":lock_data,"openwrt_overlay_diff_sha256":hashlib.sha256(subprocess.check_output(["git","diff","--binary","HEAD"],cwd=source)).hexdigest(),"untracked_openwrt_source_inputs":overlay_untracked_files(source),"files":files}
             (out/"artifact-manifest.json").write_text(json.dumps(proof,indent=2)+"\n")
+            # Keep the verified release copy and remove only identical binary-output duplicates.
+            duplicate_files=0
+            for item in files:
+                relative=Path(item["path"])
+                if relative.parts[0]=="firmware":
+                    original=output/Path(*relative.parts[1:])
+                elif relative.parts[0]=="packages":
+                    original=package_source/Path(*relative.parts[1:])
+                else:
+                    continue
+                if original.is_file():
+                    require(original.stat().st_size==item["size"] and sha(original)==item["sha256"],"output duplicate differs from verified artifact")
+                    original.unlink()
+                    duplicate_files+=1
+            record["verified_output_duplicates_removed"]=duplicate_files
             record.update(phase="built_static_checks_passed",architecture=architecture,files=len(files),
                           artifact_directory=str(out),hardware_boot_tested=False)
         except Exception as exc:

@@ -819,7 +819,7 @@ define Device/cudy_tr3000-256mb-v1
   IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
   DEVICE_PACKAGES := kmod-usb3 kmod-mt7915e kmod-mt7981-firmware mt7981-wo-firmware
 endef
-#TARGET_DEVICES += cudy_tr3000-256mb-v1
+TARGET_DEVICES += cudy_tr3000-256mb-v1
 
 define Device/cudy_wr3000-v1
   DEVICE_VENDOR := Cudy

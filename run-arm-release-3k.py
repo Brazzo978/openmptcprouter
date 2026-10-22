@@ -21,6 +21,10 @@ PREFERRED = {"armsr_armv8": "armsr64", "rockchip_armv8": "r4s",
 def require(ok, message):
     if not ok:
         raise RuntimeError(message)
+def banned_image_package(name):
+    # This Qualcomm kernel helper is needed by ath11k/ath12k Wi-Fi, not modem control.
+    return name != "kmod-qcom-qmi-helpers" and bool(re.search(
+        r"(modemmanager|luci-i18n-|^u(qmi|mbim)$|(^|[-_])(mbim|qmi|ncm|wwan)([-_]|$)|^mlvpn$)", name, re.I))
 def sha(path):
     h=hashlib.sha256()
     with path.open("rb") as f:
@@ -47,11 +51,99 @@ def matrix(root):
     require(set(groups)==set(ORDER), "unexpected platform")
     return groups
 
+def maintenance_policy(catalog, groups):
+    all_targets={row["target"] for rows in groups.values() for row in rows}
+    require(catalog["boards"]==len(all_targets) and catalog["groups"]==
+            {key:[row["target"] for row in rows] for key,rows in groups.items()},
+            "catalog differs from pinned target matrix")
+    policy=catalog["maintenance_policy"]
+    require(policy["minimum_ram_mib"]==1024,"unexpected minimum RAM policy")
+    decisions=policy["targets"]
+    require(set(decisions)==all_targets,"hardware policy must classify every ARM target exactly once")
+    for target,row in decisions.items():
+        require(row.get("decision") in ("keep","drop","pending") and
+                isinstance(row.get("reason"),str) and row["reason"].strip(),
+                "invalid hardware policy decision: "+target)
+        ram=row.get("ram_mib")
+        require(ram is None or (type(ram) is int and ram>0) or
+                (isinstance(ram,str) and re.fullmatch(r"[0-9]+(?:/[0-9]+)+",ram)),
+                "invalid catalog RAM evidence: "+target)
+        if row["decision"]=="keep" and ram is not None:
+            options=[ram] if isinstance(ram,int) else [int(x) for x in ram.split("/")]
+            require(min(options)>=policy["minimum_ram_mib"],
+                    "kept target includes a sub-minimum RAM variant: "+target)
+    deferred=catalog.get("deferred_targets",{})
+    require(set(deferred)<=all_targets and all(isinstance(reason,str) and reason for reason in deferred.values()),
+            "invalid deferred target catalog")
+    candidates={target for target,row in decisions.items() if row["decision"]=="keep" and target not in deferred}
+    require(catalog["build_candidates"]==len(candidates),"active build candidate count differs from hardware policy")
+    return decisions,deferred,candidates
 
-def verify_completed_artifacts(record):
+def requested_targets(targets, candidates):
+    if targets is None:
+        return set(candidates)
+    require(len(targets)==len(set(targets)),"duplicate --targets ID")
+    require(set(targets)<=candidates,
+            "--targets must contain only active keep targets: "+", ".join(sorted(set(targets)-candidates)))
+    return set(targets)
+
+def policy_skip_record(target, platform, decision, previous=None):
+    previous=previous or {}
+    phase={"drop":"excluded_by_hardware_policy","pending":"pending_hardware_verification"}[decision["decision"]]
+    record={"phase":phase,"boards":[target],"representative":target,"platform":platform,
+            "reason":decision["reason"]}
+    for field in ("previous_phase","previous_artifact_directory"):
+        if field in previous:
+            record[field]=previous[field]
+    if previous.get("phase") not in (None,phase):
+        record["previous_phase"]=previous["phase"]
+        if previous.get("artifact_directory"):
+            record["previous_artifact_directory"]=previous["artifact_directory"]
+    return record
+
+def nonbuild_record(target, platform, decision, deferred, selected, previous=None):
+    previous=previous or {}
+    if decision["decision"] in ("drop","pending"):
+        return policy_skip_record(target,platform,decision,previous)
+    if target in deferred:
+        require(previous.get("phase")!="built_static_checks_passed",
+                "cannot defer an already verified target")
+        record={"phase":"deferred_requires_board_port","boards":[target],
+                "representative":target,"platform":platform,"reason":deferred[target],
+                "deferred_utc":time.strftime("%Y-%m-%dT%H:%M:%SZ",time.gmtime())}
+        if previous.get("error"):
+            record["previous_failure"]={name:previous[name] for name in ("error","log","finished_utc") if name in previous}
+        return record
+    if target not in selected:
+        require(previous.get("phase") in (None,"not_requested"),
+                "previously processed target is outside the requested selection: "+target)
+        return {"phase":"not_requested","boards":[target],
+                "representative":target,"platform":platform}
+    return None
+
+def status_counts(state, expected_targets):
+    require(set(state["targets"])==expected_targets,"queue status must account for every ARM target")
+    statuses={"built_boards":"built_static_checks_passed","failed_boards":"failed",
+              "deferred_boards":"deferred_requires_board_port",
+              "excluded_boards":"excluded_by_hardware_policy",
+              "pending_boards":"pending_hardware_verification","not_requested_boards":"not_requested"}
+    counts={field:sum(record.get("phase")==phase for record in state["targets"].values())
+            for field,phase in statuses.items()}
+    require(sum(counts.values())==len(expected_targets),"queue contains unfinished or unknown target status")
+    return counts
+
+
+def verify_completed_artifacts(record, expected_directory=None, target=None, platform=None, state=None):
     out=Path(record["artifact_directory"]).resolve(strict=True)
+    if expected_directory is not None:
+        require(out==expected_directory.resolve(),"completed artifact belongs to another job or target")
     proof=json.loads((out/"artifact-manifest.json").read_text())
     require(proof.get("passed") and proof.get("static_checks_only"),"completed artifact proof missing")
+    if target is not None:
+        require(proof.get("boards")==[target] and proof.get("platform")==platform,
+                "completed artifact belongs to another board or platform")
+        for field in ("build_root_commit","openwrt_commit","feed_commit"):
+            require(proof.get(field)==state.get(field),"completed artifact provenance changed: "+field)
     for item in proof["files"]:
         path=out/item["path"]
         require(path.resolve().is_relative_to(out) and path.is_file(),"completed artifact path missing or unsafe")
@@ -78,15 +170,39 @@ def retire_completed_kernels(root, source, job, groups, state, active):
     compressor=source/"staging_dir/host/bin/zstd"
     if not compressor.is_file():
         return
+    catalog=json.loads((root/"arm-targets-3k.json").read_text())
+    decisions,approved_deferred,_=maintenance_policy(catalog,groups)
     archive_root=job/"cache-archives"
     archive_root.mkdir(mode=0o700,exist_ok=True)
     for platform,rows in groups.items():
-        if platform==active or not all(state["targets"].get(row["target"],{}).get("phase")=="built_static_checks_passed" for row in rows):
+        phases=[state["targets"].get(row["target"],{}).get("phase") for row in rows]
+        for row in rows:
+            target=row["target"]
+            record=state["targets"].get(target,{})
+            phase=record.get("phase")
+            if phase=="deferred_requires_board_port":
+                require(target in approved_deferred and decisions[target]["decision"]=="keep" and
+                        record.get("reason")==approved_deferred[target],
+                        "unapproved deferred status cannot authorize cache retirement")
+            if phase in ("excluded_by_hardware_policy","pending_hardware_verification"):
+                decision=decisions[target]
+                expected={"drop":"excluded_by_hardware_policy","pending":"pending_hardware_verification"}.get(decision["decision"])
+                require(phase==expected and record.get("reason")==decision["reason"],
+                        "unapproved hardware skip cannot authorize cache retirement")
+            if phase=="built_static_checks_passed":
+                require(decisions[target]["decision"]=="keep" and target not in approved_deferred,
+                        "excluded or deferred target cannot authorize cache retirement as built")
+        terminal=("built_static_checks_passed","deferred_requires_board_port",
+                  "excluded_by_hardware_policy","pending_hardware_verification")
+        if platform==active or not all(phase in terminal for phase in phases) or "built_static_checks_passed" not in phases:
             continue
         directories=list(cache_root.glob("target-*/linux-"+platform))
         if directories:
             for row in rows:
-                verify_completed_artifacts(state["targets"][row["target"]])
+                if state["targets"][row["target"]]["phase"]=="built_static_checks_passed":
+                    target=row["target"]
+                    verify_completed_artifacts(state["targets"][target],job/"artifacts"/target,
+                                               target,platform,state)
         for directory in directories:
             require(directory.is_dir() and not directory.is_symlink() and directory.resolve().is_relative_to(cache_root),"unsafe cache archive path")
             archive=archive_root/(directory.parent.name+"--"+directory.name+".tar.zst")
@@ -120,14 +236,20 @@ def main():
     p.add_argument("--adopt-first-exit",type=Path)
     p.add_argument("--list",action="store_true")
     p.add_argument("--retry-failed",action="store_true")
+    p.add_argument("--targets",nargs="+",metavar="OMR_TARGET",
+                   help="build only these active keep IDs; all other IDs remain recorded explicitly")
     a=p.parse_args()
     root=a.root.resolve(strict=True)
     source=root/"shared-arm/6.18/source"
     require(source.is_dir() and (source/".git").exists(), "shared pinned OpenWrt source missing")
     require(1<=a.jobs<=20, "jobs must be 1..20")
     groups=matrix(root)
+    catalog=json.loads((root/"arm-targets-3k.json").read_text())
+    decisions,deferred,candidates=maintenance_policy(catalog,groups)
+    selected=requested_targets(a.targets,candidates)
     if a.list:
-        print(json.dumps(groups,indent=2));return
+        print(json.dumps({"groups":groups,"build_candidates":len(candidates),
+                          "requested_targets":sorted(selected),"maintenance_policy":catalog["maintenance_policy"]},indent=2));return
     job=a.job.resolve()
     job.mkdir(parents=True,exist_ok=True)
     require(job!=root and not job.is_relative_to(source), "job directory must be outside source")
@@ -144,22 +266,36 @@ def main():
         "build_root_commit":root_commit,
         "openwrt_commit":lock_data["upstream"]["openwrt"]["commit"],
         "feed_commit":json.loads((root/"source-lock-3k.json").read_text())["client_feed_release"]["commit"],
+        "requested_targets":sorted(selected),
         "targets":{}}
     require(state["build_root_commit"]==root_commit and state["feed_commit"]==lock_data["client_feed_release"]["commit"], "resume provenance changed; use a new job directory")
+    require(state.get("requested_targets")==sorted(selected),"requested targets changed; use a new job directory")
     def save():
         state["updated_utc"]=time.strftime("%Y-%m-%dT%H:%M:%SZ",time.gmtime())
         temp=job/"status.json.tmp";temp.write_text(json.dumps(state,indent=2)+"\n")
         temp.replace(status_file)
-    state["phase"]="running";save()
+    state["phase"]="running";state["build_candidates"]=len(candidates);save()
     env=dict(os.environ,FORCE_UNSAFE_CONFIGURE="1",OMR_JOBS=str(a.jobs))
     queue=[]
     for platform in ORDER:
         preferred=PREFERRED.get(platform)
         queue.extend((platform,[row]) for row in sorted(groups[platform],key=lambda x:(x["target"]!=preferred,x["target"])))
     require(len(queue)==44,"44 independent board builds required")
+    all_targets={row["target"] for _,rows in queue for row in rows}
+    require(all_targets==set(decisions),"queue differs from hardware policy")
+    # Normalize policy exclusions before any cache cleanup, including on resume.
+    for key,rows in queue:
+        target=rows[0]["target"]
+        record=nonbuild_record(target,key,decisions[target],deferred,selected,
+                               state["targets"].get(target))
+        if record is not None:
+            state["targets"][target]=record
+    save()
     for key,rows in queue:
         representative=rows[0]["target"]
         previous=state["targets"].get(representative,{})
+        if decisions[representative]["decision"] in ("drop","pending") or representative in deferred or representative not in selected:
+            continue
         if previous.get("phase")=="built_static_checks_passed" or (previous.get("phase")=="failed" and not a.retry_failed):
             continue
         record={"phase":"preparing","boards":[x["target"] for x in rows],"representative":representative,
@@ -257,7 +393,7 @@ def main():
             require(any(line.split() and line.split()[-1]=="tcp_reno" for line in symbols.splitlines()),"built-in Reno symbol missing")
             for manifest in output.glob("*.manifest"):
                 packages={line.split()[0] for line in manifest.read_text().splitlines() if line.split()}
-                require(not any(re.search(r"(modemmanager|luci-i18n-|(^|[-_])(mbim|qmi|ncm|wwan)([-_]|$)|^mlvpn$)",name,re.I) for name in packages),"banned package in installed image manifest")
+                require(not any(banned_image_package(name) for name in packages),"banned package in installed image manifest")
 
             shutil.copytree(output,out/"firmware",dirs_exist_ok=True)
             package_source=output_root/"packages"/architecture
@@ -274,6 +410,8 @@ def main():
                    for p in sorted(out.rglob("*")) if p.is_file() and p.name!="artifact-manifest.json"]
             proof={"passed":True,"static_checks_only":True,"hardware_boot_tested":False,
                    "platform":key,"architecture":architecture,"boards":record["boards"],
+                   "maintenance_policy":{"minimum_ram_mib":catalog["maintenance_policy"]["minimum_ram_mib"],
+                                         "target":representative,**decisions[representative]},
                    "build_root_commit":state["build_root_commit"],"openwrt_commit":state["openwrt_commit"],"feed_commit":state["feed_commit"],
                    "congestion_controls":len(controls)+1,"reno_builtin_symbol_verified":True,"bpf_schedulers":8,"source_lock":lock_data,"openwrt_overlay_diff_sha256":hashlib.sha256(subprocess.check_output(["git","diff","--binary","HEAD"],cwd=source)).hexdigest(),"untracked_openwrt_source_inputs":overlay_untracked_files(source),"files":files}
             (out/"artifact-manifest.json").write_text(json.dumps(proof,indent=2)+"\n")
@@ -299,12 +437,13 @@ def main():
             print(representative+": "+str(exc),flush=True)
         record["finished_utc"]=time.strftime("%Y-%m-%dT%H:%M:%SZ",time.gmtime());save()
     state["phase"]="build_queue_finished"
-    state["built_boards"]=sum(x.get("phase")=="built_static_checks_passed" for x in state["targets"].values())
-    state["failed_boards"]=sum(x.get("phase")=="failed" for x in state["targets"].values())
+    state.update(status_counts(state,all_targets))
     state["ready_to_publish"]=False
     state["next_step"]="Review failures, verify installed UI/source parity, run available ARM64 boot tests, then package and publish"
     save()
     print(json.dumps({"built_boards":state["built_boards"],"failed_boards":state["failed_boards"],
+                      "deferred_boards":state["deferred_boards"],"excluded_boards":state["excluded_boards"],
+                      "pending_boards":state["pending_boards"],"not_requested_boards":state["not_requested_boards"],
                       "ready_to_publish":False}),flush=True)
 if __name__=="__main__":
     main()

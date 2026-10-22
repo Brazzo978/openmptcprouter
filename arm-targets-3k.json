@@ -78,5 +78,240 @@
     "bcm27xx_bcm2712": [
       "rpi5"
     ]
+  },
+  "maintenance_policy": {
+    "minimum_ram_mib": 1024,
+    "inventory_reference": "hardware-inventory-3k.json",
+    "scope": "Future ARM builds and maintenance only; previously published assets are unchanged.",
+    "targets": {
+      "armsr64": {
+        "decision": "keep",
+        "ram_mib": null,
+        "reason": "Generic ARM64 EFI target; deployments must provide at least 1024 MiB RAM."
+      },
+      "bpi-r1": {
+        "decision": "keep",
+        "ram_mib": 1024,
+        "reason": "Meets the RAM floor and is retained for the requested recovery build.",
+        "cpu_advisory": "Older ARMv7 CPU; limited headroom for encrypted bonding/SQM; no 3K throughput measurement available."
+      },
+      "bpi-r2": {
+        "decision": "keep",
+        "ram_mib": 2048,
+        "reason": "Meets the RAM floor and is retained for the requested recovery build.",
+        "cpu_advisory": "Older ARMv7 CPU; limited headroom for encrypted bonding/SQM; no 3K throughput measurement available."
+      },
+      "bpi-r3": {
+        "decision": "keep",
+        "ram_mib": 2048,
+        "reason": "Documented 2 GiB RAM meets the minimum."
+      },
+      "bpi-r3-mini": {
+        "decision": "keep",
+        "ram_mib": 2048,
+        "reason": "Documented 2 GiB RAM meets the minimum."
+      },
+      "bpi-r4": {
+        "decision": "keep",
+        "ram_mib": 4096,
+        "reason": "Documented 4 GiB RAM meets the minimum."
+      },
+      "bpi-r4-poe": {
+        "decision": "keep",
+        "ram_mib": 4096,
+        "reason": "Documented 4 GiB RAM meets the minimum."
+      },
+      "bpi-r64": {
+        "decision": "keep",
+        "ram_mib": 1024,
+        "reason": "Meets the RAM floor and is retained for the requested recovery build."
+      },
+      "cudy_tr3000-256mb-v1": {
+        "decision": "drop",
+        "ram_mib": 512,
+        "reason": "512 MiB RAM is below the 1024 MiB maintenance floor; 256 MB in the ID describes flash."
+      },
+      "cznic_turris-omnia": {
+        "decision": "keep",
+        "ram_mib": "1024/2048",
+        "reason": "Both documented 1 GiB and 2 GiB variants meet the minimum."
+      },
+      "espressobin": {
+        "decision": "keep",
+        "ram_mib": 1024,
+        "reason": "Documented 1 GiB RAM meets the minimum."
+      },
+      "gl-mt2500": {
+        "decision": "keep",
+        "ram_mib": 1024,
+        "reason": "Documented 1 GiB RAM meets the minimum."
+      },
+      "gl-mt2500-airoha": {
+        "decision": "keep",
+        "ram_mib": 1024,
+        "reason": "Documented 1 GiB RAM meets the minimum."
+      },
+      "gl-mt3000": {
+        "decision": "drop",
+        "ram_mib": 512,
+        "reason": "512 MiB RAM is below the maintenance floor."
+      },
+      "gl-mt3600be": {
+        "decision": "drop",
+        "ram_mib": 512,
+        "reason": "512 MiB RAM is below the maintenance floor."
+      },
+      "gl-mt5000": {
+        "decision": "keep",
+        "ram_mib": 1024,
+        "reason": "Documented 1 GiB RAM meets the minimum."
+      },
+      "gl-mt6000": {
+        "decision": "keep",
+        "ram_mib": 1024,
+        "reason": "Documented 1 GiB RAM meets the minimum."
+      },
+      "gl-x3000": {
+        "decision": "drop",
+        "ram_mib": 512,
+        "reason": "512 MiB RAM is below the maintenance floor."
+      },
+      "gl-xe3000": {
+        "decision": "drop",
+        "ram_mib": 512,
+        "reason": "512 MiB RAM is below the maintenance floor."
+      },
+      "p2w_r619ac": {
+        "decision": "drop",
+        "ram_mib": 512,
+        "reason": "512 MiB RAM is below the maintenance floor."
+      },
+      "qnap-301w": {
+        "decision": "keep",
+        "ram_mib": 1024,
+        "reason": "Meets the RAM floor and is retained for the requested recovery build."
+      },
+      "r2s": {
+        "decision": "keep",
+        "ram_mib": 1024,
+        "reason": "Documented 1 GiB RAM meets the minimum."
+      },
+      "r3s": {
+        "decision": "keep",
+        "ram_mib": "1024/2048",
+        "reason": "Both documented 1 GiB and 2 GiB variants meet the minimum."
+      },
+      "r4s": {
+        "decision": "keep",
+        "ram_mib": 4096,
+        "reason": "Documented 4 GiB RAM meets the minimum."
+      },
+      "r5c": {
+        "decision": "keep",
+        "ram_mib": 4096,
+        "reason": "Documented 4 GiB RAM meets the minimum."
+      },
+      "r5s": {
+        "decision": "keep",
+        "ram_mib": "2048/4096",
+        "reason": "Both documented RAM variants meet the minimum."
+      },
+      "r6s": {
+        "decision": "keep",
+        "ram_mib": 8192,
+        "reason": "Meets the RAM floor and is retained for the requested recovery build."
+      },
+      "r7800": {
+        "decision": "drop",
+        "ram_mib": 512,
+        "reason": "512 MiB RAM is below the maintenance floor; the historical 6.18 board port is also deferred."
+      },
+      "rpi2": {
+        "decision": "drop",
+        "ram_mib": null,
+        "reason": "Raspberry Pi models before 3B+ are outside the future maintenance policy; this shared profile is retained only as history."
+      },
+      "rpi3": {
+        "decision": "keep",
+        "ram_mib": 1024,
+        "reason": "Keep the explicitly requested Raspberry Pi 3B+ 1 GiB variant; older models in this shared profile are outside the maintenance policy."
+      },
+      "rpi4": {
+        "decision": "keep",
+        "ram_mib": "1024/2048/4096/8192",
+        "reason": "Documented variants start at 1 GiB; only variants with at least 1024 MiB qualify."
+      },
+      "rpi5": {
+        "decision": "keep",
+        "ram_mib": "2048/4096/8192/16384",
+        "reason": "Documented variants exceed the 1024 MiB minimum."
+      },
+      "rutx": {
+        "decision": "drop",
+        "ram_mib": 256,
+        "reason": "256 MiB RAM is below the maintenance floor; the historical generic board port is also deferred."
+      },
+      "rutx12": {
+        "decision": "drop",
+        "ram_mib": 256,
+        "reason": "256 MiB RAM is below the maintenance floor; the historical board port is also deferred."
+      },
+      "rutx50": {
+        "decision": "drop",
+        "ram_mib": 256,
+        "reason": "256 MiB RAM is below the maintenance floor."
+      },
+      "wrt3200acm": {
+        "decision": "drop",
+        "ram_mib": 512,
+        "reason": "512 MiB RAM is below the maintenance floor."
+      },
+      "wrt32x": {
+        "decision": "drop",
+        "ram_mib": 512,
+        "reason": "512 MiB RAM is below the maintenance floor."
+      },
+      "z8102ax_128m": {
+        "decision": "keep",
+        "ram_mib": 1024,
+        "reason": "Restricted to the documented Z8102AX v1 128 MB NAND / 1 GiB RAM variant; the NAND suffix alone does not establish RAM."
+      },
+      "z8102ax_64m": {
+        "decision": "pending",
+        "ram_mib": null,
+        "reason": "RAM of this exact 64 MB NAND profile is unverified; do not build by default until the physical variant is confirmed."
+      },
+      "z8102ax-emmc": {
+        "decision": "pending",
+        "ram_mib": null,
+        "reason": "Vendor lists 1 GiB but the local DTS declares 256 MiB; resolve this conflict before building."
+      },
+      "z8109ax_128m": {
+        "decision": "pending",
+        "ram_mib": null,
+        "reason": "Vendor lists 512 MiB default and optional 1 GiB, but RAM of this exact 128 MB NAND profile is unconfirmed."
+      },
+      "z8109ax_512m": {
+        "decision": "pending",
+        "ram_mib": null,
+        "reason": "Vendor lists 512 MiB default and optional 1 GiB, but RAM of this exact 512 MB NAND profile is unconfirmed."
+      },
+      "z8802be_128m": {
+        "decision": "drop",
+        "ram_mib": 512,
+        "reason": "The exact device DTS declares 512 MiB RAM, below the maintenance floor; 128 MB in the ID is flash."
+      },
+      "z8803be": {
+        "decision": "keep",
+        "ram_mib": 1024,
+        "reason": "Vendor specification and the exact upstream device DTS agree on 1 GiB RAM."
+      }
+    }
+  },
+  "build_candidates": 26,
+  "deferred_targets": {
+    "r7800": "The frozen ipq806x source has config/patches for 6.12; requires a reviewed 6.18 target backport and board tests.",
+    "rutx": "No matching generic RUTX device; the available RUTX10 definition is disabled because DSA setup is missing.",
+    "rutx12": "No matching RUTX12 device definition/DTS in the frozen source; requires a board-specific port and tests."
   }
 }

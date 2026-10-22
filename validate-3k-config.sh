@@ -73,7 +73,7 @@ fi
 bad_legacy=$(grep -E '^CONFIG_PACKAGE_(mlvpn|luci-app-mlvpn)=[ym]$' "$conf" || true)
 [ -z "$bad_legacy" ] || { echo "unsupported client VPN selected: $bad_legacy" >&2; exit 1; }
 
-bad_modems=$(grep -Ei '^CONFIG_PACKAGE_[A-Za-z0-9_-]*(modem|mbim|qmi|ncm|wwan|sierra|huawei|hso|kalmia|ipheth|comgt|usb-modeswitch|gobinet|pcie_mhi|usb-wdm|usb-acm|gigaset|hfcpci|hfcmulti|solos-pci|chat|luci-proto-3g|usb-serial-ipw)[A-Za-z0-9_-]*=[ym]$' "$conf" || true)
+bad_modems=$(grep -Ev '^CONFIG_PACKAGE_kmod-qcom-qmi-helpers=[ym]$' "$conf" | grep -Ei '^CONFIG_PACKAGE_[A-Za-z0-9_-]*(modem|mbim|qmi|ncm|wwan|sierra|huawei|hso|kalmia|ipheth|comgt|usb-modeswitch|gobinet|pcie_mhi|usb-wdm|usb-acm|gigaset|hfcpci|hfcmulti|solos-pci|chat|luci-proto-3g|usb-serial-ipw)[A-Za-z0-9_-]*=[ym]$' || true)
 if [ -n "$bad_modems" ]; then
     echo "cellular/legacy modem selections restored by defconfig:" >&2
     printf '%s\n' "$bad_modems" >&2

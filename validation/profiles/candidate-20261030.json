@@ -1,7 +1,7 @@
 {
   "checked_utc": "2026-10-30T14:35:04+00:00",
   "source": {
-    "client_feed_commit": "48ed3af09332fa6084226d02906b256b7c2fc899",
+    "client_feed_commit": "6d11faccfdcd8f952c8e8058c26da210d57a0260",
     "vps_commit": "93b943968d80bc920b0fa99657ff8a1fc4c85d54",
     "profile_implementation_commit": "440a7b9a4c17b43d061bb5fa679757c63c3d3e09",
     "no_tunnel_implementation_commit": "8891d4c701f8000ef2b21491c38aeba575f46496"

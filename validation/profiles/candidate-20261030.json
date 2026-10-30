@@ -1,14 +1,16 @@
 {
-  "checked_utc": "2026-10-30T12:38:43+00:00",
+  "checked_utc": "2026-10-30T13:18:41+00:00",
   "source": {
-    "client_feed_commit": "f38cfb488efeba94a8ded2e41488da41d8f1a8c0",
-    "vps_commit": "b68d5e10ce33b31c867438ee288d9ca04c726d84",
+    "client_feed_commit": "ab5f34ab4a893236453bdf75841e45e3cf8d82ec",
+    "vps_commit": "7a818955bff9d1043e962a875f25ef20acf47c5b",
     "profile_implementation_commit": "440a7b9a4c17b43d061bb5fa679757c63c3d3e09"
   },
   "profile_modes": [
     "Default",
     "Performance",
-    "Gaming",
+    "Stability / Gaming",
+    "Performance (old)",
+    "Stability (old)",
     "Custom"
   ],
   "rpc_and_transaction_model": "Lua 5.1 isolated transaction suite passed",
@@ -20,8 +22,12 @@
     "scenarios": [
       "Default asymmetric values",
       "Performance plus lost confirmation response",
-      "Gaming timeout rollback",
-      "Custom capture/revert"
+      "Stability / Gaming timeout rollback",
+      "Custom capture/revert with asymmetric router and VPS values",
+      "Five built-ins and MQVPN to Glorytun TCP to MQVPN",
+      "Original Xray proxy flags restored",
+      "Mandatory route phase and failed-route rollback",
+      "Persistent quick pair without applying tuning"
     ],
     "adapters": "UCI/kernel/service operations simulated"
   },
@@ -39,27 +45,33 @@
       "Performance WLB MQVPN paths",
       "Preview selection does not mutate the active profile",
       "Pause/resume and reduced motion",
-      "Production animation and isolated fragment in a sandboxed iframe, 320px layout"
+      "Production animation and isolated fragment in a sandboxed iframe, 320px layout",
+      "Simultaneous distinct TCP packets on both paths and denser Performance illustration",
+      "Old profiles distribute or duplicate all three protocols inside Glorytun TCP",
+      "Native A/B switch, save pair without apply, outside-pair endpoint selection",
+      "Pending switch retains confirmed position; position changes after Keep",
+      "320px layout with 48-character custom profile names"
     ],
     "real_OpenWrt_LuCI": "not run"
   },
   "vps_tests": {
-    "passed": 572,
+    "passed": 597,
     "subtests_passed": 2,
-    "scope": "API, profile transactions, NanBBR, WireGuard manager/helper, candidate preparation, DSCP, Xray, frozen-update independence"
+    "scope": "Primary independent selected regression run: API, transport transactions, NanBBR, WireGuard manager/helper, candidate preparation, DSCP, Xray, frozen-update independence",
+    "full_admin_suite_agent_verified": {"passed": 1090, "skipped": 9, "subtests_passed": 2}
   },
   "api_transport_regression": {
     "fixture_cases_passed": 19,
     "includes": "IPv6 token/address context regression"
   },
   "vps_deb_candidate": {
-    "filename": "omr-vps-admin_0.18+20261030-3k5_all.deb",
-    "sha256": "7c84b4b195fd8342dd608a9299a25f94e678f7282ef054b6c7a892bff05135eb",
+    "filename": "omr-vps-admin_0.18+20261030-3k6_all.deb",
+    "sha256": "cbd707cd442cc74701df90cb9adb47a8b77ea068312d5c34db1aa127c9a5a1b8",
     "installed": false,
     "source_and_unit_bytes_match": true
   },
   "vps_prepare": {
-    "fixture_cases_passed": 13,
+    "fixture_cases_passed": 14,
     "actual_prepare": "PASS in isolated source copy with real dpkg; stale 3k4 file ignored",
     "installed": false,
     "frozen_or_kernel_assets_fetched": false
@@ -72,6 +84,17 @@
     "scope": "Real WireGuard and shipped nft rules in Linux namespaces, simulated OMR router/tunnel and Internet endpoint",
     "gates": "New clients require individual permission and global LAN switch; legacy identity behavior preserved",
     "installed_or_clean_install_tested": false
+  },
+  "transport_validation": {
+    "negotiated_api_version": 2,
+    "native_staged_wan_delta_preserved": true,
+    "tracker_failure_cleanup": "PASS in Lua service-command fixtures",
+    "different_tunnel_device_restore": "PASS",
+    "glorytun_readiness": "procd PID, effective mptcp argument, configured TUN IPv4 and device-bound peer ping; peer ICMP is required",
+    "real_wg_nft_retarget_packet_checks_passed": 9,
+    "retarget_scope": "MQVPN and Glorytun endpoints simulated; real WireGuard and nft; GUI/DNAT switch and rollback; bypass/custom/DSCP retained",
+    "external_editor_race": "Pending UCI changes are checked but legacy proxy/tracker commits cannot atomically exclude a concurrent external edit",
+    "real_glorytun_or_mqvpn_handshake_tested": false
   },
   "pending": [
     "Full client image build and installed rpcd/procd/LuCI verification",

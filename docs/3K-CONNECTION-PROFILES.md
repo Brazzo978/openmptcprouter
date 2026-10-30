@@ -6,30 +6,53 @@ The candidate is not included in existing published firmware or VPS bundles.
 
 ## Using the GUI
 
-OMR Status has a compact switcher. **System → OpenMPTCProuter → Connection
+OMR Status has a native A/B switch with two configurable profile slots. Saving
+the pair does not apply a profile; changing the switch starts a guarded apply.
+Its position changes after confirmation. If the active configuration is outside
+the pair, either labelled endpoint can activate its profile. The pair is stored
+privately with the presets and survives local backup/sysupgrade.
+**System → OpenMPTCProuter → Connection
 profiles** shows built-ins, custom profiles, router/VPS settings and their
 verification status. Select a profile, wait for both sides to verify, then
 choose **Keep profile** within 60 seconds or **Revert**. The interface reports
 an incomplete restore for retry rather than claiming success.
 
-| Preset | MPTCP scheduler | TCP congestion | MQVPN scheduler | MQVPN congestion |
+| Preset | VPN | MPTCP scheduler | TCP congestion | MQVPN scheduler / congestion |
 |---|---|---|---|---|
-| Default | default | BBRv3 (`bbr`) | minrtt | bbr2 |
-| Performance | default | nanbbr3_light | wlb | bbr2 |
-| Gaming | bpf_red | BBRv3 (`bbr`) | minrtt | bbr2 |
+| Default | MQVPN | default | BBRv3 (`bbr`) | minrtt / bbr2 |
+| Performance | MQVPN | default | nanbbr3_light | wlb / bbr2 |
+| Stability / Gaming | MQVPN | bpf_red | BBRv3 (`bbr`) | minrtt / bbr2 |
+| Performance (old) | Glorytun TCP | default | BBRv3 (`bbr`) | inactive |
+| Stability (old) | Glorytun TCP | bpf_red | BBRv3 (`bbr`) | inactive |
 
 The labels state intended use, not benchmark results. Default resets the complete
-managed tuning set; Gaming/Performance change the four fields shown and retain
-the other tuning. Custom profiles save supported current settings separately for
-router and VPS. In particular Default keeps the original client reorder enabled
-and server reorder disabled. Profiles preserve network addresses, WAN/LAN setup,
-credentials, forwarding, remote-access gates and VPN type. This first version
-requires MQVPN already selected/configured; it does not switch other VPN types.
+managed MQVPN tuning set; Stability / Gaming and Performance retain other tuning.
+The `gaming` ID is stable. The old profiles set the main proxy to none so normally
+VPN-routed TCP, UDP and ICMP pass inside Glorytun TCP; returning to an MQVPN
+profile restores the recorded MQVPN proxy flags, including Xray choices.
+Custom profiles save supported tuning and transport snapshots separately for
+router and VPS; older custom profiles without transport data need to be saved
+again. Default keeps client reorder enabled and server reorder disabled.
+Both tunnels require existing valid configuration. WAN/LAN settings, keys,
+forwarding definitions, independent Xray port forwarding and WireGuard LAN
+permission are preserved. Existing bypass/local/management routes still apply;
+these profiles do not promise IPv6 coverage or a kill switch.
 
 Profile changes can restart services and interrupt traffic. This differs from
 the MQVPN WAN-failure continuity fix. Unsupported algorithms, stale/unavailable
 VPS capabilities, pending external UCI edits and missing configuration prevent
 application rather than producing an unverified partial switch.
+
+Glorytun readiness includes its running process with the MPTCP argument, the
+expected local tunnel IPv4 and an interface-bound ping to its configured peer.
+If the peer blocks ICMP, switching is rejected and rolled back. Different
+configured MQVPN/Glorytun device names are supported. The tracker is restarted
+even when a service transition fails.
+
+Keep other configuration editors closed during switching. The profile writer
+preserves existing staged WAN data, and pending network/firewall/proxy changes
+block application. Legacy proxy init/tracker scripts can still commit UCI, so
+an external edit created between the checks is not atomically excluded.
 
 ## Runtime and VPS prerequisite
 
@@ -40,8 +63,12 @@ a procd worker, private persistent presets/journal, kernel locks and isolated
 libuci updates of only the managed fields. Ordinary VPS synchronization honors
 the profile worker's active lease.
 
-The paired VPS needs admin candidate **0.18+20261030-3k5**. Its new API modifies
-only tuning, without resubmitting MQVPN's global authentication key. It uses a
+The paired VPS needs admin candidate **0.18+20261030-3k6** and explicit v2
+discovery. Legacy clients can still discover the v1 contract. The v2 transaction
+manages tuning and transport/proxy selection without resubmitting authentication
+keys. After tunnel verification, a required route phase updates the configured
+router tunnel IPv4 and refreshes DNAT/WireGuard before confirmation. Rollback
+restores the previous target as well as the selection and tuning. It uses a
 persisted transaction and an independent systemd recovery timer; the server
 rollback window is 240 seconds. Monotonic time plus boot identity protects the
 deadline against clock changes/reboot. Confirmation-response loss is reconciled
@@ -54,18 +81,21 @@ timer/module-loader acceptance must be performed in a disposable VPS VM before
 shipping an updated bundle.
 
 The next-branch preparation wrapper and frozen API version guard both require
-3k5. Preparation verifies its metadata, package name/version/architecture and
-SHA-256 before reporting success. Thirteen fixture cases and an actual
-isolated prepare with real dpkg passed, including a stale 3k4 package present.
+3k6. Preparation verifies its metadata, package name/version/architecture and
+SHA-256 before reporting success; older packages and metadata are rejected.
 This does not fetch the kernel/frozen assets or perform an installation.
 
 ## Completed checks and limits
 
 The full profiles page includes a preview selector and three simultaneous
 animated path diagrams: ICMP and UDP inside MQVPN, and TCP through the MPTCP
-proxy. Gaming illustrates identical redundant TCP copies and a minrtt MQVPN
-path; Performance illustrates automatic TCP scheduling and equal-weight WLB
-for MQVPN. Default uses automatic TCP scheduling and minrtt MQVPN. This is a
+proxy. Stability / Gaming illustrates identical redundant TCP copies and a
+minimum-RTT eligible MQVPN path; Performance shows distinct simultaneous TCP
+packets on both paths and equal-weight WLB for MQVPN. Its denser TCP stream is
+visual emphasis, not a speed measurement. Default uses automatic TCP scheduling
+and minrtt MQVPN. Both old profiles show all three protocols through Glorytun
+TCP: Performance distributes distinct packets and Stability duplicates them.
+This is a
 schematic example, not sampled WAN health, packet capture or a performance
 measurement. WAN-bound diagnostic pings and TCP forced into the VPN are outside
 the illustration. Preview selection never applies tuning. Pause and reduced
@@ -82,10 +112,16 @@ motion are supported, and polling does not rebuild the animation's DOM.
 - Node frontend cases and Chromium/Playwright checks passed for apply/confirm,
   revert, custom save, literal handling of HTML-like names, desktop and mobile.
   The browser used a simulated service; it was not an installed LuCI router.
-- The combined VPS test run passed **572 tests and two subtests**, covering the
+- The primary selected VPS test run passed **597 tests and two subtests**, covering the
   new API plus existing API, NanBBR, WireGuard manager/helper, candidate preparation,
   DSCP, Xray and frozen-update checks.
   DEB modules/systemd units were compared byte-for-byte to reviewed sources.
+- The full admin suite separately passed 1090 tests with nine skips and two
+  subtests. The WireGuard manager lab passed 41 checks again after the installer
+  version update; the cross-transport forwarding lab passed nine checks with
+  real WireGuard/nft and simulated MQVPN/Glorytun endpoints.
+- Real dpkg preparation of 3k6 passed in an isolated copy with an old package
+  present. Fourteen fixture cases passed for package/metadata validation.
 - API transport regression cases passed, including preserving IPv6 address
   colons in the ordinary synchronization context.
 

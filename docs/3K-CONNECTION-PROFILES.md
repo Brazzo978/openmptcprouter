@@ -53,7 +53,23 @@ and checks; the published installer/frozen lock remains unchanged. Install and
 timer/module-loader acceptance must be performed in a disposable VPS VM before
 shipping an updated bundle.
 
+The next-branch preparation wrapper and frozen API version guard both require
+3k5. Preparation verifies its metadata, package name/version/architecture and
+SHA-256 before reporting success. Thirteen fixture cases and an actual
+isolated prepare with real dpkg passed, including a stale 3k4 package present.
+This does not fetch the kernel/frozen assets or perform an installation.
+
 ## Completed checks and limits
+
+The full profiles page includes a preview selector and three simultaneous
+animated path diagrams: ICMP and UDP inside MQVPN, and TCP through the MPTCP
+proxy. Gaming illustrates identical redundant TCP copies and a minrtt MQVPN
+path; Performance illustrates automatic TCP scheduling and equal-weight WLB
+for MQVPN. Default uses automatic TCP scheduling and minrtt MQVPN. This is a
+schematic example, not sampled WAN health, packet capture or a performance
+measurement. WAN-bound diagnostic pings and TCP forced into the VPN are outside
+the illustration. Preview selection never applies tuning. Pause and reduced
+motion are supported, and polling does not rebuild the animation's DOM.
 
 - Lua model tests passed for apply, rollback, timeouts, uncertain confirmation,
   Default asymmetry, custom profiles and algorithm/FEC availability.
@@ -66,8 +82,9 @@ shipping an updated bundle.
 - Node frontend cases and Chromium/Playwright checks passed for apply/confirm,
   revert, custom save, literal handling of HTML-like names, desktop and mobile.
   The browser used a simulated service; it was not an installed LuCI router.
-- The combined VPS test run passed **494 tests and two subtests**, covering the
-  new API plus existing API, NanBBR, WireGuard, DSCP, Xray and frozen-update checks.
+- The combined VPS test run passed **572 tests and two subtests**, covering the
+  new API plus existing API, NanBBR, WireGuard manager/helper, candidate preparation,
+  DSCP, Xray and frozen-update checks.
   DEB modules/systemd units were compared byte-for-byte to reviewed sources.
 - API transport regression cases passed, including preserving IPv6 address
   colons in the ordinary synchronization context.

@@ -1,8 +1,8 @@
 {
-  "checked_utc": "2026-10-30T12:05:12.025256+00:00",
+  "checked_utc": "2026-10-30T12:38:43+00:00",
   "source": {
-    "client_feed_commit": "70cd11158cb235859fe14035043446cc37f086b1",
-    "vps_commit": "ed5de0847c10edd90f5baac42e24a924103a009a",
+    "client_feed_commit": "f38cfb488efeba94a8ded2e41488da41d8f1a8c0",
+    "vps_commit": "b68d5e10ce33b31c867438ee288d9ca04c726d84",
     "profile_implementation_commit": "440a7b9a4c17b43d061bb5fa679757c63c3d3e09"
   },
   "profile_modes": [
@@ -33,14 +33,20 @@
       "Custom save",
       "HTML-like name stays text",
       "Apply Performance then Revert",
-      "Desktop and mobile, no horizontal overflow"
+      "Desktop and mobile, no horizontal overflow",
+      "Three simultaneous ICMP/TCP/UDP path animations",
+      "Gaming synchronized redundant TCP copies and minrtt MQVPN path",
+      "Performance WLB MQVPN paths",
+      "Preview selection does not mutate the active profile",
+      "Pause/resume and reduced motion",
+      "Production animation and isolated fragment in a sandboxed iframe, 320px layout"
     ],
     "real_OpenWrt_LuCI": "not run"
   },
   "vps_tests": {
-    "passed": 494,
+    "passed": 572,
     "subtests_passed": 2,
-    "scope": "API, profile transactions, NanBBR, WireGuard, DSCP, Xray, frozen-update independence"
+    "scope": "API, profile transactions, NanBBR, WireGuard manager/helper, candidate preparation, DSCP, Xray, frozen-update independence"
   },
   "api_transport_regression": {
     "fixture_cases_passed": 19,
@@ -52,10 +58,27 @@
     "installed": false,
     "source_and_unit_bytes_match": true
   },
+  "vps_prepare": {
+    "fixture_cases_passed": 13,
+    "actual_prepare": "PASS in isolated source copy with real dpkg; stale 3k4 file ignored",
+    "installed": false,
+    "frozen_or_kernel_assets_fetched": false
+  },
+  "wireguard_manager": {
+    "unit_and_legacy_helper_checks_passed": 65,
+    "kernel_wireguard_nft_packet_checks_passed": 41,
+    "report_in_vps_repo": "tests/results/wg-manager-netns-20261030.json",
+    "parent_independently_reran": true,
+    "scope": "Real WireGuard and shipped nft rules in Linux namespaces, simulated OMR router/tunnel and Internet endpoint",
+    "gates": "New clients require individual permission and global LAN switch; legacy identity behavior preserved",
+    "installed_or_clean_install_tested": false
+  },
   "pending": [
     "Full client image build and installed rpcd/procd/LuCI verification",
     "Actual systemd module-loader and rollback timer in VPS VM",
     "Real paired router/VPS and traffic acceptance",
-    "Any publication or live deployment"
+    "Clean VPS install/legacy upgrade and two real WireGuard devices through actual MQVPN",
+    "Freeze and verify future release bundle assets",
+    "Release publication or live deployment"
   ]
 }

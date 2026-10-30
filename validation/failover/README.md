@@ -1,9 +1,15 @@
-# Offline WAN-failover audit reproductions
+# WAN-failover checks and historical reproductions
 
 See [the investigation](../../docs/3K-WAN-FAILOVER-AUDIT.md) and inventory checks
 T09/T15 in [3K-MODIFICATIONS.md](../../docs/3K-MODIFICATIONS.md).
 
-These cases reproduce the **reviewed current behavior, including defects**.
+For the `next` candidate, run the feed's `openmptcprouter/tests` API suites and
+MQVPN's `scripts/ci_e2e/run_3k_smooth_failover.py`, followed by the full paired
+OpenWrt/router acceptance matrix T15. These test the changed behavior. Retain
+source and binary hashes and the sanitized JSON evidence with each run.
+
+`reproduce.py` is historical: these cases reproduce the **original baseline
+behavior, including defects**, using feed `0060b84` and the pre-030 engine.
 All passing means the source-level observations were reproduced; it does not
 mean seamless failover works. After a fix, replace the relevant known-behavior
 assertions with acceptance expectations and retain before/after evidence.
@@ -26,6 +32,10 @@ set the paths above in a different checkout. Generated evidence stays outside
 the repository. Exit zero requires all nine cases to reproduce their expected
 behavior. The C fixture includes five removal/error branches in one test case.
 
-The inspected 2026-10-30 snapshot reproduced 9/9 cases. This was neither a full
+The original 2026-10-30 snapshot reproduced 9/9 cases. Input SHA-256 guards
+refuse candidate files so old expected-defect assertions cannot be mistaken for
+acceptance failures on corrected code. Use separate baseline source checkouts
+and the environment variables above to rerun the historical experiment.
+This was neither a full
 QUIC-engine test nor a router/VPS traffic simulation; no packet-loss, recovery
 time or application-session continuity was measured.

@@ -1,0 +1,101 @@
+{
+  "checked_utc": "2026-10-30T11:16:38.258538+00:00",
+  "scope": "Source candidate; no new firmware/APK/VPS release or deployment",
+  "feed_commit": "96b96f579cfd0c34d77a8adb2fa6c29ab876b8f7",
+  "mqvpn_version": "0.16.2-r5",
+  "patch_030_sha256": "01a2f2941baf733af0dcdbb956417d5f387545aa6ec230adacf5a8e52894cf19",
+  "api_tests": {
+    "passed": 22,
+    "total": 22,
+    "shell_fixture_cases": 18,
+    "real_curl_https_localhost_cases": 4,
+    "shells": [
+      "bash",
+      "dash"
+    ],
+    "jsonfilter": "Python fixture; deployed OpenWrt binary not executed",
+    "apk_solver_upgrade": "not run"
+  },
+  "engine_ctest": {
+    "passed": 46,
+    "total": 46,
+    "independently_rerun": true
+  },
+  "apk_world_fixture": {
+    "passed": 4,
+    "total": 4,
+    "actual_r4_to_r5_upgrade": "not run"
+  },
+  "primary_final_binary_reruns": {
+    "parent-final-blackhole": {
+      "status": "PASS",
+      "event": "blackhole",
+      "failed_path": "initial",
+      "readd": true,
+      "backup": false,
+      "no_alternate": false,
+      "wan_latency": true,
+      "fec_requested": false,
+      "all_down": false,
+      "observe_seconds": 8,
+      "survivor_drop_seconds": 0,
+      "started_utc": "2026-10-30T11:13:10.753952+00:00",
+      "binary_sha256": "af4967b5318075c8bc9aef8320c7feede10dcd117b8821fb2a1d875a42ba965e",
+      "server_binary_sha256": "a6dcf2608a0f8ebf5ba78684db337ac46dc4ca1d58f4f34ecf777df840135014",
+      "scope": "isolated Linux netns, real MQVPN client/server and xquic; synthetic TCP/UDP",
+      "failure": null,
+      "client_pid": 747,
+      "server_pid": 746,
+      "tun_ifindex_before": 2,
+      "mqvpn_connection_id_before": "1",
+      "event_monotonic": 1736.787960555,
+      "tun_samples": 40,
+      "tun_ifindex_after": 2,
+      "tcp_round_trips_after": 26,
+      "udp_replies_after": 29,
+      "udp_timeouts_total": 0,
+      "max_tcp_echo_gap_ms": 603.09,
+      "mqvpn_connection_ids_seen": [
+        "1"
+      ],
+      "switch_back": "PASS",
+      "finished_utc": "2026-10-30T11:13:27.211245+00:00"
+    },
+    "parent-final-all-down": {
+      "status": "PASS",
+      "event": "blackhole",
+      "failed_path": "initial",
+      "readd": false,
+      "backup": false,
+      "no_alternate": false,
+      "wan_latency": false,
+      "fec_requested": false,
+      "all_down": true,
+      "observe_seconds": 8,
+      "survivor_drop_seconds": 0,
+      "started_utc": "2026-10-30T11:14:10.305360+00:00",
+      "binary_sha256": "af4967b5318075c8bc9aef8320c7feede10dcd117b8821fb2a1d875a42ba965e",
+      "server_binary_sha256": "a6dcf2608a0f8ebf5ba78684db337ac46dc4ca1d58f4f34ecf777df840135014",
+      "scope": "isolated Linux netns, real MQVPN client/server and xquic; synthetic TCP/UDP",
+      "failure": null,
+      "client_pid": 102,
+      "server_pid": 101,
+      "tun_ifindex_before": 2,
+      "mqvpn_connection_id_before": "1",
+      "event_monotonic": 1795.955217535,
+      "fallback": "probe_timeout_reconnected",
+      "tun_ifindex_after": 3,
+      "mqvpn_connection_id_after": "2",
+      "recovery_seconds": 17.254,
+      "finished_utc": "2026-10-30T11:14:30.162302+00:00"
+    }
+  },
+  "lab_reference": "client feed mqvpn/tests/smooth-failover-lab-20261030.json: baseline expected failure plus 9 candidate passes; baseline server rebuilt from 010/020, not released DEB byte-for-byte",
+  "pending": [
+    "Complete firmware build and image checks",
+    "Actual BusyBox ash and JSONfilter",
+    "Real APK dependency resolution and pinned r4-to-r5 migration",
+    "Paired OpenWrt and physical WAN T15 tests",
+    "Any new VPS payload freeze/publication"
+  ]
+}

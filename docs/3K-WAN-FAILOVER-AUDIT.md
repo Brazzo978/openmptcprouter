@@ -3,7 +3,11 @@
 Reviewed 2026-10-30. This is a source-level investigation of tester reports,
 with isolated reproductions. No affected router was available, no customer
 network was accessed and no WAN, service or installed configuration was changed.
-Production implementation is unchanged by this documentation/audit commit.
+The original audit changed no production implementation.
+
+Subsequent candidate development is tracked in `omr-v0.64.2-3K-next`. This document
+describes the original baseline; consult the maintained inventory and the new
+candidate's test evidence before using these findings as a current status report.
 
 ## Scope and provenance
 
@@ -79,11 +83,14 @@ in the C fixture. An upstream outage with Ethernet carrier still up may produce
 tracker removal without a preceding netlink drop. Physical unplug and upstream
 blackhole therefore require separate tests; races can produce different outcomes.
 
-Also, with `minrtt`, configured `BackupPath` paths are created on demand when
-primary paths are no longer live in xquic. Only the `backup`/`backup_fec` schedulers
-use pre-created xquic standby paths in the reviewed engine. A configured backup
-is not necessarily already validated and ready to carry packets. This is separate
-from a second ordinary active WAN and must not be confused with it.
+Correction from subsequent real-engine testing: the comments around
+`client_check_failover` describe creation on demand for `minrtt`, but
+`activate_pending_paths` can already create and validate a configured `BackupPath`
+at startup. Actual behavior depends on the activation path. Do not infer that a
+configured backup is absent, validated, or usable from that comment alone. The
+new lab also found missing `SO_BINDTODEVICE` on startup backup sockets, allowing
+their traffic to follow the primary WAN instead. The candidate corrects this
+binding and tests a backup whose own veth is blackholed.
 
 ## Finding C: VPS API is not master-only, but interface fallback is incomplete
 

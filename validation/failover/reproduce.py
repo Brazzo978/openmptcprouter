@@ -1,8 +1,9 @@
-"""Offline source-level reproductions. No sockets, WANs, UCI or services are used.
+"""Historical baseline reproductions. No sockets, WANs, UCI or services are used.
 
 Run with Linux Python (e.g. WSL). Shell dependencies and xquic calls are mocked;
 the actual reviewed shell functions and C path-removal functions are extracted.
 This establishes control flow, not end-to-end network availability or timings.
+Source fingerprints deliberately refuse candidate sources after the fixes.
 """
 import hashlib,json,os,re,subprocess,tempfile,time,unittest
 from pathlib import Path
@@ -201,6 +202,12 @@ int main(void){
             (BASE/'c-reproducer-output.txt').write_text(output,encoding='utf-8')
 
 if __name__=='__main__':
+    expected=('1be97f1b23db0d652dec6b634a053b198d9fe834913a92e9a0d7ebb2ea437675',
+              '67badfd7037c070f9667d32cf42ae4c81a8beb97c51559a22920505d118c1684',
+              '77c6d877589bffbe04fedc35b9a03c90e5ec6df806e751b5abec8b00ae400a83',
+              '3bb09f2093de33bc1072e0a2d944aa735ad303b9b0de3def6d730ffbd929b0c8')
+    if any(hashlib.sha256(p.read_bytes()).hexdigest()!=digest for p,digest in zip((API,TRACKER,HOOK,ENGINE),expected)):
+        raise SystemExit('Historical baseline source mismatch. Use feed 0060b84 and pre-030 MQVPN for this reproducer; run the candidate API/real-tunnel acceptance suites for new sources (see README).')
     BASE.mkdir(parents=True,exist_ok=True)
     suite=unittest.defaultTestLoader.loadTestsFromTestCase(OfflineFailoverTests)
     result=unittest.TextTestRunner(verbosity=2).run(suite)

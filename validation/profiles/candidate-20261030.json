@@ -1,0 +1,61 @@
+{
+  "checked_utc": "2026-10-30T12:05:12.025256+00:00",
+  "source": {
+    "client_feed_commit": "70cd11158cb235859fe14035043446cc37f086b1",
+    "vps_commit": "ed5de0847c10edd90f5baac42e24a924103a009a",
+    "profile_implementation_commit": "440a7b9a4c17b43d061bb5fa679757c63c3d3e09"
+  },
+  "profile_modes": [
+    "Default",
+    "Performance",
+    "Gaming",
+    "Custom"
+  ],
+  "rpc_and_transaction_model": "Lua 5.1 isolated transaction suite passed",
+  "native_lock": "Real nixio kernel lock: old live owner retained, dead owner released; PASS",
+  "native_uci": "Real libuci isolated allowlist update preserves unrelated WAN and permissions; PASS",
+  "paired_contract": {
+    "passed": true,
+    "transport": "Loopback HTTP from real Lua model to real Python VPS manager",
+    "scenarios": [
+      "Default asymmetric values",
+      "Performance plus lost confirmation response",
+      "Gaming timeout rollback",
+      "Custom capture/revert"
+    ],
+    "adapters": "UCI/kernel/service operations simulated"
+  },
+  "frontend": {
+    "node_fixture": "PASS",
+    "browser": "Chromium via Playwright, real frontend with simulated service",
+    "checks": [
+      "Apply Gaming and Keep",
+      "Custom save",
+      "HTML-like name stays text",
+      "Apply Performance then Revert",
+      "Desktop and mobile, no horizontal overflow"
+    ],
+    "real_OpenWrt_LuCI": "not run"
+  },
+  "vps_tests": {
+    "passed": 494,
+    "subtests_passed": 2,
+    "scope": "API, profile transactions, NanBBR, WireGuard, DSCP, Xray, frozen-update independence"
+  },
+  "api_transport_regression": {
+    "fixture_cases_passed": 19,
+    "includes": "IPv6 token/address context regression"
+  },
+  "vps_deb_candidate": {
+    "filename": "omr-vps-admin_0.18+20261030-3k5_all.deb",
+    "sha256": "7c84b4b195fd8342dd608a9299a25f94e678f7282ef054b6c7a892bff05135eb",
+    "installed": false,
+    "source_and_unit_bytes_match": true
+  },
+  "pending": [
+    "Full client image build and installed rpcd/procd/LuCI verification",
+    "Actual systemd module-loader and rollback timer in VPS VM",
+    "Real paired router/VPS and traffic acceptance",
+    "Any publication or live deployment"
+  ]
+}

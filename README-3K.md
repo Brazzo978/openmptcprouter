@@ -5,6 +5,8 @@ MQVPN failover and resilient VPS API routing. See [candidate behavior and test
 limits](docs/3K-SMOOTH-FAILOVER.md). To materialize this candidate, clone this
 branch and use its `source-lock-3k.json`; commands and validation sections below
 also retain historical stable/RC context. Published release assets are unchanged.
+The GUI profile switcher is also implemented in this candidate; see
+[profile usage, paired VPS prerequisite and verification](docs/3K-CONNECTION-PROFILES.md).
 
 The maintained cross-version acceptance checklist is
 [3K-MODIFICATIONS.md](docs/3K-MODIFICATIONS.md). It distinguishes source,

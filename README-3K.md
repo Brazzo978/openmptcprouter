@@ -1,5 +1,11 @@
 # OpenMPTCProuter v0.64.2-3K - x86_64 source build
 
+The maintained cross-version acceptance checklist is
+[3K-MODIFICATIONS.md](docs/3K-MODIFICATIONS.md). It distinguishes source,
+artifact checks, historical runtime evidence and work still to verify. The
+[WAN-failover investigation](docs/3K-WAN-FAILOVER-AUDIT.md) records the current
+MQVPN path-removal and administration-routing findings with offline reproducers.
+
 This branch is the router-side 3K release based on Ysurac's v0.64.2 source. The server-side source, patches, package locks and installer live in the matching `Brazzo978/openmptcprouter-vps` 3K branch. The 3K feed is `Brazzo978/openmptcprouter-feeds`, branch `omr-v0.64.2-3K`.
 
 `source-lock-3k.json` pins the upstream root base and all five nested Git checkouts: the 3K feed, OpenWrt, packages, LuCI and routing. `bootstrap-3k.py` fetches each exact commit SHA and checks its origin. It never resets, cleans or updates an existing checkout. The release root commit itself is fixed by the Git commit or tag used to check out this branch; the lock records its upstream ancestor to avoid a self-referential hash.

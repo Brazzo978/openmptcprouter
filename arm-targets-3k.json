@@ -96,9 +96,9 @@
         "cpu_advisory": "Older ARMv7 CPU; limited headroom for encrypted bonding/SQM; no 3K throughput measurement available."
       },
       "bpi-r2": {
-        "decision": "keep",
+        "decision": "drop",
         "ram_mib": 2048,
-        "reason": "Meets the RAM floor and is retained for the requested recovery build.",
+        "reason": "Dropped by request after recovery-image failure: 49,597,996-byte recovery exceeds the fixed 40 MiB partition. Do not bypass the size guard, remove recovery, or change the partition layout to publish this build.",
         "cpu_advisory": "Older ARMv7 CPU; limited headroom for encrypted bonding/SQM; no 3K throughput measurement available."
       },
       "bpi-r3": {
@@ -308,7 +308,7 @@
       }
     }
   },
-  "build_candidates": 26,
+  "build_candidates": 25,
   "deferred_targets": {
     "r7800": "The frozen ipq806x source has config/patches for 6.12; requires a reviewed 6.18 target backport and board tests.",
     "rutx": "No matching generic RUTX device; the available RUTX10 definition is disabled because DSA setup is missing.",

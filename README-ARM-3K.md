@@ -1,6 +1,6 @@
 # OpenMPTCProuter 0.64.2-3K ARM builds
 
-This branch inventories all 44 ARM board configurations from upstream v0.64.2 (33 ARM64 and 11 ARM32 across 15 OpenWrt target/subtarget groups). The future-maintenance policy selects 26 build candidates with at least 1024 MiB RAM, excludes 14, and holds four ZBT profiles pending exact RAM verification. All historical IDs and source pins remain in the catalog and source lock. Previously published ARM assets are unaffected by this policy change.
+This branch inventories all 44 ARM board configurations from upstream v0.64.2 (33 ARM64 and 11 ARM32 across 15 OpenWrt target/subtarget groups). The future-maintenance policy selects 25 build candidates with at least 1024 MiB RAM, excludes 15, and holds four ZBT profiles pending exact RAM verification. All historical IDs and source pins remain in the catalog and source lock. Previously published ARM assets are unaffected by this policy change.
 
 Build status is separate from runtime validation. A compiled image is not a hardware boot test. Incompatible configurations, missing features and failed images are recorded explicitly. Partial prereleases may contain only individually verified builds and must identify the published subset and validation scope.
 
@@ -43,13 +43,13 @@ Replace `rpi4` with an active `keep` target in `arm-targets-3k.json`. The defaul
 
 ## Release queue
 
-`run-arm-release-3k.py` is the release builder's persistent queue. It records all 44 historical IDs, builds only the 26 active `keep` candidates by default, and reuses the source/download/toolchain cache sequentially. Each built board gets its own binary output directory, log, configuration and manifest, preserving device-specific partition sizes. The shared source layout must be prepared before starting this internal release queue. Hardware exclusions and pending verification are explicit statuses (`excluded_by_hardware_policy` and `pending_hardware_verification`), applied before older board-port deferrals.
+`run-arm-release-3k.py` is the release builder's persistent queue. It records all 44 historical IDs, builds only the 25 active `keep` candidates by default, and reuses the source/download/toolchain cache sequentially. Each built board gets its own binary output directory, log, configuration and manifest, preserving device-specific partition sizes. The shared source layout must be prepared before starting this internal release queue. Hardware exclusions and pending verification are explicit statuses (`excluded_by_hardware_policy` and `pending_hardware_verification`), applied before older board-port deferrals.
 
-To build only the five requested recovery boards in a **new job directory** after committing the policy change, run:
+To build selected recovery boards in a **new job directory** after committing the policy change, run:
 
 ```sh
 python3 run-arm-release-3k.py --root /path/to/build-repo --job /path/to/new-job \
-  --targets bpi-r1 bpi-r2 bpi-r64 qnap-301w r6s
+  --targets bpi-r1 qnap-301w
 ```
 
 `--targets` accepts unique active `keep` IDs only. The job records the exact `requested_targets`; every other kept board is `not_requested`, not a success. A job cannot resume with a different selection or build-root commit. Existing completed artifacts from earlier jobs are not imported or changed automatically; use a new job for this policy version and retain old manifests as separate provenance evidence. The queue uses the existing source and caches but does not treat earlier jobs' board states as proof for cache cleanup.
@@ -62,9 +62,9 @@ The custom BBR2 and NanBBR implementations use kernel math64 helpers for runtime
 
 ## Hardware policy and recovery
 
-The canonical hardware inventory is `hardware-inventory-3k.json`; the executable future-maintenance decisions are in `arm-targets-3k.json`. NAND/eMMC suffixes describe storage and are never used as RAM evidence. Variants with multiple documented RAM sizes are kept only where every listed variant has at least 1024 MiB. The `z8102ax_128m` decision applies specifically to the documented Z8102AX v1 with 128 MB NAND and 1 GiB RAM. The `z8102ax-emmc` profile remains pending because vendor RAM information conflicts with the local DTS. Four ZBT IDs remain pending until the exact RAM configuration is verified. R1 and R2 remain selected despite their older ARMv7 CPUs; encrypted bonding/SQM headroom is limited and no 3K throughput measurement is available. This is an advisory, not a measured speed claim.
+The canonical hardware inventory is `hardware-inventory-3k.json`; the executable future-maintenance decisions are in `arm-targets-3k.json`. NAND/eMMC suffixes describe storage and are never used as RAM evidence. Variants with multiple documented RAM sizes are kept only where every listed variant has at least 1024 MiB. The `z8102ax_128m` decision applies specifically to the documented Z8102AX v1 with 128 MB NAND and 1 GiB RAM. The `z8102ax-emmc` profile remains pending because vendor RAM information conflicts with the local DTS. Four ZBT IDs remain pending until the exact RAM configuration is verified. R1 remains selected despite its older ARMv7 CPU; encrypted bonding/SQM headroom is limited and no 3K throughput measurement is available. This is an advisory, not a measured speed claim.
 
-The 14 excluded IDs are `cudy_tr3000-256mb-v1`, `gl-mt3000`, `gl-mt3600be`, `gl-x3000`, `gl-xe3000`, `p2w_r619ac`, `r7800`, `rpi2`, `rutx`, `rutx12`, `rutx50`, `wrt3200acm`, `wrt32x`, and `z8802be_128m`. The four pending IDs are `z8102ax_64m`, `z8102ax-emmc`, `z8109ax_128m`, and `z8109ax_512m`. The other 26 IDs in the matrix are active `keep` candidates.
+The 15 excluded IDs are `bpi-r2`, `cudy_tr3000-256mb-v1`, `gl-mt3000`, `gl-mt3600be`, `gl-x3000`, `gl-xe3000`, `p2w_r619ac`, `r7800`, `rpi2`, `rutx`, `rutx12`, `rutx50`, `wrt3200acm`, `wrt32x`, and `z8802be_128m`. The four pending IDs are `z8102ax_64m`, `z8102ax-emmc`, `z8109ax_128m`, and `z8109ax_512m`. The other 25 IDs in the matrix are active `keep` candidates.
 
 The NanoPi R6S, Banana Pi R1 and Banana Pi R2 SD-root partitions are fixed at 512 MiB. The full 3K filesystem exceeds the upstream 104 MiB default. Banana Pi R2/R64 configurations use the exact current device IDs. The exact kernel package kmod-qcom-qmi-helpers is permitted because Qualcomm ath11k/ath12k Wi-Fi depends on it; modem-management packages remain excluded.
 
@@ -75,3 +75,5 @@ The following historical board-port limitations remain documented, but their tar
 - rutx12: no corresponding device definition/DTS exists in the frozen source.
 
 Their configuration files are retained for future porting. No board is substituted for a different model, and no 3K feature or source pin is removed to make a build pass.
+
+Banana Pi R2 is now excluded after the full recovery image exceeded its fixed 40 MiB SD recovery partition (49,597,996 bytes). The size guard remains enabled and the recovery/layout remain intact. No image is published for this board. R1 and QNAP are allowed one final build attempt after verified cache offload; a further failure ends their recovery work.

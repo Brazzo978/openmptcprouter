@@ -1,9 +1,10 @@
 {
-  "checked_utc": "2026-10-30T14:03:23+00:00",
+  "checked_utc": "2026-10-30T14:35:04+00:00",
   "source": {
-    "client_feed_commit": "9c23524d9e50b76d6430d6d1bb8762f29cb30f1f",
-    "vps_commit": "7a818955bff9d1043e962a875f25ef20acf47c5b",
-    "profile_implementation_commit": "440a7b9a4c17b43d061bb5fa679757c63c3d3e09"
+    "client_feed_commit": "8891d4c701f8000ef2b21491c38aeba575f46496",
+    "vps_commit": "93b943968d80bc920b0fa99657ff8a1fc4c85d54",
+    "profile_implementation_commit": "440a7b9a4c17b43d061bb5fa679757c63c3d3e09",
+    "no_tunnel_implementation_commit": "8891d4c701f8000ef2b21491c38aeba575f46496"
   },
   "profile_modes": [
     "Default",
@@ -11,6 +12,7 @@
     "Stability / Gaming",
     "Performance (old)",
     "Stability (old)",
+    "No tunnel",
     "Custom"
   ],
   "rpc_and_transaction_model": "Lua 5.1 isolated transaction suite passed",
@@ -24,7 +26,7 @@
       "Performance plus lost confirmation response",
       "Stability / Gaming timeout rollback",
       "Custom capture/revert with asymmetric router and VPS values",
-      "Five built-ins and MQVPN to Glorytun TCP to MQVPN",
+      "Six built-ins and MQVPN to Glorytun TCP to No tunnel to MQVPN; target clear and restore",
       "Original Xray proxy flags restored",
       "Mandatory route phase and failed-route rollback",
       "Persistent quick pair without applying tuning"
@@ -54,7 +56,10 @@
       "Distributed AB then CD cycle: WAN1 A/C, WAN2 B/D; redundant copies share their letter",
       "SVG geometry and 32px router/cloud icons share stable anchors",
       "One logical frame clock resets on preset change and survives status polling",
-      "Sampled desktop and 320px frames: no packet overlap, minimum 8px gap, adaptive narrow density"
+      "Sampled desktop and 320px frames: no packet overlap, minimum 8px gap, adaptive narrow density",
+      "Single-path A/B/C/D without skipping B or D",
+      "No tunnel: TCP on both eligible VPS paths; UDP/ICMP only through master to Internet",
+      "No tunnel native and inline previews at desktop and 320px, without applying configuration"
     ],
     "real_OpenWrt_LuCI": "not run",
     "animation_regression": {
@@ -66,18 +71,18 @@
     }
   },
   "vps_tests": {
-    "passed": 597,
+    "passed": 1157,
+    "skipped": 9,
     "subtests_passed": 2,
-    "scope": "Primary independent selected regression run: API, transport transactions, NanBBR, WireGuard manager/helper, candidate preparation, DSCP, Xray, frozen-update independence",
-    "full_admin_suite_agent_verified": {"passed": 1090, "skipped": 9, "subtests_passed": 2}
+    "scope": "Primary independent full run: python3 -m pytest -q admin/test tests; includes profile/API, existing API, WireGuard manager/helper, candidate prepare, DSCP, Xray and frozen-update checks"
   },
   "api_transport_regression": {
     "fixture_cases_passed": 19,
     "includes": "IPv6 token/address context regression"
   },
   "vps_deb_candidate": {
-    "filename": "omr-vps-admin_0.18+20261030-3k6_all.deb",
-    "sha256": "cbd707cd442cc74701df90cb9adb47a8b77ea068312d5c34db1aa127c9a5a1b8",
+    "filename": "omr-vps-admin_0.18+20261030-3k7_all.deb",
+    "sha256": "e1dc0d24783a52cf0667d40a88ac413d504242785a89860c6b1769fdb1fd574b",
     "installed": false,
     "source_and_unit_bytes_match": true
   },
@@ -102,8 +107,8 @@
     "tracker_failure_cleanup": "PASS in Lua service-command fixtures",
     "different_tunnel_device_restore": "PASS",
     "glorytun_readiness": "procd PID, effective mptcp argument, configured TUN IPv4 and device-bound peer ping; peer ICMP is required",
-    "real_wg_nft_retarget_packet_checks_passed": 9,
-    "retarget_scope": "MQVPN and Glorytun endpoints simulated; real WireGuard and nft; GUI/DNAT switch and rollback; bypass/custom/DSCP retained",
+    "real_wg_nft_retarget_packet_checks_passed": 17,
+    "retarget_scope": "Real WireGuard/nft; MQVPN/Glorytun endpoints simulated. No tunnel removes GUI/LAN/ordinary forwarding target, retains saved permissions, independent reverse proxy, WG Internet and bypass/custom/DSCP; rollback restores target.",
     "external_editor_race": "Pending UCI changes are checked but legacy proxy/tracker commits cannot atomically exclude a concurrent external edit",
     "real_glorytun_or_mqvpn_handshake_tested": false
   },
@@ -114,5 +119,20 @@
     "Clean VPS install/legacy upgrade and two real WireGuard devices through actual MQVPN",
     "Freeze and verify future release bundle assets",
     "Release publication or live deployment"
-  ]
+  ],
+  "no_tunnel": {
+    "transport": "none",
+    "tcp_proxy": "shadowsocks-rust",
+    "vps_tcp_backend": "Go SS2022 TCP/MPTCP",
+    "tcp_cc": "bbr (BBRv3)",
+    "tcp_scheduler": "default",
+    "udp_icmp": "Direct Internet through unique active master WAN",
+    "preconditions": "Existing valid proxy credentials, matching running VPS backend, no balancing or ambiguous master, matching default/LAN-source sample routes",
+    "readiness": "Actual Lua runtime adapter with simulated UCI/ubus/nft/commands: wrong WAN, ECMP, UDP capture, missing MPTCP and failed TCP rejected. Transaction DNS failure rolls back. Live implementation performs bounded tracker SOCKS TCP exchange and local DNS lookup.",
+    "route_contract": "Explicit no_tunnel true, exclusive of vpnremoteip; only accepted for pending none transport; no address sentinel",
+    "preserved": "Credentials, WAN/LAN setup, WG global/per-peer gates, forwarding definitions, independent Xray, proxy flags on restore",
+    "management": "Keep must be reached from LAN or independent management path; VPN GUI/LAN and ordinary VPN forwarding suspended until VPN return/rollback",
+    "real_openwrt_dataplane_tested": false,
+    "limits": "Route samples do not prove every nft fwmark, policy, IPv6 path, real aggregation or performance"
+  }
 }

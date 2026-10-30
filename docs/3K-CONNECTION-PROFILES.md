@@ -24,6 +24,23 @@ an incomplete restore for retry rather than claiming success.
 | Stability / Gaming | MQVPN | bpf_red | BBRv3 (`bbr`) | minrtt / bbr2 |
 | Performance (old) | Glorytun TCP | default | BBRv3 (`bbr`) | inactive |
 | Stability (old) | Glorytun TCP | bpf_red | BBRv3 (`bbr`) | inactive |
+| No tunnel | none, Shadowsocks Rust TCP proxy | default | BBRv3 (`bbr`) | inactive |
+
+No tunnel uses the existing provisioned Shadowsocks Rust TCP/MPTCP proxy and
+the VPS Go SS2022 TCP/MPTCP backend. Ordinary UDP/ICMP bypass the VPN and leave
+directly through the unique active master WAN. Balancing mode, an ambiguous
+master and routes pointing elsewhere reject the switch. It verifies generated
+MPTCP config, procd instances, a real TCP exchange through each active tracker
+SOCKS, absent UDP interception, LAN-source IPv4 route samples and local DNS.
+This initial adapter does not automatically substitute Xray or libev.
+
+The explicit no-tunnel route phase removes the VPS tunnel target. VPN-based
+remote GUI/LAN access and ordinary VPN port forwarding stop while this profile
+is active; saved rules, per-peer/global LAN gates and independent Xray forwarding
+are retained. Returning to a VPN or rollback restores the target and original
+proxy flags. **Confirm from the LAN or an independent management path** because
+the VPN management connection stops before confirmation. Both A/B slots and
+custom snapshots support this preset.
 
 The labels state intended use, not benchmark results. Default resets the complete
 managed MQVPN tuning set; Stability / Gaming and Performance retain other tuning.
@@ -63,7 +80,7 @@ a procd worker, private persistent presets/journal, kernel locks and isolated
 libuci updates of only the managed fields. Ordinary VPS synchronization honors
 the profile worker's active lease.
 
-The paired VPS needs admin candidate **0.18+20261030-3k6** and explicit v2
+The paired VPS needs admin candidate **0.18+20261030-3k7** and explicit v2
 discovery. Legacy clients can still discover the v1 contract. The v2 transaction
 manages tuning and transport/proxy selection without resubmitting authentication
 keys. After tunnel verification, a required route phase updates the configured
@@ -81,7 +98,7 @@ timer/module-loader acceptance must be performed in a disposable VPS VM before
 shipping an updated bundle.
 
 The next-branch preparation wrapper and frozen API version guard both require
-3k6. Preparation verifies its metadata, package name/version/architecture and
+3k7. Preparation verifies its metadata, package name/version/architecture and
 SHA-256 before reporting success; older packages and metadata are rejected.
 This does not fetch the kernel/frozen assets or perform an installation.
 
@@ -95,6 +112,8 @@ packets on both paths and equal-weight WLB for MQVPN. Its denser TCP stream is
 visual emphasis, not a speed measurement. Default uses automatic TCP scheduling
 and minrtt MQVPN. Both old profiles show all three protocols through Glorytun
 TCP: Performance distributes distinct packets and Stability duplicates them.
+No tunnel retains the TCP destination VPS and shows UDP/ICMP going through the
+master to Internet, with the other lane inactive.
 This is a
 schematic example, not sampled WAN health, packet capture or a performance
 measurement. WAN-bound diagnostic pings and TCP forced into the VPN are outside
@@ -103,8 +122,9 @@ motion are supported, and polling does not rebuild the animation's DOM.
 
 The revised diagrams use SVG coordinates and a single logical frame clock.
 Distributed packets cycle A on WAN 1, B on WAN 2, C on WAN 1, D on WAN 2,
-then repeat; matching letters on both paths represent redundant copies. Fixed
-router/cloud anchors match the path fan-out and fan-in. Performance shows at
+then repeat; matching letters on both paths represent redundant copies.
+Single-path streams independently cycle A, B, C, D without skipping identifiers.
+Fixed router/cloud anchors match the path fan-out and fan-in. Performance shows at
 most two packets per lane with an 8px minimum gap; narrow lanes reduce density.
 Preset changes reset the shared epoch, while status polling and pause/resume
 preserve it. Deterministic fixture checks and sampled browser frames cover the
@@ -121,15 +141,15 @@ sequence, reset, collision bounds, icon placement and 320px layout.
 - Node frontend cases and Chromium/Playwright checks passed for apply/confirm,
   revert, custom save, literal handling of HTML-like names, desktop and mobile.
   The browser used a simulated service; it was not an installed LuCI router.
-- The primary selected VPS test run passed **597 tests and two subtests**, covering the
+- The primary full VPS test run passed **1157 tests and two subtests**, with nine
+  skips, covering the
   new API plus existing API, NanBBR, WireGuard manager/helper, candidate preparation,
   DSCP, Xray and frozen-update checks.
   DEB modules/systemd units were compared byte-for-byte to reviewed sources.
-- The full admin suite separately passed 1090 tests with nine skips and two
-  subtests. The WireGuard manager lab passed 41 checks again after the installer
-  version update; the cross-transport forwarding lab passed nine checks with
+- The WireGuard manager lab passed 41 checks again after the installer
+  version update; the cross-transport/No tunnel lab passed 17 checks with
   real WireGuard/nft and simulated MQVPN/Glorytun endpoints.
-- Real dpkg preparation of 3k6 passed in an isolated copy with an old package
+- Real dpkg preparation of 3k7 passed in an isolated copy with an old package
   present. Fourteen fixture cases passed for package/metadata validation.
 - API transport regression cases passed, including preserving IPv6 address
   colons in the ordinary synchronization context.

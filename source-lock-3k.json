@@ -8,7 +8,7 @@
   },
   "kernel": "6.18",
   "policy": "Strict release feed commit and exact upstream SHAs; preserve dirty local edits at pinned HEAD. Development-only override OMR3K_ALLOW_LOCAL_EDITS=yes accepts dirty official feed at 818fa... for local testing, never for materialize.",
-  "release": "v0.64.2-3K",
+  "release": "v0.64.3-3K",
   "root_upstream_base": "74eacd096f9f0500fc3e8b3ca1c6c40cd227ffa1",
   "root_upstream_repository": "https://github.com/Ysurac/openmptcprouter.git",
   "schema": 1,

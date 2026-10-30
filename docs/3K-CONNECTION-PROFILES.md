@@ -4,6 +4,11 @@ Implemented in the `omr-v0.64.2-3K-next` feed/build branches and paired
 `omr-vps-0.1163-3K-next` source. The exact feed is pinned in `source-lock-3k.json`.
 The candidate is not included in existing published firmware or VPS bundles.
 
+The next x86_64 test image is labelled **v0.64.3-3K**, as requested. This is the
+3K version number: the upstream v0.64.2 commits, kernel 6.18 and upstream
+v0.64.2-6.18 package feed URLs remain pinned. Build and test it before promotion
+to a public release; the version label alone does not imply acceptance.
+
 ## Using the GUI
 
 OMR Status has a native A/B switch with two configurable profile slots. Saving

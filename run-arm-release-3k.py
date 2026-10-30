@@ -262,7 +262,7 @@ def main():
     require(not subprocess.check_output(["git","status","--porcelain","--untracked-files=all"],cwd=root,text=True).strip(), "root changes must be committed or explicitly ignored")
     require(subprocess.check_output(["git","rev-parse","HEAD"],cwd=source,text=True).strip()==lock_data["upstream"]["openwrt"]["commit"], "OpenWrt source pin changed")
     state=json.loads(status_file.read_text()) if status_file.exists() else {
-        "release":"v0.64.2-3K-arm","boards":44,"platform_groups":15,
+        "release":json.loads((root/"source-lock-3k.json").read_text())["release"]+"-arm","boards":44,"platform_groups":15,
         "build_root_commit":root_commit,
         "openwrt_commit":lock_data["upstream"]["openwrt"]["commit"],
         "feed_commit":json.loads((root/"source-lock-3k.json").read_text())["client_feed_release"]["commit"],

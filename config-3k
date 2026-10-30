@@ -1,4 +1,7 @@
-# Applied after the common configuration for the selected v0.64.2-3K image.
+# Applied after the common configuration for the v0.64.3-3K image (upstream v0.64.2).
+CONFIG_PACKAGE_omr-profiles=y
+CONFIG_PACKAGE_luci-app-omr-profiles=y
+CONFIG_PACKAGE_omr-api-paths=y
 # Keep generic Ethernet, Wi-Fi, PPPoE and USB Ethernet support.
 # CONFIG_ALL_KMODS is not set
 # CONFIG_ALL is not set

@@ -1,5 +1,5 @@
 #!/bin/sh
-# Build a selected v0.64.2-3K image from the pinned local checkouts.
+# Build a selected v0.64.3-3K image from pinned upstream v0.64.2 checkouts.
 set -eu
 
 cd "$(dirname "$0")"
@@ -28,8 +28,8 @@ export OMR_TARGET="$target"
 export OMR_KERNEL=6.18
 export OMR_DIST=openmptcprouter
 export OMR_PACKAGES=full
-export OMR_RELEASE=v0.64.2-3K
-export OMR_VERSION_NUMBER=v0.64.2-3K
+export OMR_RELEASE=v0.64.3-3K
+export OMR_VERSION_NUMBER=v0.64.3-3K
 export OMR_PACKAGE_RELEASE=v0.64.2-6.18
 export OMR_REPO="https://packages.openmptcprouter.com/v0.64.2-6.18/$target"
 export OMR_FEED=feeds/openmptcprouter

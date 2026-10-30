@@ -1,7 +1,7 @@
 {
-  "checked_utc": "2026-10-30T13:18:41+00:00",
+  "checked_utc": "2026-10-30T14:03:23+00:00",
   "source": {
-    "client_feed_commit": "ab5f34ab4a893236453bdf75841e45e3cf8d82ec",
+    "client_feed_commit": "9c23524d9e50b76d6430d6d1bb8762f29cb30f1f",
     "vps_commit": "7a818955bff9d1043e962a875f25ef20acf47c5b",
     "profile_implementation_commit": "440a7b9a4c17b43d061bb5fa679757c63c3d3e09"
   },
@@ -50,9 +50,20 @@
       "Old profiles distribute or duplicate all three protocols inside Glorytun TCP",
       "Native A/B switch, save pair without apply, outside-pair endpoint selection",
       "Pending switch retains confirmed position; position changes after Keep",
-      "320px layout with 48-character custom profile names"
+      "320px layout with 48-character custom profile names",
+      "Distributed AB then CD cycle: WAN1 A/C, WAN2 B/D; redundant copies share their letter",
+      "SVG geometry and 32px router/cloud icons share stable anchors",
+      "One logical frame clock resets on preset change and survives status polling",
+      "Sampled desktop and 320px frames: no packet overlap, minimum 8px gap, adaptive narrow density"
     ],
-    "real_OpenWrt_LuCI": "not run"
+    "real_OpenWrt_LuCI": "not run",
+    "animation_regression": {
+      "deterministic_frame_fixture": "PASS: sequence, shared reset, polling, pause and detached-node cleanup",
+      "real_browser_frames": "PASS on the production component and sandboxed inline preview",
+      "max_dense_packets_per_wan": 2,
+      "minimum_packet_gap_px": 8,
+      "icons": "Vendored Lucide router/cloud SVGs, exact source and ISC license included; host-provided Lucide in inline preview"
+    }
   },
   "vps_tests": {
     "passed": 597,

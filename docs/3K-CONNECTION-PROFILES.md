@@ -101,6 +101,15 @@ measurement. WAN-bound diagnostic pings and TCP forced into the VPN are outside
 the illustration. Preview selection never applies tuning. Pause and reduced
 motion are supported, and polling does not rebuild the animation's DOM.
 
+The revised diagrams use SVG coordinates and a single logical frame clock.
+Distributed packets cycle A on WAN 1, B on WAN 2, C on WAN 1, D on WAN 2,
+then repeat; matching letters on both paths represent redundant copies. Fixed
+router/cloud anchors match the path fan-out and fan-in. Performance shows at
+most two packets per lane with an 8px minimum gap; narrow lanes reduce density.
+Preset changes reset the shared epoch, while status polling and pause/resume
+preserve it. Deterministic fixture checks and sampled browser frames cover the
+sequence, reset, collision bounds, icon placement and 320px layout.
+
 - Lua model tests passed for apply, rollback, timeouts, uncertain confirmation,
   Default asymmetry, custom profiles and algorithm/FEC availability.
 - Real nixio lock tests passed: a live owner cannot lose its lock due to age;

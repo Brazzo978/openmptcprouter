@@ -8,6 +8,9 @@ The next x86_64 test image is labelled **v0.64.3-3K**, as requested. This is the
 3K version number: the upstream v0.64.2 commits, kernel 6.18 and upstream
 v0.64.2-6.18 package feed URLs remain pinned. Build and test it before promotion
 to a public release; the version label alone does not imply acceptance.
+The first-boot feed initializer recognizes both 3K labels and keeps the same
+upstream repositories; its disposable-filesystem regression covers five label
+variants, including unmodified upstream behaviour.
 
 ## Using the GUI
 

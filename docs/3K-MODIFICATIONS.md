@@ -99,6 +99,7 @@ For each ID, run the referenced check group in **Regression procedures** and rec
 | 3K-UI-03 | Remove router-to-VPS backup tab, upload/restore commands and server backup endpoints. Normal local OpenWrt configuration backup remains available; removing VPS backup must not remove server failover. | C/`luci-app-openmptcprouter/root/usr/share/luci/menu.d/luci-app-openmptcprouter.json`, V/`admin/test/test_api.py` | T03, T05, T12 |
 | 3K-UI-04 | Preserve relevant modern LuCI bandwidth/monitor styles, status and access ACLs, wizard/footer and advanced diagnostic page; test rendered UI and browser console, not source presence alone. | C/`luci-app-mptcp/htdocs/luci-static/resources/mptcp/css/mptcp_bandwidth.css`, C/`luci-app-mptcp/htdocs/luci-static/resources/mptcp/css/mptcp_monitor.css`, C/`luci-app-openmptcprouter/htdocs/luci-static/resources/view/openmptcprouter/wizard.js` | T04, T05 |
 | 3K-UI-05 | Next candidate implements native Status A/B switch, two persisted selectable slots, six built-ins and custom profiles. Saving the pair does not apply tuning; slider position follows the confirmed profile, with safe outside-pair/pending/readonly behavior. Stability / Gaming retains ID gaming. Preserve independent router/VPS snapshots, safe save/delete, Keep/Revert, timeout/reboot recovery, permissions and availability checks. Three illustrative ICMP/TCP/UDP diagrams distinguish distributed data from identical copies and add visual density for Performance; old modes depict Glorytun. Single-path identifiers cycle A/B/C/D independently; No tunnel depicts TCP to VPS and UDP/ICMP via master to Internet. Preview controls never apply profiles, support pause/reduced motion and survive polling. | C/`omr-profiles/README.md`, C/`luci-app-omr-profiles/htdocs/luci-static/resources/omr/profiles.js`, V/`admin/omr_profiles.py` | T16, T19 |
+| 3K-UI-06 | Candidate login bootstrap retries only transient missing luci/getFeatures objects, shares one probe, validates feature cache and rejects permanent/auth/HTTP/malformed failures. Handle LuCI stack-bearing messages and translated ubus status 4. Do not start authenticated OMR navigation on login/logout. Preserve anonymous read ACL and all authentication checks; version patched luci-base and runtime revision to invalidate old asset caches. | B/`patches/luci-features-startup-retry.patch`, B/`apply-luci-startup-fix.py`, B/`validation/luci`, C/`luci-theme-openmptcprouter/luasrc/view/themes/openmptcprouter/footer.htm` | T05, T20 |
 
 ## Regression procedures
 
@@ -220,6 +221,25 @@ Before release, rebuild the frozen VPS bundle, test a clean install and an upgra
 Run the Lua model/transport tests, real nixio/libuci/quick-store checks, `tests/test_no_tunnel_runtime.py`, `tests/run_uci_staged_lab.sh` and the paired Lua-to-Python `tests/test_vps_contract.py` in C/`omr-profiles`. Check all six built-ins and custom capture, MQVPN → Glorytun → No tunnel → MQVPN, Xray and UDP/MPTCP flag restoration, different tunnel device names, explicit target clearing, route failure, timeout, lost confirmation and tracker recovery after failed service operations. Reject ambiguous master/balancing, wrong route, UDP interception, broken proxy and DNS. The staged-WAN test must preserve unrelated live and pending UCI bytes. Exercise A/B pair persistence and deletion repair, no apply on pair save, actual slider transitions, unavailable/readonly gating and pending/confirmed positions in browser tests. Confirm No tunnel from LAN or an independent path and verify its single-path A/B/C/D sequence.
 
 The VPS admin candidate is 3k7. Run V/`admin/test` and the preparation tests, and V/`admin/test/run_profiles_nft_netns.py` in an isolated privileged Linux namespace. The packet lab passed 17 checks of WireGuard GUI/public forwarding retarget, No tunnel target removal and rollback while preserving the LAN permission, independent reverse proxy, WireGuard Internet and bypass/custom/DSCP chains, with both VPN endpoints simulated. Preserve v1 discovery for older clients and require v2 route completion before confirmation. Repeat T10/T11 on installed router/VPS images; actual MQVPN/Glorytun handshakes, MPTCP subflows, IPv6/bypass policy and physical-WAN traffic remain acceptance work. A tunnel switch may interrupt existing flows and change the router's remote GUI tunnel IP. Do not edit other configuration concurrently, and allow the bound Glorytun peer ICMP check.
+
+### T20 — LuCI login and feature discovery
+
+Materialize locked sources and apply `apply-luci-startup-fix.py`. Run
+`node validation/luci/test_luci_features.js` (12 cases), including real
+LuCI.raise stack messages, shared promises, bounded missing-object retries,
+translated ubus status 4, cache validation, later recovery and no retry for
+permission/HTTP/method/malformed failures. Confirm patch reapplication is
+idempotent and a changed upstream HEAD or non-applicable hunk stops the build.
+
+On a disposable installed image, verify rpcd-mod-ucode and the live `luci`
+object, then exercise a clean login, wrong password, authenticated menu and
+logout. Inject temporary missing-object replies before and after login: two
+failures should recover on the third call without the feature RPC notification.
+Persistent failure must remain visible after the bounded attempts; authentication
+must not be bypassed. Verify compiled patched bytes and luci-base/runtime
+revision `26.210.61729~a3cc0e1-r1` so cached original JavaScript is replaced.
+The affected testers' backend outage cause is not established by fault injection.
+See `docs/3K-LUCI-LOGIN.md` and `validation/luci/login-qa-20261102.json`.
 
 ## Historical evidence and known limits
 

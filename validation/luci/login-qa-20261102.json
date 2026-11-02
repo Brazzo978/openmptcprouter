@@ -1,0 +1,51 @@
+{
+  "checked_utc": "2026-11-02T09:41:41+00:00",
+  "release": "v0.64.3-3K",
+  "upstream_luci": "a3cc0e14419c96ca74578b792d306cba017b9e6d",
+  "patch_sha256": "b0acd659d1ccde49d8b3d93a2522ee188dbfdaf10082dcc6ce9f22bcafb7b0a8",
+  "node": {
+    "passed": 12,
+    "uses_actual_luci_raise_with_stack": true
+  },
+  "real_guest": {
+    "image_feed_before_source_overlay": "6d11faccfdcd8f952c8e8058c26da210d57a0260",
+    "mode": "Isolated QEMU snapshot with reviewed core/footer sources installed for QA",
+    "live_luci_object": true,
+    "live_getFeatures": true,
+    "default_tcp_cc": "bbr",
+    "previous_built_image_static_checks_passed": 32
+  },
+  "browser": {
+    "engine": "Chromium via Playwright",
+    "baseline_missing_object": {
+      "calls": 1,
+      "injected_failures": 1,
+      "feature_error_visible": true
+    },
+    "patched_anonymous": {
+      "calls": 3,
+      "injected_failures": 2,
+      "feature_error_visible": false,
+      "login_present": true
+    },
+    "patched_authenticated": {
+      "calls": 3,
+      "injected_failures": 2,
+      "feature_error_visible": false,
+      "menu_items": 58
+    },
+    "wrong_password_denied": true,
+    "valid_login": true,
+    "logout_returns_login_without_menu": true
+  },
+  "rebuilt_image_tested": false,
+  "production_router_changed": false,
+  "published": false,
+  "limits": [
+    "Original tester outage/startup cause not diagnosed on those routers",
+    "Browser checks used guest source overlay, not the not-yet-rebuilt final image",
+    "Fault replies injected; underlying guest backend healthy",
+    "WiFi hostapd/wpa_supplicant in the unmodified candidate logged unresolved common module; no wireless hardware acceptance"
+  ],
+  "patch_application": "PASS: forward dry-run, actual application, reverse repeat detection, tested JS equality and package/runtime revision pair"
+}

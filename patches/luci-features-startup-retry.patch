@@ -1,0 +1,70 @@
+--- a/modules/luci-base/htdocs/luci-static/resources/luci.js
++++ b/modules/luci-base/htdocs/luci-static/resources/luci.js
+@@ -2595,19 +2595,50 @@
+ 		},
+ 
+ 		probeSystemFeatures() {
++			/* Share one probe while rpcd's ucode objects are registering. */
++			if (sysFeatures && typeof(sysFeatures.then) == 'function')
++				return sysFeatures;
++
+ 			if (sysFeatures == null)
+ 				sysFeatures = Session.getLocalData('features');
+ 
+-			if (!this.isObject(sysFeatures)) {
+-				sysFeatures = classes.rpc.declare({
++			const validFeatures = features => this.isObject(features) &&
++				!Array.isArray(features) && typeof(features.firewall) == 'boolean';
++
++			if (!validFeatures(sysFeatures)) {
++				const callFeatures = classes.rpc.declare({
+ 					object: 'luci',
+ 					method: 'getFeatures',
++					reject: true,
+ 					expect: { '': {} }
+-				})().then(features => {
++				});
++				const delays = [ 250, 500, 1000, 1000, 1000 ];
++				const probe = attempt => Promise.resolve().then(() => callFeatures()).catch(error => {
++					/* Retry only an absent object, never auth, HTTP or method errors.
++					 * Ubus status 4 descriptions may be translated by rpc.js. */
++					const firstLine = String(error?.message || '').split(/\r?\n/, 1)[0];
++					const missingObject = /^RPC call to luci\/getFeatures failed with (?:error -32000: Object not found$|ubus code 4:)/.test(firstLine);
++					if (!missingObject || attempt >= delays.length)
++						throw error;
++
++					return new Promise(resolve => setTimeout(resolve, delays[attempt]))
++						.then(() => probe(attempt + 1));
++				});
++
++				sysFeatures = probe(0).then(features => {
++					if (!validFeatures(features)) {
++						const error = new Error('RPC luci/getFeatures returned an invalid feature response');
++						error.name = 'RPCError';
++						throw error;
++					}
++
+ 					Session.setLocalData('features', features);
+ 					sysFeatures = features;
+-
+ 					return features;
++				}).catch(error => {
++					/* Do not poison the cache or retain a rejected promise. */
++					sysFeatures = null;
++					throw error;
+ 				});
+ 			}
+ 
+--- a/modules/luci-base/Makefile
++++ b/modules/luci-base/Makefile
+@@ -7,6 +7,10 @@
+ include $(TOPDIR)/rules.mk
+ 
+ PKG_NAME:=luci-base
++# 3K startup fix; keep the upstream base and invalidate browser caches.
++PKG_VERSION:=26.210.61729~a3cc0e1
++PKG_RELEASE:=1
++PKG_SRC_VERSION:=26.210.61729~a3cc0e1-r1
+ PKG_BUILD_FLAGS:=no-lto
+ 
+ LUCI_TYPE:=mod

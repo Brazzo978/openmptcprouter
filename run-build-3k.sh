@@ -14,6 +14,7 @@ target=${OMR_TARGET:-x86_64}
 # Fail before build.sh can rewrite feed indexes unless every local checkout is
 # based on the reviewed immutable source lock. Dirty authorized edits remain.
 python3 ./bootstrap-3k.py verify --target "$target"
+python3 ./apply-luci-startup-fix.py
 source_dir="$PWD/$target/6.18/source"
 target_board=$(sed -n 's/^CONFIG_TARGET_\([A-Za-z0-9]*\)=y$/\1/p' "config-$target" | head -n 1)
 [ -n "$target_board" ] && [ -d "$source_dir/target/linux/$target_board" ] || {

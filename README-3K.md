@@ -1,4 +1,4 @@
-# OpenMPTCProuter v0.64.2-3K - x86_64 source build
+# OpenMPTCProuter v0.64.3-3K candidate - x86_64 source build
 
 This `omr-v0.64.2-3K-next` branch is a source candidate for session-preserving
 MQVPN failover and resilient VPS API routing. See [candidate behavior and test
@@ -7,6 +7,8 @@ branch and use its `source-lock-3k.json`; commands and validation sections below
 also retain historical stable/RC context. Published release assets are unchanged.
 The GUI profile switcher is also implemented in this candidate; see
 [profile usage, paired VPS prerequisite and verification](docs/3K-CONNECTION-PROFILES.md).
+The v0.64.3-3K test candidate also includes bounded feature discovery and an
+authenticated-only theme menu; see [login correction and test evidence](docs/3K-LUCI-LOGIN.md).
 
 The maintained cross-version acceptance checklist is
 [3K-MODIFICATIONS.md](docs/3K-MODIFICATIONS.md). It distinguishes source,

@@ -11,6 +11,14 @@ The new `omr-api-paths` package supplies `/usr/share/omr/api-paths.sh` and is an
 explicit dependency of both `openmptcprouter` and `omr-tracker`. It is not a file
 that requires users to remember to install a newer tracker package separately.
 
+The helper also depends on `coreutils-sleep`. The stock BusyBox binary in the
+2026-11-02 installed x86 candidate rejects fractional delays (`sleep 0.05`).
+Without this dependency the probe poll loop spins and can cancel working TLS
+connections before they finish. Release 1-r2 installs the GNU sleep alternative
+and stops immediately if an expected 50 ms pause fails, rather than spinning.
+Check the actual installed sleep implementation and elapsed pause on each
+target; host tests with GNU sleep alone did not reveal this incompatibility.
+
 Each operation first races harmless unauthenticated OMR homepage probes over
 ordinary routing and eligible default, backup, subflow and signal interfaces.
 All candidates start concurrently; the first HTTP 200 with the expected OMR
@@ -70,7 +78,7 @@ runner is part of patch 030 (`scripts/ci_e2e/run_3k_smooth_failover.py`). Source
 and binary hashes identify the actual tested inputs; do not substitute a new
 binary while retaining the old result record.
 
-- API: 18 Bash/Dash fixture/source cases plus four real curl/HTTPS localhost
+- API: 20 Bash/Dash fixture/source cases plus four real curl/HTTPS localhost
   cases passed. JSONfilter is a Python fixture, not the deployed OpenWrt binary.
 - Engine: the original path-0 bug was reproduced with a real tunnel and ongoing
   TCP flow. Candidate scenarios check TCP progress, UDP replies, unchanged TUN

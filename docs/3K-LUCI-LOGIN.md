@@ -5,6 +5,10 @@ LuCI a3cc0e1 checkout. Upstream 0.64.2, kernel 6.18 and package-feed URLs stay
 unchanged. The patch is tracked in `patches/luci-features-startup-retry.patch`
 and applied idempotently by `apply-luci-startup-fix.py` during normal preparation.
 A different upstream HEAD or non-applicable patch stops preparation.
+The patch tool runs in forced-direction mode, with source postconditions. Its
+automatic reverse-direction guessing must not classify unpatched originals as
+already patched. The 2026-11-02 first rebuilt image was rejected by the final
+marker/package checks for exactly that helper error; it was not published.
 
 The reported error is `luci/getFeatures`, JSON-RPC -32000 `Object not found`.
 The pinned core probes features during initialization, including the login page;

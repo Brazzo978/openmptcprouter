@@ -5,6 +5,7 @@ After `bootstrap-3k.py materialize` and `apply-luci-startup-fix.py`, run with No
 
 ```sh
 node validation/luci/test_luci_features.js
+python3 validation/luci/test_patch_application.py
 ```
 
 `--source FILE` and `--footer FILE` select explicit reviewed sources when the
@@ -16,6 +17,10 @@ classifier must handle that real shape, not just a synthetic plain Error.
 The original pinned source is a negative control with
 `--baseline --source ORIGINAL-LUCI-JS --without-theme`: failures are expected.
 No backend permissions, services or real credentials are changed by this suite.
+The Python case exercises the real helper and GNU patch on a sparse temporary
+clone: pristine source must actually change, repeat application must preserve
+bytes, and drift/partial application must fail. This prevents GNU patch's
+automatic reverse guessing from incorrectly reporting a patch as present.
 
 The 2026-11-02 browser checks additionally used the built x86 candidate in a
 disposable QEMU snapshot: baseline produced the reported red RPC notification

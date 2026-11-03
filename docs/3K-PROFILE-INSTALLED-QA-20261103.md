@@ -93,10 +93,26 @@ image must use this source lock, carry 1-r4 and repeat built-image/fresh-boot ch
   preserved the surviving path and passed TCP/UDP traffic. The sanitized source
   evidence is `mqvpn/tests/reconnect-path-recovery-lab-20261103.json` in the feed.
   This is engine-level Linux lab evidence, separate from the final OpenWrt r6 APK.
+- The signed r6/r4/r3/dashboard APKs were subsequently installed on the paired
+  VMware router. **23/23 checks** passed, including exact installed runtime
+  files, the stripped binary extracted from the signed APK, preserved profile
+  store and unrelated world constraints, the exact r6 world hold, peer traffic
+  and `fec_enabled=1`. Compiled FEC capability is distinct from enabling FEC in
+  a chosen profile. The QA verifier initially compared an unstripped build copy
+  and expected a JSON boolean instead of the API's numeric flag; those verifier
+  assumptions were corrected before acceptance.
+- Actual r6 repeated **20/20 failover checks**. WAN1/WAN2 TCP reply gaps were
+  8.67/0.22 seconds; UDP gaps were 0.22/0.22 seconds. No daemon restart or TUN
+  replacement occurred during either single-WAN interruption.
+- Actual r6 native MQVPN and independent Xray TCP forwarding passed **17/17
+  smoke checks**, including distinct public listeners, HTTP response markers,
+  backend rules, exact temporary-section removal and unchanged existing rules.
+  The GUI was never used as the public canary. Both test ports were released.
+- Actual r6 repeated **13/13 WireGuard checks**: GUI and full-tunnel traffic,
+  public VPS egress, peer lifecycle and complete cleanup. The earlier distinct
+  LAN host matrix remains the 28/28 run; it was not silently counted again.
 
 These are functional tests with two virtual WANs and namespace WireGuard clients.
 They do not establish physical fiber/5G throughput, zero-loss failover, mobile QR
-onboarding, IPv6 parity or legacy-package upgrade safety. Independent Xray and
-native port-forward smoke checks, the actual r6 OpenWrt package and the final
-rebuilt-image test remain separate acceptance items until their result files
-are recorded.
+onboarding, IPv6 parity or legacy-package upgrade safety. The final rebuilt-image
+test remains a separate acceptance item until its result files are recorded.

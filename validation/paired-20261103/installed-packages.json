@@ -1,0 +1,31 @@
+{
+  "checks": {
+    "installed bytes:/usr/libexec/omr-profiles/agent": true,
+    "installed bytes:/usr/libexec/omr-profiles/guard": true,
+    "installed bytes:/usr/libexec/omr-profiles/network-device": true,
+    "installed bytes:/usr/libexec/omr-profiles/uci-isolated": true,
+    "installed bytes:/usr/libexec/omr-profiles/vps-bridge": true,
+    "installed bytes:/usr/libexec/rpcd/omr.profiles": true,
+    "installed bytes:/usr/lib/lua/omr/profiles.lua": true,
+    "installed bytes:/usr/lib/lua/omr/profiles_runtime.lua": true,
+    "installed bytes:/usr/lib/lua/omr/profile_transport.lua": true,
+    "installed bytes:/lib/upgrade/keep.d/omr-profiles": true,
+    "installed bytes:/etc/init.d/omr-profiles": true,
+    "installed bytes:/usr/bin/mqvpn-path": true,
+    "installed bytes:/etc/hotplug.d/iface/40-mqvpn-path-rejoin": true,
+    "installed bytes:/usr/share/omr/post-tracking.d/005-mqvpn-path": true,
+    "installed bytes:/usr/sbin/mqvpn": true,
+    "installed bytes:/www/luci-static/resources/view/dashboard/index.js": true,
+    "MQVPN peer traffic": true,
+    "version:mqvpn": true,
+    "version:omr-profiles": true,
+    "version:omr-tracker": true,
+    "world hold r6": true,
+    "FEC compiled": true,
+    "profile state preserved": true
+  },
+  "passed": 23,
+  "failed": [],
+  "mqvpn_sha256": "de199b7924fbb84b8380e951f38f716f1608fb71de4d91a38a69ff9fcfd4bc28",
+  "scope": "Actual signed r6/r4/r3/dashboard APK install on paired VMware router"
+}

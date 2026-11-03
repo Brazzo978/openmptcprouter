@@ -1,0 +1,400 @@
+{
+  "checks": {
+    "baseline_tcp_and_udp": true,
+    "completed_without_error": true,
+    "router_job_cleaned": true,
+    "vps_job_cleaned": true,
+    "wan1_capabilities": true,
+    "wan1_down_during_capabilities": true,
+    "wan1_down_observed": true,
+    "wan1_down_through_hold": true,
+    "wan1_mqvpn_identity_unchanged": true,
+    "wan1_readiness_after_restore": true,
+    "wan1_restored": true,
+    "wan1_tcp_continuity": true,
+    "wan1_udp_progress": true,
+    "wan2_capabilities": true,
+    "wan2_down_during_capabilities": true,
+    "wan2_down_observed": true,
+    "wan2_down_through_hold": true,
+    "wan2_mqvpn_identity_unchanged": true,
+    "wan2_readiness_after_restore": true,
+    "wan2_restored": true,
+    "wan2_tcp_continuity": true,
+    "wan2_udp_progress": true
+  },
+  "mptcp_observation_scope": "Uncorrelated VPS socket only; not proof of test subflows.",
+  "observations": {
+    "uncorrelated_mptcp_vps_socket_baseline": true,
+    "wan1_tcp_failure_events": [],
+    "wan1_uncorrelated_mptcp_vps_socket": true,
+    "wan2_tcp_failure_events": [],
+    "wan2_uncorrelated_mptcp_vps_socket": true
+  },
+  "phases": {
+    "wan1": {
+      "tcp": {
+        "after": 496,
+        "before": 25,
+        "during": 43,
+        "first_sequence": 20,
+        "last_sequence": 583,
+        "max_gap_seconds": 8.57
+      },
+      "udp": {
+        "after": 496,
+        "before": 25,
+        "during": 43,
+        "first_sequence": 20,
+        "last_sequence": 583,
+        "max_gap_seconds": 0.23
+      }
+    },
+    "wan2": {
+      "tcp": {
+        "after": 551,
+        "before": 24,
+        "during": 39,
+        "first_sequence": 574,
+        "last_sequence": 1187,
+        "max_gap_seconds": 0.23
+      },
+      "udp": {
+        "after": 551,
+        "before": 24,
+        "during": 39,
+        "first_sequence": 574,
+        "last_sequence": 1187,
+        "max_gap_seconds": 0.23
+      }
+    }
+  },
+  "readiness": {
+    "after_wan1": {
+      "last_error_type": null,
+      "last_snapshot": {
+        "wan1": {
+          "device": "eth1",
+          "ipv4": [
+            "192.168.184.132"
+          ],
+          "matching_endpoints": [
+            [
+              "192.168.184.132",
+              "eth1",
+              [
+                "id",
+                "5",
+                "subflow",
+                "fullmesh",
+                "dev",
+                "eth1"
+              ]
+            ]
+          ],
+          "netifd_up": true,
+          "proto_dhcp": true,
+          "tracker_up": true
+        },
+        "wan2": {
+          "device": "eth2",
+          "ipv4": [
+            "10.10.10.108"
+          ],
+          "matching_endpoints": [
+            [
+              "10.10.10.108",
+              "eth2",
+              [
+                "id",
+                "2",
+                "subflow",
+                "fullmesh",
+                "dev",
+                "eth2"
+              ]
+            ]
+          ],
+          "netifd_up": true,
+          "proto_dhcp": true,
+          "tracker_up": true
+        }
+      },
+      "ready": true,
+      "stable_snapshots": 2,
+      "wait_seconds": 97.35
+    },
+    "after_wan2": {
+      "last_error_type": null,
+      "last_snapshot": {
+        "wan1": {
+          "device": "eth1",
+          "ipv4": [
+            "192.168.184.132"
+          ],
+          "matching_endpoints": [
+            [
+              "192.168.184.132",
+              "eth1",
+              [
+                "id",
+                "5",
+                "subflow",
+                "fullmesh",
+                "dev",
+                "eth1"
+              ]
+            ]
+          ],
+          "netifd_up": true,
+          "proto_dhcp": true,
+          "tracker_up": true
+        },
+        "wan2": {
+          "device": "eth2",
+          "ipv4": [
+            "10.10.10.108"
+          ],
+          "matching_endpoints": [
+            [
+              "10.10.10.108",
+              "eth2",
+              [
+                "id",
+                "2",
+                "subflow",
+                "fullmesh",
+                "dev",
+                "eth2"
+              ]
+            ]
+          ],
+          "netifd_up": true,
+          "proto_dhcp": true,
+          "tracker_up": true
+        }
+      },
+      "ready": true,
+      "stable_snapshots": 2,
+      "wait_seconds": 108.95
+    },
+    "baseline": {
+      "last_error_type": null,
+      "last_snapshot": {
+        "wan1": {
+          "device": "eth1",
+          "ipv4": [
+            "192.168.184.132"
+          ],
+          "matching_endpoints": [
+            [
+              "192.168.184.132",
+              "eth1",
+              [
+                "id",
+                "5",
+                "subflow",
+                "fullmesh",
+                "dev",
+                "eth1"
+              ]
+            ]
+          ],
+          "netifd_up": true,
+          "proto_dhcp": true,
+          "tracker_up": true
+        },
+        "wan2": {
+          "device": "eth2",
+          "ipv4": [
+            "10.10.10.108"
+          ],
+          "matching_endpoints": [
+            [
+              "10.10.10.108",
+              "eth2",
+              [
+                "id",
+                "2",
+                "subflow",
+                "fullmesh",
+                "dev",
+                "eth2"
+              ]
+            ]
+          ],
+          "netifd_up": true,
+          "proto_dhcp": true,
+          "tracker_up": true
+        }
+      },
+      "ready": true,
+      "stable_snapshots": 2,
+      "wait_seconds": 2.64
+    },
+    "before_sender": {
+      "last_error_type": null,
+      "last_snapshot": {
+        "wan1": {
+          "device": "eth1",
+          "ipv4": [
+            "192.168.184.132"
+          ],
+          "matching_endpoints": [
+            [
+              "192.168.184.132",
+              "eth1",
+              [
+                "id",
+                "5",
+                "subflow",
+                "fullmesh",
+                "dev",
+                "eth1"
+              ]
+            ]
+          ],
+          "netifd_up": true,
+          "proto_dhcp": true,
+          "tracker_up": true
+        },
+        "wan2": {
+          "device": "eth2",
+          "ipv4": [
+            "10.10.10.108"
+          ],
+          "matching_endpoints": [
+            [
+              "10.10.10.108",
+              "eth2",
+              [
+                "id",
+                "2",
+                "subflow",
+                "fullmesh",
+                "dev",
+                "eth2"
+              ]
+            ]
+          ],
+          "netifd_up": true,
+          "proto_dhcp": true,
+          "tracker_up": true
+        }
+      },
+      "ready": true,
+      "stable_snapshots": 2,
+      "wait_seconds": 2.6
+    },
+    "before_wan1": {
+      "last_error_type": null,
+      "last_snapshot": {
+        "wan1": {
+          "device": "eth1",
+          "ipv4": [
+            "192.168.184.132"
+          ],
+          "matching_endpoints": [
+            [
+              "192.168.184.132",
+              "eth1",
+              [
+                "id",
+                "5",
+                "subflow",
+                "fullmesh",
+                "dev",
+                "eth1"
+              ]
+            ]
+          ],
+          "netifd_up": true,
+          "proto_dhcp": true,
+          "tracker_up": true
+        },
+        "wan2": {
+          "device": "eth2",
+          "ipv4": [
+            "10.10.10.108"
+          ],
+          "matching_endpoints": [
+            [
+              "10.10.10.108",
+              "eth2",
+              [
+                "id",
+                "2",
+                "subflow",
+                "fullmesh",
+                "dev",
+                "eth2"
+              ]
+            ]
+          ],
+          "netifd_up": true,
+          "proto_dhcp": true,
+          "tracker_up": true
+        }
+      },
+      "ready": true,
+      "stable_snapshots": 2,
+      "wait_seconds": 2.66
+    },
+    "before_wan2": {
+      "last_error_type": null,
+      "last_snapshot": {
+        "wan1": {
+          "device": "eth1",
+          "ipv4": [
+            "192.168.184.132"
+          ],
+          "matching_endpoints": [
+            [
+              "192.168.184.132",
+              "eth1",
+              [
+                "id",
+                "5",
+                "subflow",
+                "fullmesh",
+                "dev",
+                "eth1"
+              ]
+            ]
+          ],
+          "netifd_up": true,
+          "proto_dhcp": true,
+          "tracker_up": true
+        },
+        "wan2": {
+          "device": "eth2",
+          "ipv4": [
+            "10.10.10.108"
+          ],
+          "matching_endpoints": [
+            [
+              "10.10.10.108",
+              "eth2",
+              [
+                "id",
+                "2",
+                "subflow",
+                "fullmesh",
+                "dev",
+                "eth2"
+              ]
+            ]
+          ],
+          "netifd_up": true,
+          "proto_dhcp": true,
+          "tracker_up": true
+        }
+      },
+      "ready": true,
+      "stable_snapshots": 2,
+      "wait_seconds": 2.65
+    }
+  },
+  "scope": "Actual clean-imported r7 VMware OVA; two stable tracker-and-MPTCP readiness snapshots, each-WAN loss, independent TCP/UDP observation",
+  "runner_returncode": 0
+}

@@ -1,0 +1,66 @@
+{
+  "checks": {
+    "default_restored": true,
+    "final_default_matching": true,
+    "initial_default_confirmed": true,
+    "master_restored": true,
+    "pending_rolled_back_or_clear": true,
+    "saved_quick_pair_unchanged": true,
+    "timer_disarmed": true,
+    "wan_parameters_and_tries_unchanged": true,
+    "wireguard_cleanup": true
+  },
+  "failure_stage": null,
+  "profiles": {
+    "default": {
+      "local_dns": true,
+      "profile_confirmed_and_matching": true,
+      "public_egress": true,
+      "saved_quick_pair_unchanged": true,
+      "wg_gui_and_traffic": true
+    },
+    "gaming": {
+      "local_dns": true,
+      "profile_confirmed_and_matching": true,
+      "public_egress": true,
+      "saved_quick_pair_unchanged": true,
+      "wg_gui_and_traffic": true
+    },
+    "no_tunnel": {
+      "direct_public_icmp": true,
+      "direct_udp_dns": true,
+      "lan_icmp_route_eth1": true,
+      "lan_udp_route_eth1": true,
+      "local_dns": true,
+      "local_icmp_route_eth1": true,
+      "local_udp_route_eth1": true,
+      "mq_address_absent": true,
+      "old_wg_gui_suspended": true,
+      "profile_confirmed_and_matching": true,
+      "proxy_public_egress": true,
+      "saved_quick_pair_unchanged": true
+    },
+    "performance": {
+      "local_dns": true,
+      "profile_confirmed_and_matching": true,
+      "public_egress": true,
+      "saved_quick_pair_unchanged": true,
+      "wg_gui_and_traffic": true
+    },
+    "performance_old": {
+      "local_dns": true,
+      "profile_confirmed_and_matching": true,
+      "public_egress": true,
+      "saved_quick_pair_unchanged": true,
+      "wg_gui_and_traffic": true
+    },
+    "stability_old": {
+      "local_dns": true,
+      "profile_confirmed_and_matching": true,
+      "public_egress": true,
+      "saved_quick_pair_unchanged": true,
+      "wg_gui_and_traffic": true
+    }
+  },
+  "scope": "router-origin HTTPS/DNS and LAN-source route lookup; not physical-client benchmark"
+}

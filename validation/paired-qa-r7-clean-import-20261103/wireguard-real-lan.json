@@ -1,0 +1,37 @@
+{
+  "checks": {
+    "both_added_with_lan_denied": true,
+    "cleanup_succeeded": true,
+    "completed_without_error": true,
+    "full_gui_and_traffic": true,
+    "full_tunnel_public_egress": true,
+    "global_gate_unchanged": true,
+    "initial_consistent_and_names_unique": true,
+    "lan_established_peer_revoke": true,
+    "lan_established_pre_revoke": true,
+    "lan_global_gate_restored": true,
+    "lan_gui_after_revoke": true,
+    "lan_initial_peer_denied": true,
+    "lan_matrix_00": true,
+    "lan_matrix_00_gui": true,
+    "lan_matrix_01": true,
+    "lan_matrix_01_gui": true,
+    "lan_matrix_10": true,
+    "lan_matrix_10_gui": true,
+    "lan_matrix_11": true,
+    "lan_matrix_11_gui": true,
+    "lan_peer_restored_deny": true,
+    "lan_positive_baseline": true,
+    "peers_removed_and_existing_unchanged": true,
+    "private_tmpfs_and_namespaces_available": true,
+    "removed_peers_gui_blocked": true,
+    "split_disable_blocks_gui": true,
+    "split_enable_restores_gui_and_traffic": true,
+    "split_gui_and_traffic": true
+  },
+  "timings": {
+    "split_enable_recovery_seconds": 12.2
+  },
+  "scope": "Actual clean-imported r7 VMware OVA; WG GUI/full Internet, peer lifecycle, distinct Windows LAN matrix and established-flow revocation",
+  "runner_returncode": 0
+}

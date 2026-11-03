@@ -1,0 +1,10 @@
+{
+  "scope": "Actual dashboard slider, explicit GUI Revert and Keep profile in both directions",
+  "checks": {
+    "pending_keeps_confirmed_A": true,
+    "explicit_GUI_revert": true,
+    "GUI_B_apply_and_confirm": true,
+    "GUI_A_apply_and_confirm": true
+  },
+  "failed": []
+}

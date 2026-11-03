@@ -1,0 +1,57 @@
+{
+  "checks": {
+    "brand": true,
+    "VMware_model": true,
+    "kernel": true,
+    "MQVPN_r7_payload": true,
+    "MQVPN_executable": true,
+    "MQVPN_world_hold": true,
+    "profiles_payload": true,
+    "live_LuCI_features": true,
+    "package:mqvpn": true,
+    "package:omr-profiles": true,
+    "package:omr-tracker": true,
+    "package:omr-api-paths": true,
+    "package:luci-mod-dashboard": true
+  },
+  "failed": [],
+  "model": "VMware, Inc. VMware Virtual Platform",
+  "version": "v0.64.3-3K",
+  "kernel": "6.18.39",
+  "interfaces": {
+    "lan": {
+      "up": true,
+      "proto": "static",
+      "l3_device": "eth0",
+      "ipv4-address": [
+        {
+          "address": "192.168.100.1",
+          "mask": 24
+        }
+      ],
+      "route": []
+    },
+    "wan1": {
+      "up": true,
+      "proto": "static",
+      "l3_device": "eth1",
+      "ipv4-address": [],
+      "route": []
+    },
+    "wan2": {
+      "up": true,
+      "proto": "static",
+      "l3_device": "eth2",
+      "ipv4-address": [],
+      "route": []
+    },
+    "omrvpn": {
+      "up": false,
+      "proto": "none",
+      "l3_device": null,
+      "ipv4-address": null,
+      "route": null
+    }
+  },
+  "read_only": true
+}

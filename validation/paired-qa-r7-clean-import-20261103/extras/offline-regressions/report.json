@@ -1,0 +1,130 @@
+{
+  "report_version": 1,
+  "scope": "bounded offline regressions; no installs, services, SSH, or external network",
+  "root": "C:\\Users\\Admin\\.codex\\visualizations\\2026\\10\\13\\01a13480-d043-7080-b21f-02ef0a071ff9\\omr-rebase-review",
+  "generated_utc": "2026-11-03T14:31:08Z",
+  "totals": {
+    "test_files": 4,
+    "passed": 4,
+    "failed": 0,
+    "skipped_or_unavailable": 0,
+    "count_unit": "suite-level test files"
+  },
+  "suites": [
+    {
+      "name": "test_profiles_ui",
+      "status": "passed",
+      "command": "& 'C:\\Program Files\\nodejs\\node.exe' 'C:\\Users\\Admin\\.codex\\visualizations\\2026\\10\\13\\01a13480-d043-7080-b21f-02ef0a071ff9\\omr-rebase-review\\client-repo\\luci-app-omr-profiles\\tests\\test_profiles_ui.js'",
+      "exit_code": 0,
+      "pass_count": 1,
+      "fail_count": 0,
+      "skip_count": 0,
+      "count_unit": "profile-ui-aggregate",
+      "log": "C:\\Users\\Admin\\.codex\\visualizations\\2026\\10\\13\\01a13480-d043-7080-b21f-02ef0a071ff9\\omr-rebase-review\\paired-qa-r7-clean-import-20261103\\extras\\offline-regressions\\test_profiles_ui.log"
+    },
+    {
+      "name": "test_luci_features",
+      "status": "passed",
+      "command": "& 'C:\\Program Files\\nodejs\\node.exe' 'C:\\Users\\Admin\\.codex\\visualizations\\2026\\10\\13\\01a13480-d043-7080-b21f-02ef0a071ff9\\omr-rebase-review\\build-repo\\validation\\luci\\test_luci_features.js' --source 'C:\\Users\\Admin\\.codex\\visualizations\\2026\\10\\13\\01a13480-d043-7080-b21f-02ef0a071ff9\\omr-rebase-review\\paired-qa-r7-clean-import-20261103\\extras\\offline-regressions\\inputs\\luci-source-unminified.js' --footer 'C:\\Users\\Admin\\.codex\\visualizations\\2026\\10\\13\\01a13480-d043-7080-b21f-02ef0a071ff9\\omr-rebase-review\\paired-qa-r7-clean-import-20261103\\extras\\offline-regressions\\inputs\\footer.htm'",
+      "exit_code": 0,
+      "pass_count": 12,
+      "fail_count": 0,
+      "skip_count": 0,
+      "count_unit": "individual-test-case",
+      "log": "C:\\Users\\Admin\\.codex\\visualizations\\2026\\10\\13\\01a13480-d043-7080-b21f-02ef0a071ff9\\omr-rebase-review\\paired-qa-r7-clean-import-20261103\\extras\\offline-regressions\\test_luci_features.log",
+      "limitation": "Latest supplied-source run passed all 12 cases. An earlier default-path invocation exited 2 before cases, and an earlier minified-installed-source run exited 1 in the source extractor before cases.",
+      "source_paths": {
+        "luci_js": "C:\\Users\\Admin\\.codex\\visualizations\\2026\\10\\13\\01a13480-d043-7080-b21f-02ef0a071ff9\\omr-rebase-review\\paired-qa-r7-clean-import-20261103\\extras\\offline-regressions\\inputs\\luci-source-unminified.js",
+        "footer_htm": "C:\\Users\\Admin\\.codex\\visualizations\\2026\\10\\13\\01a13480-d043-7080-b21f-02ef0a071ff9\\omr-rebase-review\\paired-qa-r7-clean-import-20261103\\extras\\offline-regressions\\inputs\\footer.htm"
+      },
+      "source_sha256": {
+        "luci_js": "5A9E9D4A4ABE82774D117DC99BFDD1F13DE2113273A08302672FAC541768B1CE",
+        "footer_htm": "253FE9D675BB20C94CC3B94F08FB2C57D9BC7A697001579A5DFC8D651522B53D"
+      },
+      "source_scope": "Pinned patched BUILD LuCI source unit and installed public r7 footer, evaluated only by local RPC/browser-storage/virtual-clock fixtures; no router execution or network.",
+      "source_origin": {
+        "luci_js": "Pinned patched BUILD source supplied by primary.",
+        "footer_htm": "/usr/lib/lua/luci/view/themes/openmptcprouter/footer.htm from the actual r7 router."
+      },
+      "previous_attempts": [
+        {
+          "command": "& 'C:\\Program Files\\nodejs\\node.exe' 'C:\\Users\\Admin\\.codex\\visualizations\\2026\\10\\13\\01a13480-d043-7080-b21f-02ef0a071ff9\\omr-rebase-review\\build-repo\\validation\\luci\\test_luci_features.js'",
+          "exit_code": 2,
+          "cases_executed": 0,
+          "limitation": "Earlier default-path invocation stopped because build-repo luci.js was absent.",
+          "log": "C:\\Users\\Admin\\.codex\\visualizations\\2026\\10\\13\\01a13480-d043-7080-b21f-02ef0a071ff9\\omr-rebase-review\\paired-qa-r7-clean-import-20261103\\extras\\offline-regressions\\test_luci_features-default-input-attempt.log"
+        },
+        {
+          "command": "& 'C:\\Program Files\\nodejs\\node.exe' 'C:\\Users\\Admin\\.codex\\visualizations\\2026\\10\\13\\01a13480-d043-7080-b21f-02ef0a071ff9\\omr-rebase-review\\build-repo\\validation\\luci\\test_luci_features.js' --source 'C:\\Users\\Admin\\.codex\\visualizations\\2026\\10\\13\\01a13480-d043-7080-b21f-02ef0a071ff9\\omr-rebase-review\\paired-qa-r7-clean-import-20261103\\extras\\offline-regressions\\inputs\\luci.js' --footer 'C:\\Users\\Admin\\.codex\\visualizations\\2026\\10\\13\\01a13480-d043-7080-b21f-02ef0a071ff9\\omr-rebase-review\\paired-qa-r7-clean-import-20261103\\extras\\offline-regressions\\inputs\\footer.htm'",
+          "exit_code": 1,
+          "cases_executed": 0,
+          "limitation": "The installed minified luci.js has probeSystemFeatures() inline rather than at line start, so the fixture extractor stopped before case registration.",
+          "source_sha256": "08BE4C9C9ADC85CED2A4B02B09D6E1A6A67D3DBD9066060B9D75F9C728E25E97",
+          "log": "C:\\Users\\Admin\\.codex\\visualizations\\2026\\10\\13\\01a13480-d043-7080-b21f-02ef0a071ff9\\omr-rebase-review\\paired-qa-r7-clean-import-20261103\\extras\\offline-regressions\\test_luci_features-minified-source-attempt.log"
+        }
+      ]
+    },
+    {
+      "name": "test_vps_candidate_prepare",
+      "status": "passed",
+      "command": "wsl.exe --exec env PYTHONDONTWRITEBYTECODE=1 python3 -m pytest -q -p no:cacheprovider /mnt/c/Users/Admin/.codex/visualizations/2026/10/13/01a13480-d043-7080-b21f-02ef0a071ff9/omr-rebase-review/vps-repo/tests/test_vps_candidate_prepare.py",
+      "exit_code": 0,
+      "pass_count": 14,
+      "fail_count": 0,
+      "skip_count": 0,
+      "limitation": "Test is Linux-only and uses sh; python3 -m pytest was not available in any of the 7 already-running WSL distros. No dependency installation or test run was attempted.",
+      "path": "C:\\Users\\Admin\\.codex\\visualizations\\2026\\10\\13\\01a13480-d043-7080-b21f-02ef0a071ff9\\omr-rebase-review\\vps-repo\\tests\\test_vps_candidate_prepare.py",
+      "count_unit": "individual pytest case",
+      "python_version": "3.11.2 (default WSL)",
+      "pytest_version": "7.2.1 (already installed; no bootstrap)",
+      "scope": "Linux fixture run in pytest temporary directories; wrapper copied to temp, fake builder/dpkg-deb used, only prepare mode; bytecode and pytest cache disabled. No network, SSH, dependency install, product edit, or global system change.",
+      "log": "C:\\Users\\Admin\\.codex\\visualizations\\2026\\10\\13\\01a13480-d043-7080-b21f-02ef0a071ff9\\omr-rebase-review\\paired-qa-r7-clean-import-20261103\\extras\\offline-regressions\\test_vps_candidate_prepare.log"
+    },
+    {
+      "name": "test_no_tunnel_runtime",
+      "status": "passed",
+      "command": "wsl.exe --exec env PROFILE_LUA=/tmp/omr3k-profile-deps/root/usr/bin/lua5.1 PROFILE_NIXIO_CPATH=/tmp/omrprofiles-uci-lab/luci/libs/luci-lib-nixio/src PROFILE_NIXIO_LUAPATH=/tmp/omrprofiles-uci-lab/luci/libs/luci-lib-nixio/root/usr/lib/lua PROFILE_UCI_CPATH=/tmp/omrprofiles-uci-lab/uci-build PROFILE_JSON_CPATH=/tmp/omr3k-profile-deps/root/usr/lib/x86_64-linux-gnu/lua/5.1 LD_LIBRARY_PATH=/tmp/omr3k-profile-deps/root/usr/lib/x86_64-linux-gnu:/tmp/omrprofiles-uci-lab/uci-build:/tmp/omrprofiles-uci-lab/prefix/lib PYTHONDONTWRITEBYTECODE=1 python3 -s /mnt/c/Users/Admin/.codex/visualizations/2026/10/13/01a13480-d043-7080-b21f-02ef0a071ff9/omr-rebase-review/client-repo/omr-profiles/tests/test_no_tunnel_runtime.py",
+      "exit_code": 0,
+      "pass_count": 1,
+      "fail_count": 0,
+      "skip_count": 0,
+      "limitation": "No lua5.1, lua, or luajit executable exists in the default WSL PATH; PROFILE_LUA and the required module path variables are also not configured in Windows. No Lua install was attempted.",
+      "path": "C:\\Users\\Admin\\.codex\\visualizations\\2026\\10\\13\\01a13480-d043-7080-b21f-02ef0a071ff9\\omr-rebase-review\\client-repo\\omr-profiles\\tests\\test_no_tunnel_runtime.py",
+      "required_python": "python3 with standard library; default WSL is 3.11.2",
+      "required_lua": "Lua 5.1 or LuaJIT with Lua 5.1 ABI, executable supplied via PROFILE_LUA",
+      "required_module_paths": {
+        "PROFILE_NIXIO_LUAPATH": "Directory containing nixio/fs.lua.",
+        "PROFILE_NIXIO_CPATH": "Lua 5.1 shared-module search directory for nixio and its native submodules.",
+        "PROFILE_JSON_CPATH": "Lua 5.1 shared-module search directory containing cjson.so."
+      },
+      "project_modules": "The test prepends this checkout files/usr/lib/lua/?.lua, which supplies omr.profiles and omr.profile_transport.",
+      "recommended_command": "env PROFILE_LUA=/path/to/lua5.1 PROFILE_NIXIO_LUAPATH=/path/to/share/lua/5.1 PROFILE_NIXIO_CPATH=/path/to/lib/lua/5.1 PROFILE_JSON_CPATH=/path/to/lib/lua/5.1 python3 -s /mnt/c/Users/Admin/.codex/visualizations/2026/10/13/01a13480-d043-7080-b21f-02ef0a071ff9/omr-rebase-review/client-repo/omr-profiles/tests/test_no_tunnel_runtime.py",
+      "stubs": {
+        "UCI": "luci.model.uci is replaced by a fixture cursor implementing get and foreach.",
+        "sys_exec": "luci.sys.exec is replaced by canned route/service/nft results; it never launches commands.",
+        "os_execute": "Global os.execute is replaced by a fixture that records commands and returns simulated status.",
+        "luci_jsonc": "luci.jsonc is supplied by a fixture wrapper around cjson."
+      },
+      "local_effects": "The test redirects persistent/runtime/generated-config paths into Python TemporaryDirectory, overrides heartbeat, and uses real nixio.fs only for temporary-directory mkdir/chmod/access plus reads of generated fixture JSON. No real sys.exec/os.execute network or service command runs on the asserted paths. Static inspection only; not run on a router.",
+      "count_unit": "single Lua runtime fixture assertion",
+      "log": "C:\\Users\\Admin\\.codex\\visualizations\\2026\\10\\13\\01a13480-d043-7080-b21f-02ef0a071ff9\\omr-rebase-review\\paired-qa-r7-clean-import-20261103\\extras\\offline-regressions\\test_no_tunnel_runtime.log",
+      "previous_limitation": "Initially skipped because Windows and default WSL PATH lacked Lua; closed using the pre-existing profile-work-20261030 runtime bootstrap.",
+      "runtime_paths": {
+        "PROFILE_LUA": "/tmp/omr3k-profile-deps/root/usr/bin/lua5.1",
+        "PROFILE_NIXIO_CPATH": "/tmp/omrprofiles-uci-lab/luci/libs/luci-lib-nixio/src",
+        "PROFILE_NIXIO_LUAPATH": "/tmp/omrprofiles-uci-lab/luci/libs/luci-lib-nixio/root/usr/lib/lua",
+        "PROFILE_UCI_CPATH": "/tmp/omrprofiles-uci-lab/uci-build",
+        "PROFILE_JSON_CPATH": "/tmp/omr3k-profile-deps/root/usr/lib/x86_64-linux-gnu/lua/5.1",
+        "LD_LIBRARY_PATH": "/tmp/omr3k-profile-deps/root/usr/lib/x86_64-linux-gnu:/tmp/omrprofiles-uci-lab/uci-build:/tmp/omrprofiles-uci-lab/prefix/lib"
+      },
+      "scope": "Default WSL Lua 5.1 with pre-existing nixio/cjson modules; Python harness generated only a TemporaryDirectory and used UCI/sys.exec/os.execute fixtures. No dependency bootstrap, router execution, network, SSH, global system change, or product edits."
+    }
+  ],
+  "limitations": [
+    "The profile UI entrypoint reports one aggregate success marker after its assertions; that marker is counted as one pass.",
+    "The LuCI feature entrypoint provides per-case PASS lines and a final passed/total summary.",
+    "Skipped suites have no process exit code because they were not launched."
+  ],
+  "invocation_errors": 2,
+  "invocation_error_scope": "Two historical pre-case stops (missing default source; minified-source extractor mismatch); latest supplied unminified-source run passed. These are not failed test cases."
+}

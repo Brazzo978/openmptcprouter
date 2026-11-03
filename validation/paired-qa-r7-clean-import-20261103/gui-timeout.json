@@ -1,0 +1,26 @@
+{
+  "initial_active": {
+    "id": "default",
+    "name": "Default",
+    "modified": true
+  },
+  "pending_observed": true,
+  "initial_phase": "awaiting_confirm",
+  "final_active": {
+    "id": "default",
+    "server_match": true,
+    "name": "Default",
+    "modified": false
+  },
+  "last_result": {
+    "ok": false,
+    "profile_id": "gaming",
+    "message": "Confirmation time expired."
+  },
+  "checks": {
+    "GUI_started_gaming_transaction": true,
+    "timeout_returns_confirmed_Default": true,
+    "timeout_reported": true,
+    "no_profile_modification": true
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "checks": {
+    "canary_files_removed": true,
+    "canary_local": true,
+    "canary_stopped": true,
+    "completed_without_error": true,
+    "native_http": true,
+    "native_rule_present": true,
+    "other_redirects_preserved": true,
+    "other_server_rules_unchanged": true,
+    "own_redirects_removed": true,
+    "preflight_clean": true,
+    "private_backups_created": true,
+    "public_marker_gone": true,
+    "router_firewall_restored": true,
+    "router_rpf_removed": true,
+    "rpf_http": true,
+    "rpf_rule_present": true,
+    "vps_test_ports_released": true
+  },
+  "failure_stage": null,
+  "scope": "Actual clean-imported r7 VMware OVA, native MQVPN and independent Xray public forwarding",
+  "runner_returncode": 0
+}

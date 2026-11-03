@@ -1,0 +1,44 @@
+{
+  "scope": "Actual clean-imported VMware r7 GUI; read-only views without saving forms",
+  "checks": {
+    "admin/dashboard:no_RPC_error_banner": true,
+    "dashboard_quick_A_B": true,
+    "admin/system/openmptcprouter/wizard:no_RPC_error_banner": true,
+    "wizard_single_page_sections": true,
+    "wizard_single_save_apply": true,
+    "no_VPS_backup_tab": true,
+    "admin/system/openmptcprouter/status:no_RPC_error_banner": true,
+    "calculated_MTU_visible": true,
+    "admin/system/openmptcprouter/logs:no_RPC_error_banner": true,
+    "advanced_log_controls": true,
+    "admin/network/mptcp/bandwidth:no_RPC_error_banner": true,
+    "custom_bandwidth_charts": true,
+    "admin/network/mptcp/mptcp_monitor:no_RPC_error_banner": true,
+    "custom_monitor_live": true,
+    "custom_monitor_endpoint_table": true,
+    "admin/vpn/mqvpn/metrics:no_RPC_error_banner": true,
+    "MQ_FEC_built_in_GUI": true,
+    "MQ_control_reachable_in_GUI": true,
+    "admin/system/openmptcprouter/profiles:no_RPC_error_banner": true,
+    "three_protocol_previews": true,
+    "ICMP_TCP_UDP_previews": true
+  },
+  "details": {
+    "wizard_headings": [
+      "Server",
+      "Settings",
+      "LAN",
+      "WAN"
+    ],
+    "pmtu_labels": [
+      "PMTU: 1500",
+      "PMTU: 1500"
+    ],
+    "protocols": [
+      "icmp",
+      "tcp",
+      "udp"
+    ]
+  },
+  "failed": []
+}

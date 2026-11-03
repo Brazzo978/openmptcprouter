@@ -1,0 +1,13 @@
+{
+  "auth_none_only": true,
+  "fake_values_absent_from_sanitized_rpc": true,
+  "marker_entry_count": 1,
+  "qa_pass": true,
+  "redacted_fake_field_categories": {
+    "authorization": true,
+    "password": true,
+    "token": true
+  },
+  "request_succeeded": true,
+  "rpc_entry_count": 500
+}

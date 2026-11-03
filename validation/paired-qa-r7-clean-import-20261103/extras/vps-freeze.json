@@ -1,0 +1,620 @@
+{
+  "assessment": {
+    "findings": [
+      "candidate payload metadata identifies a different source commit than the audited checkout"
+    ],
+    "finding_analysis": {
+      "category": "candidate_source_provenance_delta",
+      "candidate_payload_source_commit": "4a763d2e0547de11dc84f822ec63d8abc8c4c5ba",
+      "audited_checkout_commit": "b6010fcd2728d98096f1f9957bb55f2f2bea6232",
+      "candidate_commit_is_ancestor": true,
+      "paths_added_after_candidate_commit": [
+        "patches/mqvpn/040-3k-reconnect-path-recovery.patch",
+        "patches/mqvpn/050-3k-initial-tun-recovery.patch"
+      ],
+      "vps_or_admin_source_files_changed": false,
+      "added_patches_are_inputs_to_vps_native_mqvpn_repacker": false,
+      "live_freeze_or_health_mismatch": false,
+      "exact_candidate_source_commit_attested": false,
+      "summary": "The recorded candidate commit is an ancestor of the audited checkout. The intervening diff adds only two MQVPN client reconnect/TUN recovery patch files. The VPS native-MQVPN repacker references its existing 010 and 020 patches, not these additions. All deployed package, kernel, admin, BBR, service, and freeze-lock checks match; the source-commit provenance difference remains."
+    },
+    "limits": [
+      "Debian distribution/security package feeds are expected and were not treated as frozen OMR artifact sources.",
+      "A stopped profile transport is an observation, not a failure; no inactive tunnel was classified as unhealthy.",
+      "The kernel build source lock includes pinned Ysurac upstream/patch provenance even when deployed frozen binary URLs are hosted elsewhere.",
+      "A missing retained .deb means the installed package archive hash cannot be independently rehashed from that host; installed version and deployed asset checks remain separate evidence."
+    ],
+    "status": "attention"
+  },
+  "audit": "read-only frozen VPS and health attestation",
+  "collected_at_utc": "2026-11-03T14:17:45.964043+00:00",
+  "local_source_checkout": {
+    "branch": "omr-vps-0.1163-3K-next",
+    "commit": "b6010fcd2728d98096f1f9957bb55f2f2bea6232",
+    "dirty_entry_count": 0,
+    "worktree_clean": true
+  },
+  "remote_evidence": {
+    "apt_sources": {
+      "active_uri_count": 11,
+      "category_counts": {
+        "debian_distribution": 8,
+        "local_frozen": 1,
+        "omr_upstream": 0,
+        "other_remote": 2,
+        "three_k_mirror": 0,
+        "ysurac_host": 0
+      },
+      "exact_local_frozen_source_count": 1,
+      "upstream_omr_source_count": 0,
+      "ysurac_host_source_count": 0
+    },
+    "bbr": {
+      "config_has_bbr_default_congestion_control": true,
+      "config_has_default_bbr": true,
+      "config_sha256": "c74427c09396f16c890a0eef7698ae2a7ee67f9d62fb8d59bdaa2507324b5fae",
+      "config_sha256_matches_source": true,
+      "running_config_available": true,
+      "runtime_tcp_congestion_control": "bbr"
+    },
+    "candidate_metadata": {
+      "admin_sha256_matches_expected": true,
+      "admin_version": "0.18+20261030-3k7",
+      "admin_version_matches_expected": true,
+      "base_release": "v0.1163-3K",
+      "frozen_package_count": 21,
+      "kernel_lock_sha256": "1aab58275e01b99ca70d75160c939525349379f1ce32af93c6f592d80c34238e",
+      "kernel_lock_sha256_matches_checkout": true,
+      "payload_present": true,
+      "source_commit": "4a763d2e0547de11dc84f822ec63d8abc8c4c5ba",
+      "source_commit_matches_checkout": false
+    },
+    "disk": {
+      "boot": {
+        "available": true,
+        "available_bytes": 10126798848,
+        "total_bytes": 15875375104,
+        "used_bytes": 4919836672,
+        "used_percent": "33%"
+      },
+      "root": {
+        "available": true,
+        "available_bytes": 10126798848,
+        "total_bytes": 15875375104,
+        "used_bytes": 4919836672,
+        "used_percent": "33%"
+      }
+    },
+    "freeze_marker": {
+      "lock_sha256_matches_deployed": true,
+      "present": true,
+      "release": "0.1163-3K"
+    },
+    "frozen_kernel": {
+      "candidate_payload_lock_sha256_matches_source": true,
+      "canonical_asset_url_hosts": {
+        "repoomr.3klab.com": 2
+      },
+      "lock_matches_source": true,
+      "lock_sha256": "1aab58275e01b99ca70d75160c939525349379f1ce32af93c6f592d80c34238e"
+    },
+    "frozen_omr": {
+      "canonical_asset_url_hosts": {
+        "github.com": 1,
+        "repoomr.3klab.com": 20
+      },
+      "deployed_lock_matches_expected_values": true,
+      "deployed_lock_parseable": true,
+      "helper_match_count": 3,
+      "helper_total": 3,
+      "helpers": [
+        {
+          "actual_sha256": "21a169d4553645db29bb8f506f89f9663592d8119ffcfe33e6abe832db023caa",
+          "actual_size": 8679,
+          "expected_sha256": "21a169d4553645db29bb8f506f89f9663592d8119ffcfe33e6abe832db023caa",
+          "expected_size": 8679,
+          "file": "helpers/mptcp-scheduler-dscp.sh",
+          "matches": true
+        },
+        {
+          "actual_sha256": "d1f4ad6e5e6ea96742a294835fcf8b01510a93b264811759838e1bb71f06a5cf",
+          "actual_size": 8432,
+          "expected_sha256": "d1f4ad6e5e6ea96742a294835fcf8b01510a93b264811759838e1bb71f06a5cf",
+          "expected_size": 8432,
+          "file": "helpers/mptcp-scheduler-weight.sh",
+          "matches": true
+        },
+        {
+          "actual_sha256": "c7d68b021cfd6380ea83a82962abde5b484779fee0b97d38681dfa1396bbc8d7",
+          "actual_size": 294737,
+          "expected_sha256": "c7d68b021cfd6380ea83a82962abde5b484779fee0b97d38681dfa1396bbc8d7",
+          "expected_size": 294737,
+          "file": "helpers/acme.sh",
+          "matches": true
+        }
+      ],
+      "install_root_present": true,
+      "installed_package_match_count": 21,
+      "installed_package_total": 21,
+      "installed_packages": [
+        {
+          "expected_version": "0.12.1+ds-2",
+          "installed_version": "0.12.1+ds-2",
+          "matches": true,
+          "package": "libjson-c3",
+          "status": "installed"
+        },
+        {
+          "expected_version": "0.16.2-1",
+          "installed_version": "0.16.2-1",
+          "matches": true,
+          "package": "libmqvpn0",
+          "status": "installed"
+        },
+        {
+          "expected_version": "1.0-1",
+          "installed_version": "1.0-1",
+          "matches": true,
+          "package": "mptcp-bpf-bkup",
+          "status": "installed"
+        },
+        {
+          "expected_version": "1.0-1",
+          "installed_version": "1.0-1",
+          "matches": true,
+          "package": "mptcp-bpf-burst",
+          "status": "installed"
+        },
+        {
+          "expected_version": "1.0-1",
+          "installed_version": "1.0-1",
+          "matches": true,
+          "package": "mptcp-bpf-dscp",
+          "status": "installed"
+        },
+        {
+          "expected_version": "1.0-1",
+          "installed_version": "1.0-1",
+          "matches": true,
+          "package": "mptcp-bpf-first",
+          "status": "installed"
+        },
+        {
+          "expected_version": "1.0-1",
+          "installed_version": "1.0-1",
+          "matches": true,
+          "package": "mptcp-bpf-red",
+          "status": "installed"
+        },
+        {
+          "expected_version": "1.0-1",
+          "installed_version": "1.0-1",
+          "matches": true,
+          "package": "mptcp-bpf-rr",
+          "status": "installed"
+        },
+        {
+          "expected_version": "1.1-1",
+          "installed_version": "1.1-1",
+          "matches": true,
+          "package": "mptcp-bpf-weight",
+          "status": "installed"
+        },
+        {
+          "expected_version": "1.0-1",
+          "installed_version": "1.0-1",
+          "matches": true,
+          "package": "mptcp-bpf-weight-rr",
+          "status": "installed"
+        },
+        {
+          "expected_version": "0.16.2-3k2",
+          "installed_version": "0.16.2-3k2",
+          "matches": true,
+          "package": "mqvpn",
+          "status": "installed"
+        },
+        {
+          "expected_version": "0.1.4-2",
+          "installed_version": "0.1.4-2",
+          "matches": true,
+          "package": "omr-dsvpn",
+          "status": "installed"
+        },
+        {
+          "expected_version": "0.3.4-5",
+          "installed_version": "0.3.4-5",
+          "matches": true,
+          "package": "omr-glorytun",
+          "status": "installed"
+        },
+        {
+          "expected_version": "0.0.35-6",
+          "installed_version": "0.0.35-6",
+          "matches": true,
+          "package": "omr-glorytun-tcp",
+          "status": "installed"
+        },
+        {
+          "expected_version": "3.0.0+20211028.git.ddafba3",
+          "installed_version": "3.0.0+20211028.git.ddafba3",
+          "matches": true,
+          "package": "omr-mlvpn",
+          "status": "installed"
+        },
+        {
+          "expected_version": "3.3.5-3",
+          "installed_version": "3.3.5-3",
+          "matches": true,
+          "package": "omr-shadowsocks-libev",
+          "status": "installed"
+        },
+        {
+          "expected_version": "0.0.5-1",
+          "installed_version": "0.0.5-1",
+          "matches": true,
+          "package": "omr-simple-obfs",
+          "status": "installed"
+        },
+        {
+          "expected_version": "1.14.0",
+          "installed_version": "1.14.0",
+          "matches": true,
+          "package": "shadowsocks-go",
+          "status": "installed"
+        },
+        {
+          "expected_version": "0.4.4",
+          "installed_version": "0.4.4",
+          "matches": true,
+          "package": "tracebox",
+          "status": "installed"
+        },
+        {
+          "expected_version": "5.32.0",
+          "installed_version": "5.32.0",
+          "matches": true,
+          "package": "v2ray",
+          "status": "installed"
+        },
+        {
+          "expected_version": "26.7.11",
+          "installed_version": "26.7.11",
+          "matches": true,
+          "package": "xray",
+          "status": "installed"
+        }
+      ],
+      "lock_matches_source": true,
+      "lock_sha256": "2b0d146f3bacec85611105da56e9c1036002ad47acde88ba984ad9693b8968d9",
+      "origin_url_hosts": {
+        "repo.openmptcprouter.com": 18,
+        "www.openmptcprouter.com": 3
+      },
+      "package_asset_match_count": 21,
+      "package_asset_total": 21,
+      "package_assets": [
+        {
+          "actual_sha256": "5b0194dac67efa04ef6df15e3080bd53448b0209f6cf25ff6a46c6ba8dccc354",
+          "actual_size": 26912,
+          "expected_sha256": "5b0194dac67efa04ef6df15e3080bd53448b0209f6cf25ff6a46c6ba8dccc354",
+          "expected_size": 26912,
+          "expected_version": "0.12.1+ds-2",
+          "file": "libjson-c3_0.12.1+ds-2_amd64.deb",
+          "matches": true,
+          "package": "libjson-c3"
+        },
+        {
+          "actual_sha256": "0301baa7c4fa8b7733a24c5bcd0ae68781aac00f3ac7a7a7cda3f56668baec05",
+          "actual_size": 138872,
+          "expected_sha256": "0301baa7c4fa8b7733a24c5bcd0ae68781aac00f3ac7a7a7cda3f56668baec05",
+          "expected_size": 138872,
+          "expected_version": "0.16.2-1",
+          "file": "libmqvpn0_0.16.2-1_amd64.deb",
+          "matches": true,
+          "package": "libmqvpn0"
+        },
+        {
+          "actual_sha256": "a292c259cc1f8e2552115e01bed23d72f39ce7d3390a54e35b2fd961be466bc8",
+          "actual_size": 230476,
+          "expected_sha256": "a292c259cc1f8e2552115e01bed23d72f39ce7d3390a54e35b2fd961be466bc8",
+          "expected_size": 230476,
+          "expected_version": "1.0-1",
+          "file": "mptcp-bpf-bkup_1.0-1_amd64.deb",
+          "matches": true,
+          "package": "mptcp-bpf-bkup"
+        },
+        {
+          "actual_sha256": "4d719de6f1768303c748d05d13fe0702c1574293062daab29065473971962c41",
+          "actual_size": 237024,
+          "expected_sha256": "4d719de6f1768303c748d05d13fe0702c1574293062daab29065473971962c41",
+          "expected_size": 237024,
+          "expected_version": "1.0-1",
+          "file": "mptcp-bpf-burst_1.0-1_amd64.deb",
+          "matches": true,
+          "package": "mptcp-bpf-burst"
+        },
+        {
+          "actual_sha256": "0465341754587c2de99224a979d50331105043b386ca64e99a7c3a8dfeab0573",
+          "actual_size": 37216,
+          "expected_sha256": "0465341754587c2de99224a979d50331105043b386ca64e99a7c3a8dfeab0573",
+          "expected_size": 37216,
+          "expected_version": "1.0-1",
+          "file": "mptcp-bpf-dscp_1.0-1_amd64.deb",
+          "matches": true,
+          "package": "mptcp-bpf-dscp"
+        },
+        {
+          "actual_sha256": "43299c215e078dfbcb0126791de744e43538844300f650044168bf8e272c0cb8",
+          "actual_size": 234144,
+          "expected_sha256": "43299c215e078dfbcb0126791de744e43538844300f650044168bf8e272c0cb8",
+          "expected_size": 234144,
+          "expected_version": "1.0-1",
+          "file": "mptcp-bpf-first_1.0-1_amd64.deb",
+          "matches": true,
+          "package": "mptcp-bpf-first"
+        },
+        {
+          "actual_sha256": "71d761b3faf14fd5d947280f76a018c2af821311a4845137bc31c9c99d07867c",
+          "actual_size": 229856,
+          "expected_sha256": "71d761b3faf14fd5d947280f76a018c2af821311a4845137bc31c9c99d07867c",
+          "expected_size": 229856,
+          "expected_version": "1.0-1",
+          "file": "mptcp-bpf-red_1.0-1_amd64.deb",
+          "matches": true,
+          "package": "mptcp-bpf-red"
+        },
+        {
+          "actual_sha256": "5ba74f731635ba58304d1579d3f8a599aab95e5f941224fcfacce6eaf8f18989",
+          "actual_size": 230600,
+          "expected_sha256": "5ba74f731635ba58304d1579d3f8a599aab95e5f941224fcfacce6eaf8f18989",
+          "expected_size": 230600,
+          "expected_version": "1.0-1",
+          "file": "mptcp-bpf-rr_1.0-1_amd64.deb",
+          "matches": true,
+          "package": "mptcp-bpf-rr"
+        },
+        {
+          "actual_sha256": "eabf3ff904033e612319d42a7b8fec36f7a76b63dbe68b5be57c4d41723fdce6",
+          "actual_size": 36164,
+          "expected_sha256": "eabf3ff904033e612319d42a7b8fec36f7a76b63dbe68b5be57c4d41723fdce6",
+          "expected_size": 36164,
+          "expected_version": "1.1-1",
+          "file": "mptcp-bpf-weight_1.1-1_amd64.deb",
+          "matches": true,
+          "package": "mptcp-bpf-weight"
+        },
+        {
+          "actual_sha256": "a038a40ed2303e5396661160695c533265642d54c3f56992635783d740f375eb",
+          "actual_size": 37214,
+          "expected_sha256": "a038a40ed2303e5396661160695c533265642d54c3f56992635783d740f375eb",
+          "expected_size": 37214,
+          "expected_version": "1.0-1",
+          "file": "mptcp-bpf-weight-rr_1.0-1_amd64.deb",
+          "matches": true,
+          "package": "mptcp-bpf-weight-rr"
+        },
+        {
+          "actual_sha256": "6195f80b4ef2406c4df94ce7fb72ab4ae7b11206f0f6af631086d30f9a20f017",
+          "actual_size": 1478424,
+          "expected_sha256": "6195f80b4ef2406c4df94ce7fb72ab4ae7b11206f0f6af631086d30f9a20f017",
+          "expected_size": 1478424,
+          "expected_version": "0.16.2-3k2",
+          "file": "mqvpn_0.16.2-3k2_amd64.deb",
+          "matches": true,
+          "package": "mqvpn"
+        },
+        {
+          "actual_sha256": "1e89ece6b42368f5c7e399e61a82d4cd870c37b55856a6a5e0568a6fdb8d9d9c",
+          "actual_size": 12072,
+          "expected_sha256": "1e89ece6b42368f5c7e399e61a82d4cd870c37b55856a6a5e0568a6fdb8d9d9c",
+          "expected_size": 12072,
+          "expected_version": "0.1.4-2",
+          "file": "omr-dsvpn_0.1.4-2_amd64.deb",
+          "matches": true,
+          "package": "omr-dsvpn"
+        },
+        {
+          "actual_sha256": "e5dafdb832fd5ed615b5f7b539b074bb21792ae92b6f70bb22ea9046b3dcde5a",
+          "actual_size": 26968,
+          "expected_sha256": "e5dafdb832fd5ed615b5f7b539b074bb21792ae92b6f70bb22ea9046b3dcde5a",
+          "expected_size": 26968,
+          "expected_version": "0.3.4-5",
+          "file": "omr-glorytun_0.3.4-5_amd64.deb",
+          "matches": true,
+          "package": "omr-glorytun"
+        },
+        {
+          "actual_sha256": "3fc06efee83bd4398ca55b24c87b35ef0a7905fb7cc93dd7d438be783250810e",
+          "actual_size": 16884,
+          "expected_sha256": "3fc06efee83bd4398ca55b24c87b35ef0a7905fb7cc93dd7d438be783250810e",
+          "expected_size": 16884,
+          "expected_version": "0.0.35-6",
+          "file": "omr-glorytun-tcp_0.0.35-6_amd64.deb",
+          "matches": true,
+          "package": "omr-glorytun-tcp"
+        },
+        {
+          "actual_sha256": "0cdebbdb405fe154a9f661b1d236784190ffbdb69823d4fcb0333cedf7cd17e2",
+          "actual_size": 49336,
+          "expected_sha256": "0cdebbdb405fe154a9f661b1d236784190ffbdb69823d4fcb0333cedf7cd17e2",
+          "expected_size": 49336,
+          "expected_version": "3.0.0+20211028.git.ddafba3",
+          "file": "omr-mlvpn_3.0.0+20211028.git.ddafba3_amd64.deb",
+          "matches": true,
+          "package": "omr-mlvpn"
+        },
+        {
+          "actual_sha256": "7f6b07a64048cbd921a95353877d74ab8b649bc6e1fba4b7915beebb0fa8e856",
+          "actual_size": 202884,
+          "expected_sha256": "7f6b07a64048cbd921a95353877d74ab8b649bc6e1fba4b7915beebb0fa8e856",
+          "expected_size": 202884,
+          "expected_version": "3.3.5-3",
+          "file": "omr-shadowsocks-libev_3.3.5-3_amd64.deb",
+          "matches": true,
+          "package": "omr-shadowsocks-libev"
+        },
+        {
+          "actual_sha256": "9e141398ae0a0cf08ead82dcaeff51d81268ce12f38018272d970d563a71d13b",
+          "actual_size": 53978,
+          "expected_sha256": "9e141398ae0a0cf08ead82dcaeff51d81268ce12f38018272d970d563a71d13b",
+          "expected_size": 53978,
+          "expected_version": "0.0.5-1",
+          "file": "omr-simple-obfs_0.0.5-1_amd64.deb",
+          "matches": true,
+          "package": "omr-simple-obfs"
+        },
+        {
+          "actual_sha256": "4464cddac16ea59d5df57214c8c6552549aaf5a8e771543622ea02d70f329c62",
+          "actual_size": 2911488,
+          "expected_sha256": "4464cddac16ea59d5df57214c8c6552549aaf5a8e771543622ea02d70f329c62",
+          "expected_size": 2911488,
+          "expected_version": "1.14.0",
+          "file": "shadowsocks-go_1.14.0_amd64.deb",
+          "matches": true,
+          "package": "shadowsocks-go"
+        },
+        {
+          "actual_sha256": "9596c2c9ebd76c5d7c68c1bdf04b4487a5f20ba80f9a2e38fb5521c61ca26ec0",
+          "actual_size": 221882,
+          "expected_sha256": "9596c2c9ebd76c5d7c68c1bdf04b4487a5f20ba80f9a2e38fb5521c61ca26ec0",
+          "expected_size": 221882,
+          "expected_version": "0.4.4",
+          "file": "tracebox_0.4.4_amd64.deb",
+          "matches": true,
+          "package": "tracebox"
+        },
+        {
+          "actual_sha256": "8c1984a5bbf2145e1e128831a96d96a72a6f6a85df96bf1f4fe2e61b99e4ded0",
+          "actual_size": 9485320,
+          "expected_sha256": "8c1984a5bbf2145e1e128831a96d96a72a6f6a85df96bf1f4fe2e61b99e4ded0",
+          "expected_size": 9485320,
+          "expected_version": "5.32.0",
+          "file": "v2ray_5.32.0_amd64.deb",
+          "matches": true,
+          "package": "v2ray"
+        },
+        {
+          "actual_sha256": "b786f68476a555ecf1f80fd7b83d65b04c9b95ddbb4cc96296c8b7c180e1dddd",
+          "actual_size": 10189184,
+          "expected_sha256": "b786f68476a555ecf1f80fd7b83d65b04c9b95ddbb4cc96296c8b7c180e1dddd",
+          "expected_size": 10189184,
+          "expected_version": "26.7.11",
+          "file": "xray_26.7.11_amd64.deb",
+          "matches": true,
+          "package": "xray"
+        }
+      ]
+    },
+    "kernel": {
+      "expected_release": "6.18.41-20261013.x64v3-omr-3k",
+      "headers": {
+        "artifact": {
+          "location_class": "candidate_source",
+          "retained": true,
+          "sha256": "811980c9c3d7f09086f09914f3e859a19615e27c7961d2c018c53dccb5d535b5",
+          "sha256_matches": true
+        },
+        "expected_version": "6.18.41-gf72c0ed9ce8e-3",
+        "installed_version": "6.18.41-gf72c0ed9ce8e-3",
+        "package": "linux-headers-6.18.41-20261013.x64v3-omr-3k",
+        "status": "installed",
+        "version_matches": true
+      },
+      "image": {
+        "artifact": {
+          "location_class": "candidate_source",
+          "retained": true,
+          "sha256": "b7e6d5b3e8bd94e187c5897a26f71f06cf10625d82ea308f89612cdcb79d3369",
+          "sha256_matches": true
+        },
+        "expected_version": "6.18.41-gf72c0ed9ce8e-3",
+        "installed_version": "6.18.41-gf72c0ed9ce8e-3",
+        "package": "linux-image-6.18.41-20261013.x64v3-omr-3k",
+        "status": "installed",
+        "version_matches": true
+      },
+      "release_matches": true,
+      "running_release": "6.18.41-20261013.x64v3-omr-3k"
+    },
+    "manager_package": {
+      "artifact": {
+        "location_class": "candidate_source",
+        "retained": true,
+        "sha256": "e1dc0d24783a52cf0667d40a88ac413d504242785a89860c6b1769fdb1fd574b",
+        "sha256_matches": true
+      },
+      "expected_version": "0.18+20261030-3k7",
+      "metadata_matches": true,
+      "metadata_retained": true,
+      "status": "installed",
+      "version": "0.18+20261030-3k7",
+      "version_matches": true
+    },
+    "observed_at_utc": "2026-11-03T14:17:46.063306+00:00",
+    "services": {
+      "omr-admin.service": {
+        "active": "active",
+        "enabled": "enabled",
+        "load": "loaded",
+        "result": "success",
+        "sub": "running"
+      },
+      "omr-profile-recovery.timer": {
+        "active": "active",
+        "enabled": "enabled",
+        "load": "loaded",
+        "result": "success",
+        "sub": "waiting"
+      }
+    },
+    "systemd_failures": {
+      "failed_unit_count": 0,
+      "query_ok": true,
+      "units": []
+    },
+    "wireguard_manager": {
+      "active_peer_count": 1,
+      "consistent": true,
+      "firewall_out_of_sync_count": 0,
+      "global_lan_gate_enabled": false,
+      "peer_count": 1,
+      "recent_handshake_count": 0,
+      "status_available": true,
+      "unknown_firewall_state_count": 0
+    }
+  },
+  "schema": 1,
+  "source_lock_provenance": {
+    "canonical_asset_urls_use_ysurac_host": false,
+    "canonical_asset_urls_use_ysurac_owner_path": false,
+    "expected_admin_package_sha256": "e1dc0d24783a52cf0667d40a88ac413d504242785a89860c6b1769fdb1fd574b",
+    "expected_admin_package_version": "0.18+20261030-3k7",
+    "expected_kernel_asset_url_hosts": [
+      "repoomr.3klab.com"
+    ],
+    "expected_kernel_config_sha256": "c74427c09396f16c890a0eef7698ae2a7ee67f9d62fb8d59bdaa2507324b5fae",
+    "expected_omr_asset_url_hosts": [
+      "github.com",
+      "repoomr.3klab.com"
+    ],
+    "expected_omr_frozen_package_count": 21,
+    "expected_omr_origin_url_hosts": [
+      "repo.openmptcprouter.com",
+      "www.openmptcprouter.com"
+    ],
+    "kernel_source_branch_context": "omr-v6.18",
+    "kernel_source_commit": "1db16030b9d4f56787cd01d52adeeaa650ea5994",
+    "kernel_source_repo": "https://github.com/Brazzo978/openmptcprouter-linux.git",
+    "omr_patch_source": "https://github.com/Ysurac/openmptcprouter.git",
+    "omr_patch_source_commit": "74eacd096f9f0500fc3e8b3ca1c6c40cd227ffa1",
+    "pinned_source_lineage_includes_ysurac": true,
+    "upstream_origin": "https://github.com/Ysurac/linux.git"
+  },
+  "target": {
+    "host": "45.146.5.32",
+    "port": 65222,
+    "username": "root"
+  },
+  "transport_error": null
+}

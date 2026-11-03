@@ -1,0 +1,59 @@
+{
+  "scope": "One handshake per bound WAN, same MPTCP listener; packet headers reduced to counts and capability flags, no application bytes or captured keys saved",
+  "observations": {
+    "wan1": {
+      "probe": {
+        "connected": true,
+        "fallback": null,
+        "remote_key_received": null,
+        "subflows": null,
+        "subflows_total": null,
+        "local_address": "192.168.184.132",
+        "info_bytes": null,
+        "error_stage": "mptcp_info",
+        "errno": 95
+      },
+      "probe_returncode": 2,
+      "client_headers": {
+        "syn_count": 1,
+        "synack_count": 1,
+        "syn_mptcp_capable": true,
+        "synack_mptcp_capable": false
+      },
+      "server_headers": {
+        "syn_count": 1,
+        "synack_count": 1,
+        "syn_mptcp_capable": false,
+        "synack_mptcp_capable": false
+      }
+    },
+    "wan2": {
+      "probe": {
+        "connected": true,
+        "fallback": false,
+        "remote_key_received": true,
+        "subflows": 0,
+        "subflows_total": 1,
+        "local_address": "10.10.10.108",
+        "info_bytes": 96,
+        "error_stage": null,
+        "errno": null
+      },
+      "probe_returncode": 0,
+      "client_headers": {
+        "syn_count": 1,
+        "synack_count": 1,
+        "syn_mptcp_capable": true,
+        "synack_mptcp_capable": true
+      },
+      "server_headers": {
+        "syn_count": 1,
+        "synack_count": 1,
+        "syn_mptcp_capable": true,
+        "synack_mptcp_capable": true
+      }
+    }
+  },
+  "owned_binary_and_directory_removed": true,
+  "does_not_prove_aggregation_or_proxy_subflow_count": true
+}

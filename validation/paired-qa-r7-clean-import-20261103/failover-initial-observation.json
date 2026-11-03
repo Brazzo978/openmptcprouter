@@ -1,0 +1,69 @@
+{
+  "checks": {
+    "baseline_tcp_and_udp": true,
+    "completed_without_error": true,
+    "router_job_cleaned": true,
+    "vps_job_cleaned": true,
+    "wan1_capabilities": true,
+    "wan1_down_during_capabilities": true,
+    "wan1_down_observed": true,
+    "wan1_down_through_hold": true,
+    "wan1_mqvpn_identity_unchanged": true,
+    "wan1_restored": true,
+    "wan1_tcp_continuity": false,
+    "wan1_udp_progress": false,
+    "wan2_capabilities": true,
+    "wan2_down_during_capabilities": true,
+    "wan2_down_observed": true,
+    "wan2_down_through_hold": true,
+    "wan2_mqvpn_identity_unchanged": true,
+    "wan2_restored": true,
+    "wan2_tcp_continuity": false,
+    "wan2_udp_progress": false
+  },
+  "observations": {
+    "mptcp_vps_socket_baseline": true,
+    "wan1_mptcp_vps_socket": true,
+    "wan2_mptcp_vps_socket": false
+  },
+  "phases": {
+    "wan1": {
+      "tcp": {
+        "after": 0,
+        "before": 24,
+        "during": 1,
+        "first_sequence": 8,
+        "last_sequence": 32,
+        "max_gap_seconds": 14.89
+      },
+      "udp": {
+        "after": 0,
+        "before": 24,
+        "during": 38,
+        "first_sequence": 8,
+        "last_sequence": 69,
+        "max_gap_seconds": 7.09
+      }
+    },
+    "wan2": {
+      "tcp": {
+        "after": 0,
+        "before": 0,
+        "during": 0,
+        "first_sequence": null,
+        "last_sequence": null,
+        "max_gap_seconds": 19.22
+      },
+      "udp": {
+        "after": 0,
+        "before": 0,
+        "during": 0,
+        "first_sequence": null,
+        "last_sequence": null,
+        "max_gap_seconds": 19.22
+      }
+    }
+  },
+  "scope": "Actual clean-imported r7 VMware OVA, repeated each-WAN loss and restoration",
+  "runner_returncode": 1
+}

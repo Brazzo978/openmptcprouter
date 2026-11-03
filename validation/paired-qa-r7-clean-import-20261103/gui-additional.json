@@ -1,0 +1,19 @@
+{
+  "scope": "Actual loaded GUI data, including original Path live and kernel diagnostics; read only",
+  "checks": {
+    "six_profile_cards_loaded": true,
+    "six_preview_options": true,
+    "no_loading_placeholder": true,
+    "advanced_logs_populated": true,
+    "legacy_path_live_graph_visible": true,
+    "path_live_controls": true,
+    "no_path_live_RPC_error": true,
+    "kernel_diagnostic_tables_loaded": true,
+    "no_kernel_diagnostic_RPC_error": true
+  },
+  "details": {
+    "log_rows": 500,
+    "path_live_status": "LIVE 2.5S"
+  },
+  "failed": []
+}

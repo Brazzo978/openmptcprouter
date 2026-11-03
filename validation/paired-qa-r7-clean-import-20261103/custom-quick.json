@@ -1,0 +1,17 @@
+{
+  "stage": "custom_quick_result",
+  "checks": {
+    "save": true,
+    "pair_saved": true,
+    "saving_pair_does_not_apply": true,
+    "apply_custom_a": true,
+    "apply_builtin_b": true,
+    "return_custom_a": true,
+    "restore_original_profile": true,
+    "delete_custom": true,
+    "restore_pair": true
+  },
+  "at_utc": "2026-11-03T14:03:20Z",
+  "scope": "Actual clean-imported r7 VMware OVA; custom capture, saved A/B pair and transitions, deletion and original state restoration",
+  "runner_returncode": 0
+}

@@ -1,0 +1,23 @@
+{
+  "checks": {
+    "healthy_confirmed_Default": true,
+    "six_builtin_profiles_only": true,
+    "quick_pair_preserved": true,
+    "both_tracker_states_up": true,
+    "master_balancing_restored": true,
+    "no_QA_proxy_exceptions": true,
+    "redirect_all_ports_off": true
+  },
+  "failed": [],
+  "active": {
+    "id": "default",
+    "server_match": true,
+    "name": "Default",
+    "modified": false
+  },
+  "pending": null,
+  "quick": {
+    "a": "default",
+    "b": "gaming"
+  }
+}

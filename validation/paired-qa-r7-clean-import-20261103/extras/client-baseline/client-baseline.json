@@ -1,0 +1,275 @@
+{
+  "scope": "Read-only client package/startup baseline on the imported r7 router",
+  "collected_at_utc": "2026-11-03T14:12:15Z",
+  "transport": {
+    "collector": "vps-candidate-qa-20261102/local_router_remote.py",
+    "host_key_pin_checked": true,
+    "python_mode": "python -s with vps-candidate-qa-20261102/python-deps",
+    "remote_files_written": false,
+    "configuration_or_package_changes": false,
+    "bandwidth_test_run": false,
+    "kernel_modules_loaded": false,
+    "process_arguments_or_configs_collected": false
+  },
+  "target": {
+    "kernel_release": "6.18.39",
+    "installed_apk_manifest_read": true,
+    "installed_package_count": 649
+  },
+  "cellular_and_bonding_exclusions": {
+    "modem_management_tool_candidates": [],
+    "cellular_kernel_driver_candidates": [],
+    "modem_library_candidates": [],
+    "allowed_kmod_qcom_qmi_helpers": "absent",
+    "mlvpn_or_openvpn_bonding_packages": [],
+    "ordinary_openvpn_related_packages": [
+      "openvpn-openssl=2.7.5-r1"
+    ],
+    "ordinary_openvpn_support_packages": {
+      "kmod-ovpn": "6.18.39-r1",
+      "luci-proto-openvpn": "26.210.61729~a3cc0e1"
+    }
+  },
+  "luci_languages": {
+    "installed_luci_i18n_packages": [],
+    "compiled_lmo_files_in_checked_standard_trees": 0,
+    "compiled_lmo_locales": [],
+    "result": "English-only package/catalog check passed"
+  },
+  "utilities": {
+    "btop": {
+      "package": "btop=1.4.7-r1",
+      "executable": "/usr/bin/btop",
+      "probe_flag": "--version",
+      "exit_code": 0,
+      "reported_version": "1.4.7"
+    },
+    "ookla_speedtest": {
+      "package": "speedtest-ookla-3k=1.2.0.84-r2",
+      "executable": "/usr/bin/speedtest",
+      "probe_flag": "--version",
+      "exit_code": 0,
+      "reported_version": "1.2.0.84"
+    },
+    "speedtestcpp": {
+      "package": "speedtestcpp=1.12-r2",
+      "executables_from_manifest": [
+        "/usr/bin/SpeedTest",
+        "/usr/bin/speedtestJson"
+      ],
+      "probe_executable": "/usr/bin/SpeedTest",
+      "probe_flag": "--help",
+      "exit_code": 0,
+      "reported_version": "1.15"
+    }
+  },
+  "service_boot_and_procd_snapshot": {
+    "observed_at_utc": "2026-11-03T14:12:15Z",
+    "services": {
+      "rpcd": {
+        "init_present": true,
+        "init_enabled": true,
+        "boot_enabled": true,
+        "procd_instance_running": [true]
+      },
+      "uhttpd": {
+        "init_present": true,
+        "init_enabled": true,
+        "boot_enabled": true,
+        "procd_instance_running": [true]
+      },
+      "dnsmasq": {
+        "init_present": true,
+        "init_enabled": true,
+        "boot_enabled": true,
+        "procd_instance_running": [true]
+      },
+      "omr-tracker": {
+        "init_present": true,
+        "init_enabled": true,
+        "boot_enabled": true,
+        "procd_instance_running": [true, true, true, true, true]
+      },
+      "omr-profiles": {
+        "init_present": true,
+        "init_enabled": true,
+        "boot_enabled": true,
+        "procd_instance_running": [true]
+      },
+      "mqvpn": {
+        "init_present": true,
+        "init_enabled": true,
+        "boot_enabled": true,
+        "procd_instance_running": [true]
+      }
+    },
+    "transient_state_note": "Single-time read-only sample. omr-tracker and mqvpn may restart during concurrent profile QA; these booleans are observations, not pass/fail criteria."
+  },
+  "tcp_congestion_control": {
+    "available_count": 18,
+    "available": [
+      "reno",
+      "bbr",
+      "bbr1",
+      "bbr2",
+      "nanqinlang",
+      "nanbbr3_light",
+      "nanbbr3_def",
+      "nanbbr3_aggr",
+      "nanbbr1_light",
+      "nanbbr1_def",
+      "nanbbr1_aggr",
+      "nanbbr2_light",
+      "nanbbr2_def",
+      "nanbbr2_aggr",
+      "nanbbr1_var",
+      "nanbbr2_var",
+      "nanbbr3_var",
+      "cubic"
+    ],
+    "active_cc_intentionally_not_read": true
+  },
+  "bpf_scheduler_availability": {
+    "bpftool": "7.7.0-r1 at /usr/sbin/bpftool",
+    "libbpf_runtime_package": "libbpf1=1.6.3-r1",
+    "kernel_btf_vmlinux": "present",
+    "kernel_support_packages": {
+      "kmod-sched-bpf": "6.18.39-r1",
+      "kmod-sched-core": "6.18.39-r1",
+      "kmod-sched-flower": "6.18.39-r1"
+    },
+    "schedulers": [
+      {
+        "id": "bkup",
+        "package": "mptcp-bpf-bkup=6.18.39-r1",
+        "object": "/usr/share/bpf/scheduler/mptcp_bpf_bkup.o",
+        "bytes": 77576
+      },
+      {
+        "id": "burst",
+        "package": "mptcp-bpf-burst=6.18.39-r1",
+        "object": "/usr/share/bpf/scheduler/mptcp_bpf_burst.o",
+        "bytes": 91560
+      },
+      {
+        "id": "first",
+        "package": "mptcp-bpf-first=6.18.39-r1",
+        "object": "/usr/share/bpf/scheduler/mptcp_bpf_first.o",
+        "bytes": 75976
+      },
+      {
+        "id": "red",
+        "package": "mptcp-bpf-red=6.18.39-r1",
+        "object": "/usr/share/bpf/scheduler/mptcp_bpf_red.o",
+        "bytes": 76520
+      },
+      {
+        "id": "rr",
+        "package": "mptcp-bpf-rr=6.18.39-r1",
+        "object": "/usr/share/bpf/scheduler/mptcp_bpf_rr.o",
+        "bytes": 78504
+      },
+      {
+        "id": "weight",
+        "package": "mptcp-bpf-weight=6.18.39-r1",
+        "object": "/usr/share/bpf/scheduler/mptcp_bpf_weight.o",
+        "bytes": 92072
+      },
+      {
+        "id": "weight_rr",
+        "package": "mptcp-bpf-weight-rr=6.18.39-r1",
+        "object": "/usr/share/bpf/scheduler/mptcp_bpf_weight_rr.o",
+        "bytes": 96552
+      },
+      {
+        "id": "dscp",
+        "package": "mptcp-bpf-dscp=6.18.39-r1",
+        "object": "/usr/share/bpf/scheduler/mptcp_bpf_dscp.o",
+        "bytes": 96880
+      }
+    ],
+    "scheduler_loading_or_selection_not_tested": true
+  },
+  "qos_speedtest_source_installed_comparison": {
+    "collected_at_utc": "2026-11-03T14:30:24Z",
+    "packages": {
+      "openmptcprouter": "0.95-r4",
+      "omr-tracker": "2.0-r3"
+    },
+    "normalization": "Hash after removing CR bytes; all inspected source files are LF-only, so comparison is normalized to LF.",
+    "direct_install_files": [
+      {
+        "source": "client-repo/openmptcprouter/files/bin/omr-test-speed",
+        "installed": "/bin/omr-test-speed",
+        "package_file_list": "openmptcprouter.list includes the path",
+        "source_lf_sha256": "bd7b96495969cf09f1e826957bebf384fb2a6d6ef8eaad5f9d5f3a900f0c0be5",
+        "installed_lf_sha256": "bd7b96495969cf09f1e826957bebf384fb2a6d6ef8eaad5f9d5f3a900f0c0be5",
+        "source_and_installed_lf_bytes": 11922,
+        "installed_executable": true,
+        "match": true
+      },
+      {
+        "source": "client-repo/openmptcprouter/files/etc/omr-test-speed-hosts.list",
+        "installed": "/etc/omr-test-speed-hosts.list",
+        "package_file_list": "openmptcprouter.list includes the path",
+        "source_lf_sha256": "5350ffd133fa4caed7a6b35b8a0e778a5a7722d083c30f8bdb397555e8a6eedd",
+        "installed_lf_sha256": "5350ffd133fa4caed7a6b35b8a0e778a5a7722d083c30f8bdb397555e8a6eedd",
+        "source_and_installed_lf_bytes": 508,
+        "match": true
+      },
+      {
+        "source": "client-repo/openmptcprouter/files/etc/omr-test-speed-hosts6.list",
+        "installed": "/etc/omr-test-speed-hosts6.list",
+        "package_file_list": "openmptcprouter.list includes the path",
+        "source_lf_sha256": "7648b64bde6c908a7b6d8600bbcc7a74046fa3d1f78587086ccdbd8251c0e40d",
+        "installed_lf_sha256": "7648b64bde6c908a7b6d8600bbcc7a74046fa3d1f78587086ccdbd8251c0e40d",
+        "source_and_installed_lf_bytes": 508,
+        "match": true
+      },
+      {
+        "source": "client-repo/omr-tracker/files/usr/share/omr/post-tracking.d/022-speedtest",
+        "installed": "/usr/share/omr/post-tracking.d/022-speedtest",
+        "package_file_list": "omr-tracker.list includes the path",
+        "source_lf_sha256": "5b5249570531e9b7dca2a2388cec01461786a303d2ed8c6875b550ede805268b",
+        "installed_lf_sha256": "5b5249570531e9b7dca2a2388cec01461786a303d2ed8c6875b550ede805268b",
+        "source_and_installed_lf_bytes": 3500,
+        "installed_executable": true,
+        "match": true
+      }
+    ],
+    "firstboot_sqm_defaults": {
+      "source": "client-repo/openmptcprouter/files/etc/uci-defaults/2040-omr-sqm",
+      "expected_installed_path": "/etc/uci-defaults/2040-omr-sqm",
+      "source_lf_sha256": "3bd16165c4147f8d20314ac3599e6694f2efdef21e5e94d65408afa27de75f6c",
+      "source_normalized_lf_bytes": 3374,
+      "openmptcprouter_package_file_list": "path is listed",
+      "present_on_live_rootfs": false,
+      "installed_content_comparison": "not possible because the one-time defaults file is absent from the live rootfs"
+    },
+    "expected_source_rules": {
+      "fixed_sqm_upload_and_download": "90% of measured rate",
+      "autorate_max_base_min_upload_and_download": "100% / 65% / 25% per WAN and direction",
+      "preserve_explicit_settings_and_zero_or_unavailable_measurements": true,
+      "custom_ipv4_ipv6_test_host_lists_and_fallback": "source and installed host-list bytes match"
+    },
+    "scope_limitations": [
+      "These are source/package/default checks, not evidence of measured or applied SQM rates.",
+      "The 2040 first-boot defaults path is present in the installed package file list but absent from the current live filesystem; the package list alone does not prove its original bytes or execution.",
+      "No UCI values were read, no SQM or autorate setting was enabled or changed, and no bandwidth or host-reachability test was run."
+    ]
+  },
+  "inventory_comparison": {
+    "relevant_requirements": [
+      "3K-SRC-05 / 3K-SRC-06 / 3K-SRC-07",
+      "3K-NET-02 / 3K-NET-04",
+      "T02 / T04 / T08 / T14"
+    ],
+    "limitations": [
+      "This checks installed packages and files on the live x86 VMware client, not every release target or physical WAN configuration.",
+      "OpenVPN package presence does not prove an OpenVPN connection was exercised.",
+      "Available CC names, BTF presence, scheduler packages and object files do not prove each CC or BPF scheduler was loaded and traffic-tested.",
+      "LuCI language evidence covers installed luci-i18n packages and compiled catalogs in /usr/lib/lua/luci/i18n and /usr/share/luci/i18n.",
+      "The fixed service snapshot reports only init enablement, boot links and procd running booleans; omr-tracker and mqvpn can be transient during profile QA."
+    ]
+  }
+}

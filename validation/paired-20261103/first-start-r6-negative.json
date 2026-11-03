@@ -1,0 +1,30 @@
+{
+  "scope": "Actual clean VMware import of the exact 2026-11-03 r6 OVA, normal DHCP setup and wizard pairing",
+  "release": "v0.64.3-3K",
+  "mqvpn_package": "0.16.2-r6",
+  "mqvpn_binary_sha256": "de199b7924fbb84b8380e951f38f716f1608fb71de4d91a38a69ff9fcfd4bc28",
+  "checks": {
+    "fresh_import_identity_passed": true,
+    "both_wan_dhcp_leases_verified": true,
+    "fresh_ssh_after_wan_setup_verified": true,
+    "wan_setup_rollback_disarmed_after_verification": true,
+    "wizard_pairing_accepted": true,
+    "vps_api_keys_retrieved": true,
+    "initial_route_pin_error_observed": true,
+    "both_wan_routes_recovered": true,
+    "same_mqvpn_process_remained_alive": true,
+    "mqvpn_control_api_reachable": true,
+    "automatic_tunnel_recovery": false
+  },
+  "observations": {
+    "process_id": 4165,
+    "tunnel_present_after_route_recovery": false,
+    "error_messages": [
+      "failed to pin server route",
+      "route setup failed, aborting tunnel"
+    ],
+    "private_original_log_retained_on_router": true,
+    "manual_restart_used_to_claim_recovery": false
+  },
+  "publication_allowed": false
+}

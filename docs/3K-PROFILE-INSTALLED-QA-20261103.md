@@ -1,5 +1,10 @@
 # Installed profile candidate: 2026-11-03 findings
 
+The subsequent clean VMware import exposed an MQVPN r6 first-start route
+failure during initial pairing. Publication is held pending its correction;
+see [the first-start investigation](3K-MQVPN-FIRST-START-20261103.md). The
+successful results below retain their recorded scope.
+
 Source feed `04a25941f4dd39c1371feb4ebd05bda800042091` includes
 `omr-profiles` 1-r4, MQVPN 0.16.2-r6, tracker 2.0-r3 and dashboard revision 2.
 It preserves the preceding 3K modifications. These

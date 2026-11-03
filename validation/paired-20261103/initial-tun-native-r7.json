@@ -1,0 +1,26 @@
+{
+  "scope": "Native isolated Linux user/mount/network namespace regression, not installed OpenWrt acceptance",
+  "pinned_source": "ee78205d3db491ca7727b974bda0c91ae1523236",
+  "patch_chain": ["010", "020", "030", "040", "050"],
+  "patch_050_sha256": "ea1ce72382baa3042978c37b6532c864f6580d51aeb0778168fe7a762ec417ce",
+  "native_r6_sha256": "3d39f4c33541054c83703c992ab7096cab22fd4d08f706ad3d593b90bf0e3eb3",
+  "native_fixed_sha256": "381532c928169bdef9ad2ea5878907afbcac91cda03dc23f2c42186c5a6cba49",
+  "checks": {
+    "full_patch_chain_applies": true,
+    "compiled_inputs_match_patched_source": true,
+    "native_build": true,
+    "r6_negative_control_does_not_recover": true,
+    "fixed_initial_server_pin_recovery_with_route_via_server": true,
+    "same_process_recovers_tunnel_traffic": true,
+    "reconnect_disabled_stays_closed": true,
+    "sigterm_from_closed_exits": true,
+    "stop_during_retry_does_not_resurrect_tunnel": true,
+    "path_and_route_return_before_first_tunnel_recovers": true,
+    "stale_tunnel_info_not_reused_during_reconnect": true,
+    "patch_040_late_route_regression": true,
+    "private_namespace_fault_injection": true,
+    "world_hold_r7_fixtures": true
+  },
+  "runtime_restarts_or_api_add_used_to_claim_recovery": false,
+  "openwrt_r7_package_acceptance_pending": true
+}

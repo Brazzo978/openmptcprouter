@@ -114,5 +114,29 @@ image must use this source lock, carry 1-r4 and repeat built-image/fresh-boot ch
 
 These are functional tests with two virtual WANs and namespace WireGuard clients.
 They do not establish physical fiber/5G throughput, zero-loss failover, mobile QR
-onboarding, IPv6 parity or legacy-package upgrade safety. The final rebuilt-image
-test remains a separate acceptance item until its result files are recorded.
+onboarding, IPv6 parity or legacy-package upgrade safety.
+
+## Final rebuilt image
+
+The complete x86 build finished successfully on 2026-11-03 at 12:18:39 UTC.
+Its root revision is `21e416687c9b549d9f4fc8701c6a24f430f50614`, with the feed
+revision above. The first package attempt failed while recovering the libbpf
+source archive; a serial diagnostic compile succeeded, and the pinned build
+resumed without a source change. Both attempt logs are retained in the job.
+
+All **54 built-filesystem/manifest checks** passed. The exact raw image then
+booted in an isolated QEMU snapshot without source overlays or VPS credentials:
+**16/16 checks** passed, including actual `luci/getFeatures`, fractional sleep,
+BBR default, package versions, r6 world hold, hotplug executable and a MQVPN
+binary hash equal to the signed package used in paired traffic tests.
+
+VMware disk conversion, OVF Tool verification and `qemu-img` comparison of the
+canonical VMDK to the verified source disk passed. The local OVA is
+`openmptcprouter-0.64.3-3K.ova` (107591680 bytes), SHA-256
+`84651d6ded830aa845a94c4861c522708f854dd4d27975e7b660251941e3e8fe`.
+It is a factory test candidate, with LAN/WAN1/WAN2 E1000 adapters, two vCPUs,
+2048 MiB RAM and BIOS VMX-13. Public release assets remain unchanged.
+
+See [the recorded results](../validation/paired-20261103/README.md). The isolated
+guest and browser were stopped; the paired router remains on Default with no
+pending transaction and its saved A/B pair preserved.

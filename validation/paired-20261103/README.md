@@ -41,6 +41,13 @@ Performance (old) traffic and return to Default. The router was left on Default,
 with the saved A/B pair unchanged and no pending transaction.
 
 See [the findings and corrections](../../docs/3K-PROFILE-INSTALLED-QA-20261103.md).
-Fresh final-image boot, VMware packaging and hashes are separate artifact
-evidence. These files do not assert mobile QR onboarding, IPv6, zero-loss
-failover or a legacy-install upgrade.
+`image-verification.json` records 54 passed built-image checks;
+`rebuilt-boot-verification.json` records 16 passed checks on the exact new image
+in an isolated snapshot, including MQVPN's hash matching the paired install.
+`build-provenance.json` records the exact source/image hashes. VMware OVF Tool
+verification and canonical VMDK content comparison passed.
+
+The factory local OVA is 107591680 bytes, SHA-256
+`84651d6ded830aa845a94c4861c522708f854dd4d27975e7b660251941e3e8fe`.
+No public release asset was replaced. These files do not assert mobile QR
+onboarding, IPv6, zero-loss failover or a legacy-install upgrade.

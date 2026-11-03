@@ -7,6 +7,8 @@ branch and use its `source-lock-3k.json`; commands and validation sections below
 also retain historical stable/RC context. Published release assets are unchanged.
 The GUI profile switcher is also implemented in this candidate; see
 [profile usage, paired VPS prerequisite and verification](docs/3K-CONNECTION-PROFILES.md).
+The installed client/VPS tests found additional profile handover issues; see
+[2026-11-03 findings and acceptance boundaries](docs/3K-PROFILE-INSTALLED-QA-20261103.md).
 The v0.64.3-3K test candidate also includes bounded feature discovery and an
 authenticated-only theme menu; see [login correction and test evidence](docs/3K-LUCI-LOGIN.md).
 

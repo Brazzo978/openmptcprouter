@@ -218,6 +218,17 @@ Before release, rebuild the frozen VPS bundle, test a clean install and an upgra
 
 ### T19 — cross-transport profiles and quick switch
 
+Installed-candidate fixes are recorded in
+[3K-PROFILE-INSTALLED-QA-20261103.md](3K-PROFILE-INSTALLED-QA-20261103.md).
+Retain the `omr-profiles` 1-r4 regressions: an ordinary JWT refresh delta alone
+must not block the switcher, while every mixed/user delta still blocks. Verify
+the deployed absolute command paths (`/bin/ubus`, including Glorytun readiness)
+against the built filesystem. No tunnel must quiesce only netifd's `omrvpn`,
+retire stale tunnel defaults, and install the live master WAN gateway at OMR
+metric one without depending on a later tracker health poll. Returning to MQVPN/Glorytun must bring
+the logical interface up again. Test both directions with actual traffic,
+including iproute2 device-filtered JSON that omits the redundant `dev` field.
+
 Run the Lua model/transport tests, real nixio/libuci/quick-store checks, `tests/test_no_tunnel_runtime.py`, `tests/run_uci_staged_lab.sh` and the paired Lua-to-Python `tests/test_vps_contract.py` in C/`omr-profiles`. Check all six built-ins and custom capture, MQVPN → Glorytun → No tunnel → MQVPN, Xray and UDP/MPTCP flag restoration, different tunnel device names, explicit target clearing, route failure, timeout, lost confirmation and tracker recovery after failed service operations. Reject ambiguous master/balancing, wrong route, UDP interception, broken proxy and DNS. The staged-WAN test must preserve unrelated live and pending UCI bytes. Exercise A/B pair persistence and deletion repair, no apply on pair save, actual slider transitions, unavailable/readonly gating and pending/confirmed positions in browser tests. Confirm No tunnel from LAN or an independent path and verify its single-path A/B/C/D sequence.
 
 The VPS admin candidate is 3k7. Run V/`admin/test` and the preparation tests, and V/`admin/test/run_profiles_nft_netns.py` in an isolated privileged Linux namespace. The packet lab passed 17 checks of WireGuard GUI/public forwarding retarget, No tunnel target removal and rollback while preserving the LAN permission, independent reverse proxy, WireGuard Internet and bypass/custom/DSCP chains, with both VPN endpoints simulated. Preserve v1 discovery for older clients and require v2 route completion before confirmation. Repeat T10/T11 on installed router/VPS images; actual MQVPN/Glorytun handshakes, MPTCP subflows, IPv6/bypass policy and physical-WAN traffic remain acceptance work. A tunnel switch may interrupt existing flows and change the router's remote GUI tunnel IP. Do not edit other configuration concurrently, and allow the bound Glorytun peer ICMP check.

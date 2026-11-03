@@ -1,0 +1,37 @@
+{
+  "scope": "fresh factory image snapshot; first pairing; no guest overlay or SSH key",
+  "checks": {
+    "actual_preflight": true,
+    "guest_16_checks": true,
+    "guest_wans_ready": true,
+    "actual_rollback_armed": true,
+    "guest_watchdog_armed": true,
+    "actual_binary_identity": true,
+    "actual_execution_held": true,
+    "actual_stopped": true,
+    "vps_user0_absent_before_pair": true,
+    "wizard_accepted": true,
+    "guest_tun_address": true,
+    "guest_peer_ping": true,
+    "guest_https_vps_egress": true,
+    "guest_dns": true,
+    "guest_stopped_verified": true,
+    "actual_mode_restored": true,
+    "actual_restored_verified": true,
+    "router_rollback_disarmed": true,
+    "guest_watchdog_cancelled": true
+  },
+  "startup_retry_or_route_error_count": 0,
+  "watchdog_limitation": "Independent 300s/330s timers are best effort; host/watchdog failure can defeat ordering.",
+  "failure_stage": null,
+  "failure_type": null,
+  "guest_network_pending_retries": 0,
+  "wizard_diagnostics": {
+    "wizard_accepted": true,
+    "returncode": 0,
+    "response_json": true,
+    "status_is_reload": true,
+    "stderr_present": false
+  },
+  "failed": []
+}

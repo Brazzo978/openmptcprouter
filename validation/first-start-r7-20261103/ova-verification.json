@@ -1,0 +1,14 @@
+{
+  "release": "v0.64.3-3K",
+  "acceptance_status": "local_test_ready",
+  "ova_size": 107591680,
+  "ova_sha256": "60c8fa9f4020064fc852c73385cdaccdf78654a26e9075abd54b36a38ae06e1e",
+  "disk_sha256": "d7b00247c9a0b5bd1a46cacd11d00edf3b2bf7f1988fcdcb67a66301831aac7d",
+  "disk_virtual_size": 604504064,
+  "ovftool_verified": true,
+  "canonical_content_verified": true,
+  "qemu_virtual_size_verified": true,
+  "raw_factory_bytes_preserved": true,
+  "published": false,
+  "raw_sha256": "4ca530ff5062b25e8c9f33149cfba72687ebfb12b0b99ae0784f50f89d78190f"
+}

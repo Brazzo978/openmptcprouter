@@ -1,4 +1,6 @@
 {
+  "kind": "expected_negative_baseline",
+  "expected_failures": ["automatic_tunnel_recovery"],
   "scope": "Actual clean VMware import of the exact 2026-11-03 r6 OVA, normal DHCP setup and wizard pairing",
   "release": "v0.64.3-3K",
   "mqvpn_package": "0.16.2-r6",

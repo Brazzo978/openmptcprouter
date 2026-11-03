@@ -1,0 +1,27 @@
+{
+  "scope": "Fresh boot of exact rebuilt image, isolated snapshot, no source overlay and no VPS configuration",
+  "checks": {
+    "live_getFeatures": true,
+    "api_package_r2": true,
+    "sleep_package": true,
+    "luci_login_package": true,
+    "mqvpn_r7": true,
+    "sleep_works": true,
+    "helper_bytes_match": true,
+    "default_bbr": true,
+    "login_retry_code": true,
+    "profiles_r4": true,
+    "tracker_r3": true,
+    "mqvpn_world_hold": true,
+    "rejoin_hook_executable": true,
+    "profile_actual_ubus_path": true,
+    "dashboard_quick_panel": true,
+    "MQVPN payload matches paired install": true
+  },
+  "failed": [],
+  "sleep_ms": 60.312,
+  "packages": "coreutils-sleep-9.11-r1 x86_64 {/root/omr3k-0643-x86-20261030/feeds/6.18/packages/utils/coreutils} (GPL-3.0-or-later) [installed]\nluci-base-26.210.61729~a3cc0e1-r1 x86_64 {/root/omr3k-0643-x86-20261030/feeds/6.18/luci/modules/luci-base} (Apache-2.0) [installed]\nluci-mod-dashboard-26.307.40508~04a2594 noarch {/root/omr3k-0643-x86-20261030/feeds/openmptcprouter/luci-mod-dashboard} (Apache-2.0) [installed]\nmqvpn-0.16.2-r7 x86_64 {/root/omr3k-0643-x86-20261030/feeds/openmptcprouter/mqvpn} (Apache-2.0) [installed]\nomr-api-paths-1-r2 noarch {/root/omr3k-0643-x86-20261030/feeds/openmptcprouter/omr-api-paths} () [installed]\nomr-profiles-1-r4 noarch {/root/omr3k-0643-x86-20261030/feeds/openmptcprouter/omr-profiles} () [installed]\nomr-tracker-2.0-r3 noarch {/root/omr3k-0643-x86-20261030/feeds/openmptcprouter/omr-tracker} () [installed]",
+  "helper_sha256": "26f18ed005b9d0b02e484511a5e61a669bc81d4fdb5c6ab572bd02f5c02d5429",
+  "default_tcp_cc": "bbr",
+  "os_release": "v0.64.3-3K"
+}

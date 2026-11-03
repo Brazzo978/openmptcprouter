@@ -1,5 +1,10 @@
 # Paired VMware candidate acceptance, 2026-11-03
 
+The later clean import exposed an r6 first-start failure. This OVA is held;
+use the [replacement r7 acceptance](../first-start-r7-20261103/README.md)
+for the current local-test artifact. The records below retain their earlier
+package, image and test scopes.
+
 Build source: `21e416687c9b549d9f4fc8701c6a24f430f50614`.
 Client feed: `04a25941f4dd39c1371feb4ebd05bda800042091`.
 Paired clean-installed/rebooted VPS: admin `0.18+20261030-3k7`, frozen

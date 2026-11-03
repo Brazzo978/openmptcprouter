@@ -1,0 +1,6 @@
+{
+  "content_identical": true,
+  "virtual_size": 604504064,
+  "canonical_sha256": "d7b00247c9a0b5bd1a46cacd11d00edf3b2bf7f1988fcdcb67a66301831aac7d",
+  "method": "qemu-img compare plus remote SHA-256; VMware-produced streamOptimized compared to verified staged VMDK"
+}

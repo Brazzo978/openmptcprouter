@@ -1,0 +1,8 @@
+{
+  "package": "mqvpn-0.16.2-r7.apk",
+  "apk_sha256": "7bbc56f3d7547ab8f3e33e0bb388bec4ef03a10c72d858a3442c7381c2f6223f",
+  "feed_commit": "c5730aab311781467f19e4898b2ce82b77b08235",
+  "installed": true,
+  "normal_signature_verification": true,
+  "scope": "MQVPN upgrade on the actual freshly imported VMware router"
+}

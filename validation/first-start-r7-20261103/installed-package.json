@@ -1,0 +1,18 @@
+{
+  "scope": "Actual imported VMware OVA upgraded with signed r7 package; first-failure code path independently covered by native fault injection",
+  "checks": {
+    "MQVPN_peer_traffic": true,
+    "signed_APK_payload_matches": true,
+    "package_r7": true,
+    "world_hold_r7": true,
+    "FEC_compiled": true,
+    "control_reachable": true,
+    "fixed_tunnel_addresses": true,
+    "wan1_up_with_address": true,
+    "wan2_up_with_address": true,
+    "LAN_preserved": true,
+    "profiles_RPC_and_no_pending": true
+  },
+  "failed": [],
+  "mqvpn_sha256": "63d3dec65d846aa975930b53ef8c019e311297a0c4521fcb01f74c57cedc6036"
+}

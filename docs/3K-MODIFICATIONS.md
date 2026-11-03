@@ -90,6 +90,7 @@ For each ID, run the referenced check group in **Regression procedures** and rec
 | 3K-VPN-13 | Candidate old-mode profiles use already provisioned Glorytun TCP, main proxy none and BBRv3: Performance (old) distributes through default MPTCP scheduling, Stability (old) duplicates through bpf_red. Normally VPN-routed ICMP/TCP/UDP use that TCP tunnel; existing bypass/LAN/management policies remain. Negotiate profile API v2, snapshot non-secret transport/proxy flags and operational tunnel target, verify the tunnel and retarget DNAT/WG before confirm; rollback restores proxy flags, device and routing. Preserve independent Xray forwarding and WG LAN permissions. | C/`omr-profiles/files/usr/lib/lua/omr/profile_transport.lua`, C/`glorytun/init`, V/`admin/omr_profiles.py`, V/`admin/omr_profile_firewall.py` | T03, T10, T11, T16, T19 |
 | 3K-VPN-14 | Candidate No tunnel uses the provisioned Rust TCP/MPTCP proxy and matching VPS Go SS2022 listener with BBRv3/default scheduler. Stop MQVPN/Glorytun and disable proxy UDP capture; ordinary IPv4 UDP/ICMP use a unique live master, rejecting balancing/ambiguous or wrong routes. Verify live proxy exchange, generated MPTCP config and local DNS. Explicitly clear the VPS VPN target, suspending VPN GUI/LAN and ordinary VPN forwarding while preserving their definitions, WG permissions and independent Xray forwarding; restore target/flags on return or rollback. Keep requires LAN or independent management access. Route samples are not complete dataplane/IPv6 acceptance. | C/`omr-profiles/files/usr/lib/lua/omr/profiles_runtime.lua`, C/`omr-profiles/tests/test_no_tunnel_runtime.py`, V/`admin/omr_profiles.py`, V/`admin/test/run_profiles_nft_netns.py` | T03, T10, T11, T16, T19 |
 | 3K-VPN-15 | Candidate r6 retains the platform recovery timer while reconnecting and never rearms it after CLOSED/shutdown. Late route availability must recover without a duplicate link event; explicit API path removal remains removed. The iface hotplug hook and tracker reconcile missing healthy eligible paths, preserve backup flags and defer during profile transactions. Control replies must explicitly acknowledge success. | C/`mqvpn/patches/040-3k-reconnect-path-recovery.patch`, V/`patches/mqvpn/040-3k-reconnect-path-recovery.patch`, C/`mqvpn/files/etc/hotplug.d/iface/40-mqvpn-path-rejoin`, C/`mqvpn/tests/reconnect-path-recovery-lab-20261103.json` | T09, T15, T17, T19 |
+| 3K-VPN-16 | Candidate r7 recovers transient first TUN/route setup errors asynchronously, with backoff capped at 30 seconds and configuration valid only for the same live CONNECT-IP stream. Cancel retries on teardown, new connection or explicit stop; honor reconnect-disabled operation. Start path recovery before the first TUN and exit on SIGTERM even when already CLOSED. Preserve native routes, FEC and established-session recovery. | C/`mqvpn/patches/050-3k-initial-tun-recovery.patch`, V/`patches/mqvpn/050-3k-initial-tun-recovery.patch`, B/`docs/3K-MQVPN-FIRST-START-20261103.md` | T09, T15, T21 |
 
 ## User interface, diagnostics and backup
 
@@ -252,6 +253,23 @@ must not be bypassed. Verify compiled patched bytes and luci-base/runtime
 revision `26.210.61729~a3cc0e1-r1` so cached original JavaScript is replaced.
 The affected testers' backend outage cause is not established by fault injection.
 See `docs/3K-LUCI-LOGIN.md` and `validation/luci/login-qa-20261102.json`.
+
+### T21 — first tunnel setup after transient route failure
+
+Apply the full 010–050 chain to the pinned MQVPN source and use the private
+user/mount/network namespace harness in
+`scripts/ci_e2e/run_3k_initial_tun_recovery.py`. Cover `recover`, `disabled`,
+`stop` and `pre-tun-path` with RouteViaServer enabled. The same injected first
+server `/32` pin failure must leave r6 unrecovered and let r7 restore TUN and
+traffic without a manual restart or API path-add. Verify shutdown from CLOSED,
+no resurrection after stop, no stale tunnel information across reconnect and
+the earlier patch-040 late-route regression. Never bind the fault shim over the
+host's `ip` outside the verified private mount namespace.
+
+Repeat signed-package, ordinary wizard first-pairing, traffic, forwarding and
+WireGuard checks on installed/factory images. Keep source/binary hashes and
+negative-baseline scope with the results. See
+[the first-start investigation](3K-MQVPN-FIRST-START-20261103.md).
 
 ## Historical evidence and known limits
 

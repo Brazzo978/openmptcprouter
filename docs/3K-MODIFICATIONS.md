@@ -271,6 +271,15 @@ WireGuard checks on installed/factory images. Keep source/binary hashes and
 negative-baseline scope with the results. See
 [the first-start investigation](3K-MQVPN-FIRST-START-20261103.md).
 
+When the normal TCP proxy is active, binding a router-origin TCP probe to the
+TUN does not bypass the transparent NAT OUTPUT redirect. Native MQVPN TCP
+acceptance must prove the packet path, using an automatically removed,
+endpoint-scoped test exception if needed. Verify the bound source, rule hit,
+Internet response and cleanup separately from normal transparent-proxy TCP.
+Do not change the production proxy policy to make the probe pass. The actual
+clean VMware r7 import and this QA distinction are recorded in
+`validation/first-start-r7-20261103/README.md`.
+
 ## Historical evidence and known limits
 
 - B/`validation/rc2/README.md` and B/`validation/rc2/` contain prior x86 image/BIOS/EFI, PMTU, APK-index and OVA-import reports. These describe RC2; later release images need their own checks.

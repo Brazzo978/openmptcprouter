@@ -1,0 +1,70 @@
+{
+  "scope": "Actual user-imported r7 VMware factory OVA; DHCP then ordinary wizard pairing with the test VPS",
+  "checks": {
+    "fresh_r7_import_identity": true,
+    "fixed_tunnel_addresses": true,
+    "mqvpn_peer_traffic": true,
+    "native_MQ_TCP_test_and_cleanup": true,
+    "mqvpn_public_ICMP": true,
+    "public_UDP_DNS": true,
+    "tcp_proxy_https_vps_egress": true,
+    "local_DNS": true,
+    "mqvpn_control_reachable": true,
+    "FEC_compiled": true,
+    "wan1_DHCP_lease": true,
+    "wan2_DHCP_lease": true,
+    "profiles_RPC": true,
+    "no_pending_transaction": true,
+    "BBRv3_default": true,
+    "LAN_preserved": true,
+    "WAN_rollback_disarmed": true,
+    "LuCI_feature_RPC": true
+  },
+  "failed": [],
+  "manual_restart_used": false,
+  "first_observed_pid": "28261",
+  "final_pid": "28261",
+  "observed_process_unchanged": true,
+  "startup_retry_or_route_error_count": 0,
+  "active": {
+    "id": "default",
+    "server_match": true,
+    "name": "Default",
+    "modified": true
+  },
+  "presets": [
+    {
+      "id": "default",
+      "available": true,
+      "unavailable_reasons": []
+    },
+    {
+      "id": "performance",
+      "available": true,
+      "unavailable_reasons": []
+    },
+    {
+      "id": "gaming",
+      "available": true,
+      "unavailable_reasons": []
+    },
+    {
+      "id": "performance_old",
+      "available": true,
+      "unavailable_reasons": []
+    },
+    {
+      "id": "stability_old",
+      "available": true,
+      "unavailable_reasons": []
+    },
+    {
+      "id": "no_tunnel",
+      "available": false,
+      "unavailable_reasons": [
+        "No tunnel requires one master WAN; balancing is enabled."
+      ]
+    }
+  ],
+  "at_utc": "2026-11-03T13:39:55Z"
+}

@@ -1,0 +1,13 @@
+{
+  "scope": "Router-origin TCP bound to tun0; test-only exception from transparent proxy for one resolved HTTPS endpoint, automatically removed",
+  "checks": {
+    "HTTPS_VPS_egress": true,
+    "bound_MQ_source": true,
+    "endpoint_proxy_exception_used": true,
+    "own_rule_removed": true
+  },
+  "failed": [],
+  "test_endpoint": "172.67.74.152",
+  "production_proxy_configuration_changed": false,
+  "at_utc": "2026-11-03T13:39:51Z"
+}

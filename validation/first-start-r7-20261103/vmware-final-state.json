@@ -1,0 +1,17 @@
+{
+  "checks": {
+    "confirmed_Default_and_live_tunnel": true,
+    "ordinary_transparent_TCP_VPS_egress": true,
+    "all_QA_proxy_exceptions_removed": true,
+    "redirect_all_ports_disabled": true
+  },
+  "failed": [],
+  "active": {
+    "id": "default",
+    "server_match": true,
+    "name": "Default",
+    "modified": false
+  },
+  "pending": null,
+  "at_utc": "2026-11-03T13:40:32Z"
+}

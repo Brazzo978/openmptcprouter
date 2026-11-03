@@ -61,3 +61,33 @@ namespaces, listeners and temporary forwarding rules were removed.
 All previous 3K source modifications are retained. Mobile QR onboarding,
 IPv6 and upgrading an arbitrary legacy installation remain outside this
 acceptance scope. Public release assets are unchanged.
+
+## Actual clean VMware import after local handoff
+
+The user imported the replacement OVA as a new VMware VM. Thirteen read-only
+identity checks passed before trusting its new SSH key. Both factory-empty WANs
+obtained DHCP leases with a timed rollback; fresh SSH and both leases were
+verified before disarming it. VPS user 0 was free before the ordinary wizard
+paired this router. Eighteen traffic/runtime checks passed. MQVPN's observed
+PID stayed unchanged throughout that first-pairing observation, with no manual
+restart and no logged initial server-route failure.
+
+An unqualified TCP `curl --interface tun0` probe initially timed out: the live
+SS NAT OUTPUT chain redirected it to local port 1100. Header-only capture showed
+SYNs to `127.0.0.1:1100` on tun0, so it was not testing native Internet TCP over
+MQVPN. The dedicated native TCP check used an automatically removed NAT-output
+exception for one resolved public test endpoint. Its counter increased and
+HTTPS passed with local source `10.255.220.2` and public egress matching the VPS.
+This is a QA correction, not a firmware change or a production proxy exception.
+
+| Additional evidence | Passed | Scope |
+| --- | ---: | --- |
+| `vmware-r7-identity.json` | 13 | Actual clean OVA identity, packages, exact runtime hashes, LuCI backend |
+| `vmware-r7-pairing.json` | 18 | Ordinary first pairing, peer/public ICMP, UDP DNS, proxy TCP, FEC, WANs and runtime |
+| `vmware-native-mq-tcp.json` | 4 | Native HTTPS with endpoint-only proxy exception, bound MQ source, rule hit and cleanup |
+| `vmware-final-state.json` | 4 | Normal Default apply/confirm, ordinary transparent TCP egress, no remaining QA exceptions, redirect-all disabled |
+
+After the first-pairing observation, Default was applied and confirmed through
+the normal profile API. This ordinary profile transition may restart services;
+it is separate from the first-pairing same-process observation above. Final
+state is Default, unmodified, matching the VPS and without a pending transaction.

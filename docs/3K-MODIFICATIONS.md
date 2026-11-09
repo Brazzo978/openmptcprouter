@@ -256,6 +256,12 @@ revision `26.210.61729~a3cc0e1-r1` so cached original JavaScript is replaced.
 The affected testers' backend outage cause is not established by fault injection.
 See `docs/3K-LUCI-LOGIN.md` and `validation/luci/login-qa-20261102.json`.
 
+Manual backports must preserve Linux LF and compile the staged Lua footer with
+the target's `luci.template.parser` before activation. Verify the actual served
+asset URL, anonymous/authenticated rendering and logout. A 0.64.2 Flint backport,
+the corrected CRLF transfer incident and installed browser acceptance are
+documented in `docs/3K-FLINT-GUI-HOTFIX-20261109.md`.
+
 ### T21 — first tunnel setup after transient route failure
 
 Apply the full 010–050 chain to the pinned MQVPN source and use the private

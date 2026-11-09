@@ -92,6 +92,8 @@ For each ID, run the referenced check group in **Regression procedures** and rec
 | 3K-VPN-15 | Candidate r6 retains the platform recovery timer while reconnecting and never rearms it after CLOSED/shutdown. Late route availability must recover without a duplicate link event; explicit API path removal remains removed. The iface hotplug hook and tracker reconcile missing healthy eligible paths, preserve backup flags and defer during profile transactions. Control replies must explicitly acknowledge success. | C/`mqvpn/patches/040-3k-reconnect-path-recovery.patch`, V/`patches/mqvpn/040-3k-reconnect-path-recovery.patch`, C/`mqvpn/files/etc/hotplug.d/iface/40-mqvpn-path-rejoin`, C/`mqvpn/tests/reconnect-path-recovery-lab-20261103.json` | T09, T15, T17, T19 |
 | 3K-VPN-16 | Candidate r7 recovers transient first TUN/route setup errors asynchronously, with backoff capped at 30 seconds and configuration valid only for the same live CONNECT-IP stream. Cancel retries on teardown, new connection or explicit stop; honor reconnect-disabled operation. Start path recovery before the first TUN and exit on SIGTERM even when already CLOSED. Preserve native routes, FEC and established-session recovery. | C/`mqvpn/patches/050-3k-initial-tun-recovery.patch`, V/`patches/mqvpn/050-3k-initial-tun-recovery.patch`, B/`docs/3K-MQVPN-FIRST-START-20261103.md` | T09, T15, T21 |
 
+| 3K-VPN-17 | LAN synchronization accepts CIDR ipaddr values with retained or absent netmasks and legacy separate masks, including multiple IPv4 addresses and exact LAN-zone membership. Never append a second mask to CIDR. After accepting an update, remove obsolete main-table routes only for the previous router's exact gateway and VPN device, preserving prefixes still configured by another user, default routes and unrelated routes. Keep WG permission state independent. | C/`openmptcprouter/files/etc/init.d/openmptcprouter-vps`, C/`openmptcprouter/tests/test_lan_sync.py`, V/`admin/omradmin.py`, V/`tests/test_lan_route_retirement.py`, V/`docs/LAN-SUBNET-SYNC.md` | T22 |
+
 ## User interface, diagnostics and backup
 
 | ID | Required behavior | Principal source | Checks |
@@ -279,6 +281,25 @@ Internet response and cleanup separately from normal transparent-proxy TCP.
 Do not change the production proxy policy to make the probe pass. The actual
 clean VMware r7 import and this QA distinction are recorded in
 `validation/first-start-r7-20261103/README.md`.
+
+### T22 — LAN subnet changes and obsolete route retirement
+
+Run the client LAN fixtures (`python3 openmptcprouter/tests/test_lan_sync.py`)
+under Linux and the VPS route fixtures (`python3 tests/test_lan_route_retirement.py`).
+Require CIDR + retained-mask, CIDR without mask, legacy mask, multiple LAN
+addresses/interfaces and unchanged-payload cases. Use an isolated Linux network
+namespace to prove exact old-route deletion while retaining the new /23,
+unrelated VPN routes and the default gateway. Preserve other users' configured
+prefixes and report command failures explicitly.
+
+For installed acceptance, reproduce the malformed payload before the fix,
+verify authenticated POST /lan succeeds afterward, wait for both periodic route
+reconcilers, and check the stored prefix, MQVPN grants, main and WG policy
+tables. Verify tunnel/LAN GUI reachability and hosts in both halves of a /23.
+Do not claim a real WireGuard-client-to-LAN probe solely from policy-table
+inspection. The 2026-11-09 incident and tested hotfix scope are documented in
+V/`docs/LAN-SUBNET-SYNC.md`; existing release archives do not acquire these fixes
+without a new build/package.
 
 ## Historical evidence and known limits
 

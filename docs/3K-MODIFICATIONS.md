@@ -94,6 +94,8 @@ For each ID, run the referenced check group in **Regression procedures** and rec
 
 | 3K-VPN-17 | LAN synchronization accepts CIDR ipaddr values with retained or absent netmasks and legacy separate masks, including multiple IPv4 addresses and exact LAN-zone membership. Never append a second mask to CIDR. After accepting an update, remove obsolete main-table routes only for the previous router's exact gateway and VPN device, preserving prefixes still configured by another user, default routes and unrelated routes. Keep WG permission state independent. | C/`openmptcprouter/files/etc/init.d/openmptcprouter-vps`, C/`openmptcprouter/tests/test_lan_sync.py`, V/`admin/omradmin.py`, V/`tests/test_lan_route_retirement.py`, V/`docs/LAN-SUBNET-SYNC.md` | T22 |
 
+| 3K-VPN-18 | Unreleased `omr-rth` source candidate retains the existing peer backend and `omr-wg-manager` alias. Reuse the requested reference add/list/remove wizard and connected-client table, omit unrelated/IPv6 menu features, and keep the identity-verified installation client first. Preserve GUI rescue, IPv4 full tunnel and global AND per-peer LAN grants/revocation. Fresh/generated link defaults are MTU1320 and keepalive25; inherit explicit original values, including disabled keepalive. Installer-only missing server MTU insertion never changes a running link. | V/`omr-rth`, V/`omr_wg_manager.py`, V/`debian9-x86_64.sh`, V/`docs/WIREGUARD-REMOTE-MANAGER.md` | T23 |
+
 ## User interface, diagnostics and backup
 
 | ID | Required behavior | Principal source | Checks |
@@ -306,6 +308,25 @@ Do not claim a real WireGuard-client-to-LAN probe solely from policy-table
 inspection. The 2026-11-09 incident and tested hotfix scope are documented in
 V/`docs/LAN-SUBNET-SYNC.md`; existing release archives do not acquire these fixes
 without a new build/package.
+
+### T23 — return-to-home menu and link defaults
+
+Run `python3 -m pytest tests/test_omr_wg_manager.py` on Linux (92 source cases at
+the 2026-11-09 candidate). Verify the numbered default-first list, identity
+mismatch/address reuse, add wizard, existing endpoint/IPv4 DNS inheritance,
+profile/QR export, disabled/enabled peers and per-peer LAN permissions. Require
+MTU1320/keepalive25 defaults, preservation of explicit values (including0/off),
+rejection of duplicate/malformed settings and no interface restart by the menu.
+
+Run `python3 tests/run_omr_wg_netns.py --report REPORT` as root with ip/nft/wg in
+isolated owned namespaces. The 2026-11-09 frozen candidate passed 41 actual
+WireGuard/nft packet assertions, with a simulated OMR tunnel and Internet peer;
+see V/`tests/results/rth-manager-netns-20261109.json`. Hash every tested source,
+clean only successfully created namespace/link identities and preserve all host
+firewall/routes. This does not replace clean-installer or physical/client-device
+acceptance, and does not imply that the published 0.1164 archive contains the
+new command. The existing running server MTU may be persisted by SaveConfig on
+stop; do not claim a live MTU migration from merely inserting a config default.
 
 ## Historical evidence and known limits
 

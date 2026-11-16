@@ -106,6 +106,7 @@ For each ID, run the referenced check group in **Regression procedures** and rec
 | 3K-UI-04 | Preserve relevant modern LuCI bandwidth/monitor styles, status and access ACLs, wizard/footer and advanced diagnostic page; test rendered UI and browser console, not source presence alone. | C/`luci-app-mptcp/htdocs/luci-static/resources/mptcp/css/mptcp_bandwidth.css`, C/`luci-app-mptcp/htdocs/luci-static/resources/mptcp/css/mptcp_monitor.css`, C/`luci-app-openmptcprouter/htdocs/luci-static/resources/view/openmptcprouter/wizard.js` | T04, T05 |
 | 3K-UI-05 | Next candidate implements native Status A/B switch, two persisted selectable slots, six built-ins and custom profiles. Saving the pair does not apply tuning; slider position follows the confirmed profile, with safe outside-pair/pending/readonly behavior. Stability / Gaming retains ID gaming. Preserve independent router/VPS snapshots, safe save/delete, Keep/Revert, timeout/reboot recovery, permissions and availability checks. Three illustrative ICMP/TCP/UDP diagrams distinguish distributed data from identical copies and add visual density for Performance; old modes depict Glorytun. Single-path identifiers cycle A/B/C/D independently; No tunnel depicts TCP to VPS and UDP/ICMP via master to Internet. Preview controls never apply profiles, support pause/reduced motion and survive polling. | C/`omr-profiles/README.md`, C/`luci-app-omr-profiles/htdocs/luci-static/resources/omr/profiles.js`, V/`admin/omr_profiles.py` | T16, T19 |
 | 3K-UI-06 | Candidate login bootstrap retries only transient missing luci/getFeatures objects, shares one probe, validates feature cache and rejects permanent/auth/HTTP/malformed failures. Handle LuCI stack-bearing messages and translated ubus status 4. Do not start authenticated OMR navigation on login/logout. Preserve anonymous read ACL and all authentication checks; version patched luci-base and runtime revision to invalidate old asset caches. | B/`patches/luci-features-startup-retry.patch`, B/`apply-luci-startup-fix.py`, B/`validation/luci`, C/`luci-theme-openmptcprouter/luasrc/view/themes/openmptcprouter/footer.htm` | T05, T20 |
+| 3K-UI-07 | VPS dashboard candidate is informational and admin-authenticated, shares the existing API HTTPS listener, and preserves old client API behavior. Persist bounded sanitized observations independently of browser polling; distinguish configured settings, actual session evidence, VPS kernel defaults, unknown values, stale snapshots and RTH requested/effective gates. Never expose keys, passwords, private profiles or write controls. | V/`admin/omr_dashboard.py`, V/`admin/dashboard/`, V/`docs/VPS-DASHBOARD.md`, V/`tests/test_dashboard_telemetry.py`, V/`admin/test/test_dashboard_api.py` | T24 |
 
 ## Regression procedures
 
@@ -327,6 +328,19 @@ firewall/routes. This does not replace clean-installer or physical/client-device
 acceptance, and does not imply that the published 0.1164 archive contains the
 new command. The existing running server MTU may be persisted by SaveConfig on
 stop; do not claim a live MTU migration from merely inserting a config default.
+
+### T24 — informational VPS dashboard candidate
+
+Run the dashboard telemetry/API tests plus the complete VPS regression suite.
+Check anonymous/non-admin denial, disabled identities, preserved homepage and
+router API behavior, contact-versus-session evidence, secret allowlists,
+bounded history, stale/unavailable snapshots, RTH gate drift and ambiguous
+socket ownership. Inspect the built API package's module/static assets/unit.
+Test browser login/logout, read-only controls, parameter search, peer/history
+views, stale/error recovery and mobile layout. Previews use synthetic data
+and are not installed-VPS evidence. Before stable publication, install on a
+test VPS and compare actual sessions, router contacts and RTH state without
+changing customer routing or credentials.
 
 ## Historical evidence and known limits
 
